@@ -26,8 +26,11 @@ jobs:
       - name: Set image name
         id: meta
         run: |
-          IMAGE="ghcr.io/${{ github.repository_owner }}/tforai:latest"
-          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+          IMAGE_BASE="ghcr.io/${{ github.repository_owner }}/tforai"
+          IMAGE_SHA="${IMAGE_BASE}:${{ github.sha }}"
+          IMAGE_LATEST="${IMAGE_BASE}:latest"
+          echo "image=$IMAGE_SHA" >> $GITHUB_OUTPUT
+          echo "image_latest=$IMAGE_LATEST" >> $GITHUB_OUTPUT
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -42,7 +45,9 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.image }}
+          tags: |
+            ${{ steps.meta.outputs.image }}
+            ${{ steps.meta.outputs.image_latest }}
           build-args: |
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
           cache-from: type=gha
