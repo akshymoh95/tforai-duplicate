@@ -21,7 +21,7 @@ RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 COPY web/package.json /app/web/package.json
 COPY web/package-lock.json /app/web/package-lock.json
 WORKDIR /app/web
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy rest of repo
 WORKDIR /app
