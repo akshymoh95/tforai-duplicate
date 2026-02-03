@@ -1,0 +1,2351 @@
+{
+  "entities": [
+    {
+      "name": "dt_unit_config",
+      "description": "Machine/unit configuration (dimension). Grain: pu_id. Holds plant, machine label, OEM type, production variable and category mappings, and rate unit conversion settings.",
+      "database": "RAI",
+      "schema": "RAI",
+      "table": "T_UNIT_CONFIG",
+      "fields": [
+        {
+          "name": "pu_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PU_ID",
+          "description": "Machine/unit id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "pl_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PL_ID",
+          "description": "Plant id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "pu_desc",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "PU_DESC",
+          "description": "Machine label/description.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "oem_type",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "OEM_TYPE",
+          "description": "OEM / output type id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "production_var_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PRODUCTION_VAR_ID",
+          "description": "Production variable id used for execution/throughput normalization.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "setup_waste_ct",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "SETUP_WASTE_CT",
+          "description": "Setup waste category id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "performance_dt_cat",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PERFORMANCE_DT_CAT",
+          "description": "Performance downtime category id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "production_rate_timeunits_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PRODUCTION_RATE_TIMEUNITS_ID",
+          "description": "Production rate time units id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "rateunit_raw",
+          "dtype": "NUMBER(38,0)",
+          "role": "metric",
+          "expr": "RATEUNIT_RAW",
+          "description": "Raw rate unit value (as stored).",
+          "derived": false,
+          "default_agg": "last",
+          "depends_on": []
+        },
+        {
+          "name": "rateunit_value",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "RATEUNIT_VALUE",
+          "description": "Rate unit conversion value.",
+          "derived": false,
+          "default_agg": "last",
+          "depends_on": []
+        }
+      ],
+      "join_keys": [
+        "pu_id",
+        "pl_id",
+        "oem_type",
+        "production_var_id",
+        "setup_waste_ct",
+        "performance_dt_cat",
+        "production_rate_timeunits_id"
+      ],
+      "default_metric": "",
+      "entity_type": "machine",
+      "applicable_reasoners": [],
+      "applicable_derived_metrics": []
+    },
+    {
+      "name": "dt_operations",
+      "description": "Operation windows. Grain: start_id. Contains plan detail, machine, product and operation start/end timestamps.",
+      "database": "RAI",
+      "schema": "RAI",
+      "table": "T_OPERATIONS",
+      "fields": [
+        {
+          "name": "start_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "START_ID",
+          "description": "Operation start identifier.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ppd_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PPD_ID",
+          "description": "Production plan detail id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "pu_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PU_ID",
+          "description": "Machine/unit id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "prod_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PROD_ID",
+          "description": "Product id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "targetquantity",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "TARGETQUANTITY",
+          "description": "Target quantity for the operation window.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "operation_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "OPERATION_START",
+          "description": "Operation start timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "operation_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "OPERATION_END",
+          "description": "Operation end timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "is_open",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "IS_OPEN",
+          "description": "Whether operation is open.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        }
+      ],
+      "join_keys": [
+        "start_id",
+        "ppd_id",
+        "pu_id",
+        "prod_id"
+      ],
+      "default_metric": "",
+      "entity_type": "operation",
+      "applicable_reasoners": [],
+      "applicable_derived_metrics": []
+    },
+    {
+      "name": "dt_execution_numeric",
+      "description": "Execution numeric results. Grain likely (test_id, var_id, result_on). Does not contain pu_id/prod_id; joins to operations/metrics are not defensible from provided columns alone.",
+      "database": "RAI",
+      "schema": "RAI",
+      "table": "T_EXECUTION_NUMERIC",
+      "fields": [
+        {
+          "name": "test_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "TEST_ID",
+          "description": "Execution test identifier.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "array_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ARRAY_ID",
+          "description": "Array identifier.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "canceled",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "CANCELED",
+          "description": "Canceled flag.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "comment_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "COMMENT_ID",
+          "description": "Comment identifier.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "entry_by1",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ENTRY_BY1",
+          "description": "Entry-by (numeric) field.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "entry_on",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "ENTRY_ON",
+          "description": "Entry timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "event_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "EVENT_ID",
+          "description": "Event identifier (meaning not confirmed from schema alone).",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "locked",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LOCKED",
+          "description": "Locked flag/value.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "result_raw",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "RESULT_RAW",
+          "description": "Raw result as text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "result_float",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "RESULT_FLOAT",
+          "description": "Result as float.",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "result_on",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "RESULT_ON",
+          "description": "Result timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "result_ts",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "RESULT_TS",
+          "description": "Result timestamp (duplicate/alternate).",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "second_user_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "SECOND_USER_ID",
+          "description": "Second user id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "signature_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "SIGNATURE_ID",
+          "description": "Signature id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "var_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "VAR_ID",
+          "description": "Variable id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "entry_by",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "ENTRY_BY",
+          "description": "Entry-by (string).",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        }
+      ],
+      "join_keys": [
+        "test_id",
+        "var_id",
+        "result_on"
+      ],
+      "default_metric": "result_float",
+      "entity_type": "execution_result",
+      "applicable_reasoners": [],
+      "applicable_derived_metrics": []
+    },
+    {
+      "name": "dt_timed_event_denorm",
+      "description": "Timed downtime events (denormalized). Grain: tedet_id. Contains machine, fault type (value/name), time window, effective duration, and reason hierarchy fields.",
+      "database": "RAI",
+      "schema": "RAI",
+      "table": "T_TIMED_EVENT_DENORM",
+      "fields": [
+        {
+          "name": "tedet_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "TEDET_ID",
+          "description": "Timed event detail id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "pu_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PU_ID",
+          "description": "Machine/unit id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "tefault_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "TEFAULT_ID",
+          "description": "Fault id (not stable cross-machine for recurrence).",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "testatus_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "TESTATUS_ID",
+          "description": "Event status id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "uptime",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "UPTIME",
+          "description": "Uptime metric if populated.",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "user_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "USER_ID",
+          "description": "User id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "work_order_number",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "WORK_ORDER_NUMBER",
+          "description": "Work order number.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "remarks",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REMARKS",
+          "description": "Remarks.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "createdon",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "CREATEDON",
+          "description": "Created timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "createdby",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "CREATEDBY",
+          "description": "Created by.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "user_code",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "USER_CODE",
+          "description": "User code.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "start_time",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "START_TIME",
+          "description": "Event start timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "end_time",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "END_TIME",
+          "description": "Event end timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "duration_minutes_raw",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "DURATION_MINUTES_RAW",
+          "description": "Raw duration in minutes.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "duration_minutes_eff",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "DURATION_MINUTES_EFF",
+          "description": "Effective duration in minutes.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "tefault_name",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "TEFAULT_NAME",
+          "description": "Fault name/label.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "tefault_value",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "TEFAULT_VALUE",
+          "description": "Fault value/code (preferred cross-machine key).",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ertd_id_from_fault",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ERTD_ID_FROM_FAULT",
+          "description": "Event reason tree data id from fault.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ertd_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ERTD_ID",
+          "description": "Event reason tree data id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level1_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL1_ID",
+          "description": "Reason level 1 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level2_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL2_ID",
+          "description": "Reason level 2 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level3_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL3_ID",
+          "description": "Reason level 3 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level4_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL4_ID",
+          "description": "Reason level 4 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason1",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON1",
+          "description": "Reason level 1 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason2",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON2",
+          "description": "Reason level 2 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason3",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON3",
+          "description": "Reason level 3 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason4",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON4",
+          "description": "Reason level 4 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "erc_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ERC_ID",
+          "description": "Event reason category id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "erc_desc",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "ERC_DESC",
+          "description": "Event reason category description.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "erc_is_null",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "ERC_IS_NULL",
+          "description": "Whether ERC fields are null.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "is_unplanned",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "",
+          "description": "Derived flag: ERC_DESC indicates unplanned downtime.",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "erc_desc"
+          ]
+        },
+        {
+          "name": "machines_affected",
+          "dtype": "NUMBER(38,0)",
+          "role": "metric",
+          "expr": "",
+          "description": "Helper metric: count_distinct(pu_id) when grouped by tefault_value.",
+          "derived": true,
+          "default_agg": "count_distinct",
+          "depends_on": [
+            "pu_id"
+          ]
+        }
+      ],
+      "join_keys": [
+        "tedet_id",
+        "pu_id",
+        "tefault_id",
+        "tefault_value",
+        "ertd_id",
+        "level1_id",
+        "erc_id"
+      ],
+      "default_metric": "duration_minutes_eff",
+      "entity_type": "downtime_event",
+      "applicable_reasoners": [
+        "recurring_downtime_events_across_machines",
+        "top_downtime_machines",
+        "top_unplanned_downtime_causes"
+      ],
+      "applicable_derived_metrics": [
+        "is_unplanned",
+        "machines_affected"
+      ]
+    },
+    {
+      "name": "dt_waste_event_denorm",
+      "description": "Waste event (denormalized) facts. Grain: wed_id. Contains machine, waste fault type, timestamps, amount, and reason fields.",
+      "database": "RAI",
+      "schema": "RAI",
+      "table": "T_WASTE_EVENT_DENORM",
+      "fields": [
+        {
+          "name": "wed_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "WED_ID",
+          "description": "Waste event detail id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "pu_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PU_ID",
+          "description": "Machine/unit id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "entry_on",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "ENTRY_ON",
+          "description": "Entry timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "wefault_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "WEFAULT_ID",
+          "description": "Waste fault id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "wet_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "WET_ID",
+          "description": "Waste event type id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "work_order_number",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "WORK_ORDER_NUMBER",
+          "description": "Work order number.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "amount",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "AMOUNT",
+          "description": "Waste amount.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "createdon",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "CREATEDON",
+          "description": "Created timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "createdby",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "CREATEDBY",
+          "description": "Created by.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "wefault_name",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "WEFAULT_NAME",
+          "description": "Waste fault name/label.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "wefault_value",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "WEFAULT_VALUE",
+          "description": "Waste fault value/code (preferred cross-machine key).",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ertd_id_from_fault",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ERTD_ID_FROM_FAULT",
+          "description": "Event reason tree data id from fault.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ertd_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ERTD_ID",
+          "description": "Event reason tree data id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level1_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL1_ID",
+          "description": "Reason level 1 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level2_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL2_ID",
+          "description": "Reason level 2 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level3_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL3_ID",
+          "description": "Reason level 3 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level4_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL4_ID",
+          "description": "Reason level 4 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason1",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON1",
+          "description": "Reason level 1 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason2",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON2",
+          "description": "Reason level 2 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason3",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON3",
+          "description": "Reason level 3 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason4",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON4",
+          "description": "Reason level 4 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "erc_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ERC_ID",
+          "description": "Event reason category id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "erc_desc",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "ERC_DESC",
+          "description": "Event reason category description.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "erc_is_null",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "ERC_IS_NULL",
+          "description": "Whether ERC fields are null.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "is_setup_waste",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "",
+          "description": "Derived flag: setup waste based on WEFAULT_NAME.",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "wefault_name"
+          ]
+        },
+        {
+          "name": "is_operational_waste",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "",
+          "description": "Derived flag: operational waste based on WEFAULT_NAME.",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "wefault_name"
+          ]
+        }
+      ],
+      "join_keys": [
+        "wed_id",
+        "pu_id",
+        "wefault_id",
+        "wefault_value",
+        "ertd_id",
+        "level1_id",
+        "erc_id"
+      ],
+      "default_metric": "amount",
+      "entity_type": "waste_event",
+      "applicable_reasoners": [
+        "waste_by_machine",
+        "setup_waste_amount"
+      ],
+      "applicable_derived_metrics": [
+        "is_setup_waste",
+        "is_operational_waste"
+      ]
+    },
+    {
+      "name": "dt_target_speed",
+      "description": "Target speed reference by machine+product with effective dating. Equi-join uses (pu_id, prod_id). Correct validity requires effective_date/expiration_date filtering vs an operation timestamp.",
+      "database": "RAI",
+      "schema": "RAI",
+      "table": "T_TARGET_SPEED",
+      "fields": [
+        {
+          "name": "pu_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PU_ID",
+          "description": "Machine/unit id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "prod_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PROD_ID",
+          "description": "Product id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "effective_date",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "EFFECTIVE_DATE",
+          "description": "Effective timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "expiration_date",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "EXPIRATION_DATE",
+          "description": "Expiration timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "target_speed",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "TARGET_SPEED",
+          "description": "Target speed.",
+          "derived": false,
+          "default_agg": "last",
+          "depends_on": []
+        }
+      ],
+      "join_keys": [
+        "pu_id",
+        "prod_id"
+      ],
+      "default_metric": "target_speed",
+      "entity_type": "target_speed",
+      "applicable_reasoners": [],
+      "applicable_derived_metrics": []
+    },
+    {
+      "name": "dt_operation_metrics",
+      "description": "Operation-level metrics (fact) keyed by start_id. Combines operation window, unit config attributes, throughput, downtime, waste, and quality signals. Suitable primary fact for OEE analytics.",
+      "database": "RAI",
+      "schema": "RAI",
+      "table": "T_OPERATION_METRICS",
+      "fields": [
+        {
+          "name": "start_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "START_ID",
+          "description": "Operation start identifier.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ppd_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PPD_ID",
+          "description": "Production plan detail id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "pu_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PU_ID",
+          "description": "Machine/unit id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "prod_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PROD_ID",
+          "description": "Product id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "oem_type",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "OEM_TYPE",
+          "description": "OEM/output type id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "production_var_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PRODUCTION_VAR_ID",
+          "description": "Production variable id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "setup_waste_ct",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "SETUP_WASTE_CT",
+          "description": "Setup waste category id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "performance_dt_cat",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PERFORMANCE_DT_CAT",
+          "description": "Performance downtime category id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "rateunit_raw",
+          "dtype": "NUMBER(38,0)",
+          "role": "metric",
+          "expr": "RATEUNIT_RAW",
+          "description": "Raw rate unit value.",
+          "derived": false,
+          "default_agg": "last",
+          "depends_on": []
+        },
+        {
+          "name": "rateunit_value",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "RATEUNIT_VALUE",
+          "description": "Rate unit conversion value.",
+          "derived": false,
+          "default_agg": "last",
+          "depends_on": []
+        },
+        {
+          "name": "operation_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "OPERATION_START",
+          "description": "Operation start timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "operation_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "OPERATION_END",
+          "description": "Operation end timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ideal_time_seconds",
+          "dtype": "NUMBER(18,0)",
+          "role": "metric",
+          "expr": "IDEAL_TIME_SECONDS",
+          "description": "Ideal time (seconds).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "dt_minutes",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "DT_MINUTES",
+          "description": "Downtime (minutes).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "dt_seconds",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "DT_SECONDS",
+          "description": "Downtime (seconds).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "actual_run_seconds",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "ACTUAL_RUN_SECONDS",
+          "description": "Actual run time (seconds).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "target_speed",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "TARGET_SPEED",
+          "description": "Target speed used for the operation (may be null).",
+          "derived": false,
+          "default_agg": "last",
+          "depends_on": []
+        },
+        {
+          "name": "waste_excl_setup_raw",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "WASTE_EXCL_SETUP_RAW",
+          "description": "Waste excl setup (raw).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "waste_cf",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "WASTE_CF",
+          "description": "Waste conversion factor.",
+          "derived": false,
+          "default_agg": "last",
+          "depends_on": []
+        },
+        {
+          "name": "waste_excl_setup_conv",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "WASTE_EXCL_SETUP_CONV",
+          "description": "Waste excl setup (converted).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "actual_produce_exec",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "ACTUAL_PRODUCE_EXEC",
+          "description": "Actual produced value (from execution).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "actual_produce_adjusted",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "ACTUAL_PRODUCE_ADJUSTED",
+          "description": "Actual produce adjusted.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "ideal_produce",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "IDEAL_PRODUCE",
+          "description": "Ideal produce.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "performance_pct",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "PERFORMANCE_PCT",
+          "description": "Performance percentage.",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "gross_produce",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "GROSS_PRODUCE",
+          "description": "Gross produce.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "net_produce",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "NET_PRODUCE",
+          "description": "Net produce.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "quality_rate_pct",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "QUALITY_RATE_PCT",
+          "description": "Quality rate percentage.",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "availability_pct",
+          "dtype": "DOUBLE",
+          "role": "metric",
+          "expr": "",
+          "description": "Availability % = (actual_run_seconds / ideal_time_seconds) * 100 with zero-division guard.",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "actual_run_seconds",
+            "ideal_time_seconds"
+          ]
+        },
+        {
+          "name": "availability_loss_pct",
+          "dtype": "DOUBLE",
+          "role": "metric",
+          "expr": "",
+          "description": "Availability loss % = (dt_seconds / ideal_time_seconds) * 100 with zero-division guard.",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "dt_seconds",
+            "ideal_time_seconds"
+          ]
+        },
+        {
+          "name": "oee_pct",
+          "dtype": "DOUBLE",
+          "role": "metric",
+          "expr": "",
+          "description": "OEE % = ((availability_pct/100) * (performance_pct/100) * (quality_rate_pct/100)) * 100.",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "availability_pct",
+            "performance_pct",
+            "quality_rate_pct"
+          ]
+        },
+        {
+          "name": "yield_pct",
+          "dtype": "DOUBLE",
+          "role": "metric",
+          "expr": "",
+          "description": "Yield % = (net_produce / gross_produce) * 100 with zero-division guard.",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "net_produce",
+            "gross_produce"
+          ]
+        },
+        {
+          "name": "produce_per_second",
+          "dtype": "DOUBLE",
+          "role": "metric",
+          "expr": "",
+          "description": "Produce per second = actual_produce_adjusted / actual_run_seconds with zero-division guard.",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "actual_produce_adjusted",
+            "actual_run_seconds"
+          ]
+        },
+        {
+          "name": "oee_efficiency_flag",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "",
+          "description": "Flag computed when oee_pct < 60 (threshold can be tuned).",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "oee_pct"
+          ]
+        }
+      ],
+      "join_keys": [
+        "start_id",
+        "ppd_id",
+        "pu_id",
+        "prod_id"
+      ],
+      "default_metric": "dt_minutes",
+      "entity_type": "operation_metrics",
+      "applicable_reasoners": [
+        "availability_trend_by_machine",
+        "oee_by_machine",
+        "downtime_by_product"
+      ],
+      "applicable_derived_metrics": [
+        "availability_pct",
+        "availability_loss_pct",
+        "oee_pct",
+        "yield_pct",
+        "produce_per_second",
+        "oee_efficiency_flag"
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "name": "dt_operations_to_dt_operation_metrics__by__start_id",
+      "from_entity": "dt_operations",
+      "to_entity": "dt_operation_metrics",
+      "description": "Operation to operation_metrics by start_id (same operation window).",
+      "join_on": [
+        [
+          "start_id",
+          "start_id"
+        ]
+      ]
+    },
+    {
+      "name": "dt_operation_metrics_to_dt_target_speed__by__pu_id_prod_id",
+      "from_entity": "dt_operation_metrics",
+      "to_entity": "dt_target_speed",
+      "description": "Reverse traversal of target speed candidates from operation_metrics by (pu_id, prod_id). Correctness still requires effective_date/expiration_date filtering vs operation_start in the query.",
+      "join_on": [
+        ["pu_id", "pu_id"],
+        ["prod_id", "prod_id"]
+      ]
+    },
+
+    {
+      "name": "dt_operation_metrics_to_dt_unit_config__by__pu_id",
+      "from_entity": "dt_operation_metrics",
+      "to_entity": "dt_unit_config",
+      "description": "Operation_metrics to unit_config by pu_id (machine attributes).",
+      "join_on": [
+        [
+          "pu_id",
+          "pu_id"
+        ]
+      ]
+    },
+    {
+      "name": "dt_operations_to_dt_unit_config__by__pu_id",
+      "from_entity": "dt_operations",
+      "to_entity": "dt_unit_config",
+      "description": "Operations to unit_config by pu_id (machine attributes).",
+      "join_on": [
+        [
+          "pu_id",
+          "pu_id"
+        ]
+      ]
+    },
+    {
+      "name": "dt_timed_event_denorm_to_dt_unit_config__by__pu_id",
+      "from_entity": "dt_timed_event_denorm",
+      "to_entity": "dt_unit_config",
+      "description": "Timed downtime events to unit_config by pu_id (machine attributes).",
+      "join_on": [
+        [
+          "pu_id",
+          "pu_id"
+        ]
+      ]
+    },
+    {
+      "name": "dt_waste_event_denorm_to_dt_unit_config__by__pu_id",
+      "from_entity": "dt_waste_event_denorm",
+      "to_entity": "dt_unit_config",
+      "description": "Waste events to unit_config by pu_id (machine attributes).",
+      "join_on": [
+        [
+          "pu_id",
+          "pu_id"
+        ]
+      ]
+    },
+    {
+      "name": "dt_target_speed_to_dt_unit_config__by__pu_id",
+      "from_entity": "dt_target_speed",
+      "to_entity": "dt_unit_config",
+      "description": "Target speed rows to unit_config by pu_id (machine attributes).",
+      "join_on": [
+        [
+          "pu_id",
+          "pu_id"
+        ]
+      ]
+    },
+    {
+      "name": "dt_target_speed_to_dt_operation_metrics__by__pu_id_prod_id",
+      "from_entity": "dt_target_speed",
+      "to_entity": "dt_operation_metrics",
+      "description": "Target speed to operation_metrics by (pu_id, prod_id). Correctness requires effective/expiration date filtering vs operation_start.",
+      "join_on": [
+        [
+          "pu_id",
+          "pu_id"
+        ],
+        [
+          "prod_id",
+          "prod_id"
+        ]
+      ]
+    },
+    {
+      "name": "dt_target_speed_to_dt_operations__by__pu_id_prod_id",
+      "from_entity": "dt_target_speed",
+      "to_entity": "dt_operations",
+      "description": "Target speed to operations by (pu_id, prod_id). Correctness requires effective/expiration date filtering vs operation_start.",
+      "join_on": [
+        [
+          "pu_id",
+          "pu_id"
+        ],
+        [
+          "prod_id",
+          "prod_id"
+        ]
+      ]
+    }
+  ],
+  "reasoners": [
+    {
+      "id": "recurring_downtime_events_across_machines",
+      "name": "Recurring downtime events across machines",
+      "description": "Groups downtime by tefault_value and counts distinct machines (pu_id) within a time window.",
+      "type": "native_query",
+      "entity_type": "downtime_event",
+      "outputs": [
+        "fault_value",
+        "fault_name",
+        "machines_affected",
+        "event_count",
+        "total_duration_minutes"
+      ],
+      "signals": [],
+      "params": [
+        {
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "dtype": "NUMBER(38,0)",
+          "required": false
+        }
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
+    },
+    {
+      "id": "top_downtime_machines",
+      "name": "Top downtime machines",
+      "description": "Ranks machines by total downtime minutes within a time window.",
+      "type": "native_query",
+      "entity_type": "downtime_event",
+      "outputs": [
+        "pu_id",
+        "total_downtime_minutes",
+        "event_count"
+      ],
+      "signals": [],
+      "params": [
+        {
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "dtype": "NUMBER(38,0)",
+          "required": false
+        }
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
+    },
+    {
+      "id": "top_unplanned_downtime_causes",
+      "name": "Top unplanned downtime causes",
+      "description": "Ranks unplanned downtime fault types by total duration within a window (based on ERC_DESC flag).",
+      "type": "native_query",
+      "entity_type": "downtime_event",
+      "outputs": [
+        "fault_value",
+        "fault_name",
+        "machines_affected",
+        "event_count",
+        "total_duration_minutes"
+      ],
+      "signals": [
+        "is_unplanned"
+      ],
+      "params": [
+        {
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "dtype": "NUMBER(38,0)",
+          "required": false
+        }
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
+    },
+    {
+      "id": "availability_trend_by_machine",
+      "name": "Availability trend by machine",
+      "description": "Returns operation-level availability signals within a window for trend analysis using operation_metrics.",
+      "type": "native_query",
+      "entity_type": "operation_metrics",
+      "outputs": [
+        "pu_id",
+        "operation_start",
+        "operation_end",
+        "availability_pct",
+        "availability_loss_pct",
+        "dt_minutes",
+        "performance_pct",
+        "quality_rate_pct",
+        "oee_pct"
+      ],
+      "signals": [],
+      "params": [
+        {
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "pu_id",
+          "dtype": "NUMBER(38,0)",
+          "required": false
+        }
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
+    },
+    {
+      "id": "oee_by_machine",
+      "name": "OEE by machine",
+      "description": "Ranks machines by avg OEE and total downtime within a window using operation_metrics.",
+      "type": "native_query",
+      "entity_type": "operation_metrics",
+      "outputs": [
+        "pu_id",
+        "avg_oee_pct",
+        "total_dt_minutes",
+        "avg_availability_pct"
+      ],
+      "signals": [],
+      "params": [
+        {
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "dtype": "NUMBER(38,0)",
+          "required": false
+        }
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
+    },
+    {
+      "id": "downtime_by_product",
+      "name": "Downtime by product",
+      "description": "Ranks products by downtime minutes within a window using operation_metrics.",
+      "type": "native_query",
+      "entity_type": "operation_metrics",
+      "outputs": [
+        "prod_id",
+        "total_dt_minutes",
+        "avg_oee_pct"
+      ],
+      "signals": [],
+      "params": [
+        {
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "dtype": "NUMBER(38,0)",
+          "required": false
+        }
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
+    },
+    {
+      "id": "waste_by_machine",
+      "name": "Waste by machine",
+      "description": "Ranks machines by total waste amount within a time window using waste_event_denorm.",
+      "type": "native_query",
+      "entity_type": "waste_event",
+      "outputs": [
+        "pu_id",
+        "total_waste_amount",
+        "event_count"
+      ],
+      "signals": [],
+      "params": [
+        {
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "dtype": "NUMBER(38,0)",
+          "required": false
+        }
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
+    },
+    {
+      "id": "setup_waste_amount",
+      "name": "Setup waste amount",
+      "description": "Ranks machines by total setup waste amount within a time window using is_setup_waste derived flag.",
+      "type": "native_query",
+      "entity_type": "waste_event",
+      "outputs": [
+        "pu_id",
+        "setup_waste_amount",
+        "event_count"
+      ],
+      "signals": [
+        "is_setup_waste"
+      ],
+      "params": [
+        {
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "dtype": "NUMBER(38,0)",
+          "required": false
+        }
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
+    }
+  ],
+  "derived_rel_rules": [
+    {
+      "entity": "dt_timed_event_denorm",
+      "field": "is_unplanned",
+      "vars": {},
+      "rules": [
+        {
+          "when": "ilike(erc_desc, '%unplanned%')",
+          "expr": "true"
+        },
+        {
+          "when": "true",
+          "expr": "false"
+        }
+      ],
+      "description": "Unplanned downtime flag inferred from ERC_DESC containing 'unplanned'."
+    },
+    {
+      "entity": "dt_timed_event_denorm",
+      "field": "machines_affected",
+      "vars": {},
+      "rules": [
+        {
+          "when": "true",
+          "expr": "pu_id"
+        }
+      ],
+      "description": "Helper for count_distinct(pu_id) when grouped by tefault_value."
+    },
+    {
+      "entity": "dt_waste_event_denorm",
+      "field": "is_setup_waste",
+      "vars": {},
+      "rules": [
+        {
+          "when": "ilike(wefault_name, '%make ready%')",
+          "expr": "true"
+        },
+        {
+          "when": "ilike(wefault_name, '%setup%')",
+          "expr": "true"
+        },
+        {
+          "when": "true",
+          "expr": "false"
+        }
+      ],
+      "description": "Setup waste flag inferred from WEFAULT_NAME."
+    },
+    {
+      "entity": "dt_waste_event_denorm",
+      "field": "is_operational_waste",
+      "vars": {},
+      "rules": [
+        {
+          "when": "ilike(wefault_name, '%operational%')",
+          "expr": "true"
+        },
+        {
+          "when": "true",
+          "expr": "false"
+        }
+      ],
+      "description": "Operational waste flag inferred from WEFAULT_NAME."
+    },
+    {
+      "entity": "dt_operation_metrics",
+      "field": "availability_pct",
+      "vars": {},
+      "rules": [
+        {
+          "when": "(ideal_time_seconds > 0)",
+          "expr": "(actual_run_seconds / ideal_time_seconds) * 100.0"
+        },
+        {
+          "when": "true",
+          "expr": "0.0"
+        }
+      ],
+      "description": "Availability percentage with zero-division guard."
+    },
+    {
+      "entity": "dt_operation_metrics",
+      "field": "availability_loss_pct",
+      "vars": {},
+      "rules": [
+        {
+          "when": "(ideal_time_seconds > 0)",
+          "expr": "(dt_seconds / ideal_time_seconds) * 100.0"
+        },
+        {
+          "when": "true",
+          "expr": "0.0"
+        }
+      ],
+      "description": "Downtime loss percentage with zero-division guard."
+    },
+    {
+      "entity": "dt_operation_metrics",
+      "field": "oee_pct",
+      "vars": {},
+      "rules": [
+        {
+          "when": "true",
+          "expr": "((availability_pct / 100.0) * (performance_pct / 100.0) * (quality_rate_pct / 100.0)) * 100.0"
+        }
+      ],
+      "description": "OEE computed from availability/performance/quality percentages."
+    },
+    {
+      "entity": "dt_operation_metrics",
+      "field": "yield_pct",
+      "vars": {},
+      "rules": [
+        {
+          "when": "(gross_produce > 0)",
+          "expr": "(net_produce / gross_produce) * 100.0"
+        },
+        {
+          "when": "true",
+          "expr": "0.0"
+        }
+      ],
+      "description": "Yield percentage with zero-division guard."
+    },
+    {
+      "entity": "dt_operation_metrics",
+      "field": "produce_per_second",
+      "vars": {},
+      "rules": [
+        {
+          "when": "(actual_run_seconds > 0)",
+          "expr": "actual_produce_adjusted / actual_run_seconds"
+        },
+        {
+          "when": "true",
+          "expr": "0.0"
+        }
+      ],
+      "description": "Produce per second with zero-division guard."
+    },
+    {
+      "entity": "dt_operation_metrics",
+      "field": "oee_efficiency_flag",
+      "vars": {},
+      "rules": [
+        {
+          "when": "(oee_pct < 60.0)",
+          "expr": "true"
+        },
+        {
+          "when": "true",
+          "expr": "false"
+        }
+      ],
+      "description": "Low OEE flag using threshold 60%."
+    }
+  ],
+  "prompt_templates": {},
+  "analysis_config": {},
+  "config": {},
+  "kg": {
+    "nodes": [
+      {
+        "entity": "dt_unit_config",
+        "node_type": "machine",
+        "key_field": "pu_id",
+        "label_field": "pu_desc",
+        "properties": [
+          "pl_id",
+          "oem_type",
+          "production_var_id",
+          "setup_waste_ct",
+          "performance_dt_cat",
+          "production_rate_timeunits_id",
+          "rateunit_raw",
+          "rateunit_value"
+        ]
+      },
+      {
+        "entity": "dt_operations",
+        "node_type": "operation",
+        "key_field": "start_id",
+        "label_field": "operation_start",
+        "properties": [
+          "ppd_id",
+          "pu_id",
+          "prod_id",
+          "targetquantity",
+          "operation_end",
+          "is_open"
+        ]
+      },
+      {
+        "entity": "dt_operation_metrics",
+        "node_type": "operation_metrics",
+        "key_field": "start_id",
+        "label_field": "operation_start",
+        "properties": [
+          "ppd_id",
+          "pu_id",
+          "prod_id",
+          "ideal_time_seconds",
+          "dt_minutes",
+          "dt_seconds",
+          "actual_run_seconds",
+          "target_speed",
+          "performance_pct",
+          "quality_rate_pct",
+          "availability_pct",
+          "oee_pct"
+        ]
+      },
+      {
+        "entity": "dt_timed_event_denorm",
+        "node_type": "downtime_event",
+        "key_field": "tedet_id",
+        "label_field": "tefault_name",
+        "properties": [
+          "pu_id",
+          "tefault_value",
+          "start_time",
+          "end_time",
+          "duration_minutes_eff",
+          "erc_desc",
+          "reason1",
+          "reason2",
+          "is_unplanned"
+        ]
+      },
+      {
+        "entity": "dt_waste_event_denorm",
+        "node_type": "waste_event",
+        "key_field": "wed_id",
+        "label_field": "wefault_name",
+        "properties": [
+          "pu_id",
+          "wefault_value",
+          "entry_on",
+          "amount",
+          "erc_desc",
+          "reason1",
+          "is_setup_waste",
+          "is_operational_waste"
+        ]
+      },
+      {
+        "entity": "dt_target_speed",
+        "node_type": "target_speed",
+        "key_field": "pu_id",
+        "label_field": "effective_date",
+        "properties": [
+          "prod_id",
+          "expiration_date",
+          "target_speed"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "name": "dt_operations_to_dt_operation_metrics__by__start_id",
+        "from_entity": "dt_operations",
+        "to_entity": "dt_operation_metrics",
+        "description": "Operation has_metrics (1:1 by start_id).",
+        "join_on": [
+          [
+            "start_id",
+            "start_id"
+          ]
+        ],
+        "edge_type": "rel"
+      },
+      {
+        "name": "dt_operation_metrics_to_dt_unit_config__by__pu_id",
+        "from_entity": "dt_operation_metrics",
+        "to_entity": "dt_unit_config",
+        "description": "Operation_metrics occurs_on machine (pu_id).",
+        "join_on": [
+          [
+            "pu_id",
+            "pu_id"
+          ]
+        ],
+        "edge_type": "rel"
+      },
+      {
+        "name": "dt_operations_to_dt_unit_config__by__pu_id",
+        "from_entity": "dt_operations",
+        "to_entity": "dt_unit_config",
+        "description": "Operation occurs_on machine (pu_id).",
+        "join_on": [
+          [
+            "pu_id",
+            "pu_id"
+          ]
+        ],
+        "edge_type": "rel"
+      },
+      {
+        "name": "dt_timed_event_denorm_to_dt_unit_config__by__pu_id",
+        "from_entity": "dt_timed_event_denorm",
+        "to_entity": "dt_unit_config",
+        "description": "Downtime_event occurs_on machine (pu_id).",
+        "join_on": [
+          [
+            "pu_id",
+            "pu_id"
+          ]
+        ],
+        "edge_type": "rel"
+      },
+      {
+        "name": "dt_waste_event_denorm_to_dt_unit_config__by__pu_id",
+        "from_entity": "dt_waste_event_denorm",
+        "to_entity": "dt_unit_config",
+        "description": "Waste_event occurs_on machine (pu_id).",
+        "join_on": [
+          [
+            "pu_id",
+            "pu_id"
+          ]
+        ],
+        "edge_type": "rel"
+      },
+      {
+        "name": "dt_target_speed_to_dt_unit_config__by__pu_id",
+        "from_entity": "dt_target_speed",
+        "to_entity": "dt_unit_config",
+        "description": "Target_speed defined_for machine (pu_id).",
+        "join_on": [
+          [
+            "pu_id",
+            "pu_id"
+          ]
+        ],
+        "edge_type": "rel"
+      },
+      {
+        "name": "dt_target_speed_to_dt_operation_metrics__by__pu_id_prod_id",
+        "from_entity": "dt_target_speed",
+        "to_entity": "dt_operation_metrics",
+        "description": "Target_speed candidate_for operation_metrics (pu_id, prod_id). Temporal validity must be applied in queries.",
+        "join_on": [
+          [
+            "pu_id",
+            "pu_id"
+          ],
+          [
+            "prod_id",
+            "prod_id"
+          ]
+        ],
+        "edge_type": "rel"
+      }
+    ],
+    "graphs": [
+      {
+        "id": "machine_operations_graph",
+        "name": "Machine \u2194 Operations \u2194 Metrics",
+        "description": "Safe core operational graph: machines, operations and operation_metrics via pu_id/start_id joins.",
+        "directed": true,
+        "weighted": false,
+        "nodes": [
+          {
+            "entity": "dt_unit_config"
+          },
+          {
+            "entity": "dt_operations"
+          },
+          {
+            "entity": "dt_operation_metrics"
+          }
+        ],
+        "edges": [
+          {
+            "from_entity": "dt_operations",
+            "name": "dt_operations_to_dt_operation_metrics__by__start_id"
+          },
+          {
+            "from_entity": "dt_operation_metrics",
+            "name": "dt_operation_metrics_to_dt_unit_config__by__pu_id"
+          },
+          {
+            "from_entity": "dt_operations",
+            "name": "dt_operations_to_dt_unit_config__by__pu_id"
+          }
+        ]
+      },
+      {
+        "id": "downtime_graph",
+        "name": "Downtime events \u2194 Machines",
+        "description": "Safe downtime graph: timed_event_denorm joined to machines via pu_id only (recurrence via tefault_value).",
+        "directed": true,
+        "weighted": false,
+        "nodes": [
+          {
+            "entity": "dt_timed_event_denorm"
+          },
+          {
+            "entity": "dt_unit_config"
+          }
+        ],
+        "edges": [
+          {
+            "from_entity": "dt_timed_event_denorm",
+            "name": "dt_timed_event_denorm_to_dt_unit_config__by__pu_id"
+          }
+        ]
+      },
+      {
+        "id": "waste_graph",
+        "name": "Waste events \u2194 Machines",
+        "description": "Safe waste graph: waste_event_denorm joined to machines via pu_id only.",
+        "directed": true,
+        "weighted": false,
+        "nodes": [
+          {
+            "entity": "dt_waste_event_denorm"
+          },
+          {
+            "entity": "dt_unit_config"
+          }
+        ],
+        "edges": [
+          {
+            "from_entity": "dt_waste_event_denorm",
+            "name": "dt_waste_event_denorm_to_dt_unit_config__by__pu_id"
+          }
+        ]
+      },
+      {
+        "id": "target_speed_graph",
+        "name": "Target speed \u2194 Machine \u2194 Operation metrics",
+        "description": "Target speed graph: includes candidate equi-join edges; validity must be constrained by effective/expiration dates in queries.",
+        "directed": true,
+        "weighted": false,
+        "nodes": [
+          {
+            "entity": "dt_target_speed"
+          },
+          {
+            "entity": "dt_unit_config"
+          },
+          {
+            "entity": "dt_operation_metrics"
+          }
+        ],
+        "edges": [
+          {
+            "from_entity": "dt_target_speed",
+            "name": "dt_target_speed_to_dt_unit_config__by__pu_id"
+          },
+          {
+            "from_entity": "dt_target_speed",
+            "name": "dt_target_speed_to_dt_operation_metrics__by__pu_id_prod_id"
+          }
+        ]
+      }
+    ]
+  }
+}

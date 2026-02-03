@@ -1,0 +1,54 @@
+name: deploy-web
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "web/**"
+      - ".github/workflows/deploy-web.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build Next.js
+        run: |
+          set -e
+          cd web
+          npm ci
+          npm run build
+          npm prune --production
+
+      - name: Package Web
+        run: |
+          set -e
+          mkdir -p package
+          cp -r web/.next package/.next
+          if [ -d "web/public" ]; then cp -r web/public package/public; fi
+          cp web/package.json package/
+          if [ -f "web/package-lock.json" ]; then cp web/package-lock.json package/; fi
+          if [ -f "web/next.config.js" ]; then cp web/next.config.js package/; fi
+          cp -r web/node_modules package/node_modules
+          (cd package && zip -r ../web.zip .)
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy Web App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME_WEB }}
+          package: web.zip

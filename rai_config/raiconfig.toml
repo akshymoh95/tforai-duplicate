@@ -1,0 +1,15 @@
+active_profile = "RAITFOTEST"
+
+[profile.RAITFOTEST]
+platform = "snowflake"
+authenticator = "programmatic_access_token"
+role = "ACCOUNTADMIN"
+rai_app_name = "RELATIONALAI"
+token_file_path = "C:\\Users\\Akshay Mohan\\OneDrive\\Documents\\RAI\\.secrets\\snowflake_pat.txt"
+user = "akshay_mohan"
+account = "OBEIKAN-O3AI"
+warehouse = "TFO_CLONED_WH"
+engine = "TFO_DEMO"
+engine_size = "HIGHMEM_X64_M"
+use_direct_access = true
+data_freshness_mins = 0

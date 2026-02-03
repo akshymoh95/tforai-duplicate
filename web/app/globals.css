@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --shell-bg: #f5f7fb;
+  --shell-ink: #0f172a;
+  --shell-muted: #5b6676;
+  --shell-card: #ffffff;
+  --shell-card-strong: #ffffff;
+  --shell-border: #e5e9f0;
+  --shell-accent: #0a37c4;
+  --shell-accent-2: #1d4ed8;
+  --shell-accent-3: #0c4a6e;
+  --shell-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(1200px 600px at 20% 0%, #eef3ff 0%, transparent 55%),
+    radial-gradient(900px 700px at 85% 10%, #e7f0ff 0%, transparent 50%),
+    linear-gradient(160deg, #f5f7fb 0%, #f1f5fb 45%, #eef2f7 100%);
+  color: var(--shell-ink);
+  font-family: var(--font-body), sans-serif;
+}
+
+.bg-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(12px);
+  opacity: 0.3;
+  mix-blend-mode: normal;
+}
+
+.bg-orb--one {
+  animation: floatSlow 18s ease-in-out infinite;
+}
+
+.bg-orb--two {
+  animation: floatSlow 22s ease-in-out infinite reverse;
+}
+
+.bg-orb--three {
+  animation: drift 26s ease-in-out infinite;
+}
+
+.shimmer {
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.6), rgba(13, 71, 161, 0.12), rgba(255, 255, 255, 0.6));
+  background-size: 200% 200%;
+  animation: shimmer 2.8s ease-in-out infinite;
+}
+
+@keyframes floatSlow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -18px, 0);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(14px, -12px, 0) rotate(3deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #0a37c4 0%, #1d4ed8 100%);
+  border-radius: 999px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #1d4ed8 0%, #2563eb 100%);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-color: #0a37c4 rgba(255, 255, 255, 0.1);
+  scrollbar-width: thin;
+}
+
+/* Summary text improvements */
+.summary-content h2 {
+  @apply text-lg font-bold text-blue-900 mt-4 mb-3 border-b-2 border-blue-200 pb-2 first:mt-0;
+}
+
+.summary-content h3 {
+  @apply text-base font-semibold text-slate-800 mt-3 mb-2;
+}
+
+.summary-content p {
+  @apply text-slate-700 leading-relaxed mb-2;
+}
+
+.summary-content strong {
+  @apply font-bold text-slate-900;
+}
+
+.summary-content ul,
+.summary-content ol {
+  @apply ml-6 my-3 space-y-1;
+}
+
+.summary-content li {
+  @apply text-slate-700;
+}
