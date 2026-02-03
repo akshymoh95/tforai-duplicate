@@ -9,6 +9,10 @@ RUN apt-get update && apt-get install -y curl gnupg && \
 
 WORKDIR /app
 
+# Build-time API URL for Next.js
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
 # Copy API requirements first
 COPY backend/requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt
