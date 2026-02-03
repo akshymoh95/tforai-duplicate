@@ -16,9 +16,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
+        id: buildx
         uses: docker/setup-buildx-action@v3
         with:
           driver: docker-container
+          install: true
+          use: true
 
       - name: Set image name
         id: meta
@@ -36,6 +39,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
+          builder: ${{ steps.buildx.outputs.name }}
           context: .
           push: true
           tags: ${{ steps.meta.outputs.image }}
