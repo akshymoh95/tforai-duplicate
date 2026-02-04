@@ -2412,15 +2412,15 @@ def ask(req: AskRequest, async_mode: bool = Query(False, alias="async")) -> AskR
         def _worker():
             session = None
             set_request_id(request_id)
-              try:
-                  session = acquire_session()
-                  try:
-                      payload = run_orchestrate(session, question)
-                  except AuthExpiredError:
-                      session = _refresh_session_for_retry(session)
-                      payload = run_orchestrate(session, question)
-                  with _request_lock:
-                      _request_store[request_id]["status"] = "done"
+            try:
+                session = acquire_session()
+                try:
+                    payload = run_orchestrate(session, question)
+                except AuthExpiredError:
+                    session = _refresh_session_for_retry(session)
+                    payload = run_orchestrate(session, question)
+                with _request_lock:
+                    _request_store[request_id]["status"] = "done"
                     _request_store[request_id]["result"] = payload
                     _request_store[request_id]["stage"] = _ORCHESTRATION_STATE.get("requests", {}).get(request_id, {}).get("stage", "done")
                     _request_store[request_id]["thinking"] = _ORCHESTRATION_STATE.get("requests", {}).get(request_id, {}).get("thinking", "")
@@ -2455,17 +2455,17 @@ def ask(req: AskRequest, async_mode: bool = Query(False, alias="async")) -> AskR
         )
 
     session = acquire_session()
-      try:
-          # Start with planning stage (provisioning/initializing will be detected from orchestrator output)
-          _ORCHESTRATION_STATE['current_stage'] = 'planning'
-          _current_stage['current'] = 'planning'
-          set_request_id(request_id)
-          try:
-              payload = run_orchestrate(session, question)
-          except AuthExpiredError:
-              session = _refresh_session_for_retry(session)
-              payload = run_orchestrate(session, question)
-          _current_stage['current'] = _ORCHESTRATION_STATE.get('current_stage', 'done')
+    try:
+        # Start with planning stage (provisioning/initializing will be detected from orchestrator output)
+        _ORCHESTRATION_STATE['current_stage'] = 'planning'
+        _current_stage['current'] = 'planning'
+        set_request_id(request_id)
+        try:
+            payload = run_orchestrate(session, question)
+        except AuthExpiredError:
+            session = _refresh_session_for_retry(session)
+            payload = run_orchestrate(session, question)
+        _current_stage['current'] = _ORCHESTRATION_STATE.get('current_stage', 'done')
     except Exception as exc:
         _current_stage['current'] = 'error'
         detail = getattr(exc, "raw_content", None) or getattr(exc, "content", None)
