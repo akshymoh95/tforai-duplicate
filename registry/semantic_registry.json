@@ -67,16 +67,7 @@
           "default_agg": "",
           "depends_on": []
         },
-        {
-          "name": "positiondate",
-          "dtype": "date",
-          "role": "dimension",
-          "expr": "POSITIONDATE",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
+  
         {
           "name": "latest_topup_date",
           "dtype": "date",
@@ -240,7 +231,7 @@
         {
           "name": "month_date",
           "dtype": "date",
-          "role": "derived",
+          "role": "dimension",
           "expr": "",
           "description": "",
           "derived": true,
@@ -2526,7 +2517,7 @@
       "MANDATEID",
       "MANDATEID_STR",
       "RM_NAME",
-      "MONTH_DATE",
+      "montg_date",
       "MEET_YEAR"
     ],
     "entity_priority": [
