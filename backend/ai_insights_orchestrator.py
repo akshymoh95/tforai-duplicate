@@ -1066,6 +1066,9 @@ def run_orchestrate(
         # Load specs (no session needed)
         specs = load_ai_insights_specs()
         print(f"[DEBUG] Loaded {len(specs)} semantic specs")
+
+        spec_entity_names = {str(s.name).lower() for s in specs if getattr(s, "name", None)}
+        print(f"[DEBUG] Loaded entities: {sorted(spec_entity_names)}")
         
         # Render ontology text describing all entities and relationships
         ontology_text = render_ai_insights_ontology_text(specs)
@@ -1216,103 +1219,188 @@ def run_orchestrate(
             selects = candidate.get("select")
             return not (isinstance(binds, list) and len(binds) > 0 and isinstance(selects, list) and len(selects) > 0)
 
-        MULTIFACT_REASONERS_DOWNTIME = {
-            "top_unplanned_downtime_causes",
-            "top_downtime_machines",
-            "recurring_downtime_events_across_machines",
-        }
-        MULTIFACT_REASONERS_OEE = {
-            "oee_by_machine",
-            "availability_trend_by_machine",
-            "downtime_by_product",
-        }
+        fallback_specs: List[Dict[str, Any]] = []
+        try:
+            from rai_semantic_registry import load_reasoners
+        except Exception:
+            load_reasoners = None
 
-        def _needs_decompose(reasoner_ids: List[str], question_text: str) -> bool:
-            rset = set(reasoner_ids or [])
-            if (rset & MULTIFACT_REASONERS_DOWNTIME) and (rset & MULTIFACT_REASONERS_OEE):
-                return True
-            q = (question_text or "").lower()
-            has_downtime = any(k in q for k in ("downtime", "fault", "tefault", "duration_minutes"))
-            has_oee = any(k in q for k in ("oee", "availability", "performance_pct", "quality_rate"))
-            return has_downtime and has_oee
+        reasoner_specs = load_reasoners() if load_reasoners else []
+        reasoner_map = {r.id: r for r in reasoner_specs if getattr(r, "id", None)}
 
-        def _time_window_from_spec(candidate: dict) -> Dict[str, Any]:
-            if not isinstance(candidate, dict):
-                return {}
-            meta = candidate.get("meta") or {}
-            if isinstance(meta, dict):
-                tw = meta.get("time_window") or {}
-                if isinstance(tw, dict):
-                    return tw
-            return {}
+        specs_by_name = {s.name: s for s in specs if getattr(s, "name", None)}
+        specs_by_type: Dict[str, List[Any]] = {}
+        for s in specs:
+            et = str(getattr(s, "entity_type", "") or "generic").lower()
+            specs_by_type.setdefault(et, []).append(s)
 
-        def _overlap_where(alias: str, start_field: str, end_field: str, tw: Dict[str, Any]) -> List[Dict[str, Any]]:
-            if not tw:
-                return []
-            start = tw.get("start")
-            end = tw.get("end")
-            if not start or not end:
-                return []
-            return [
-                {"op": "<=", "left": {"alias": alias, "prop": start_field}, "right": {"value": end}},
-                {"op": ">=", "left": {"alias": alias, "prop": end_field}, "right": {"value": start}},
-            ]
+        def _field_map(entity_spec) -> Dict[str, Any]:
+            return {str(f.name): f for f in (getattr(entity_spec, "fields", None) or []) if getattr(f, "name", None)}
 
-        def _decompose_and_merge(question_text: str, tw: Dict[str, Any]) -> Tuple[pd.DataFrame, Dict[str, List[Dict[str, Any]]]]:
-            # Spec A: downtime facts per machine
-            spec_a = {
-                "bind": [{"alias": "dte", "entity": "dt_timed_event_denorm"}],
-                "select": [{"alias": "dte", "prop": "pu_id", "as": "pu_id"}],
-                "group_by": [{"alias": "dte", "prop": "pu_id", "as": "pu_id"}],
-                "aggregations": [
-                    {"op": "sum", "term": {"alias": "dte", "prop": "duration_minutes_eff"}, "as": "total_downtime_minutes"},
-                    {"op": "count", "term": {"alias": "dte", "prop": "tedet_id"}, "as": "event_count"},
-                ],
-                "order_by": [{"term": {"value": "total_downtime_minutes"}, "dir": "desc"}],
-                "limit": 2000,
-                "where": _overlap_where("dte", "start_time", "end_time", tw),
-            }
+        def _agg_op_for_field(field_spec: Any) -> str:
+            op = str(getattr(field_spec, "default_agg", "") or "").strip()
+            if op:
+                return op
+            role = str(getattr(field_spec, "role", "") or "").strip().lower()
+            if role in ("metric", "derived"):
+                return "avg"
+            return "count"
 
-            # Spec B: OEE facts per machine
-            spec_b = {
-                "bind": [{"alias": "om", "entity": "dt_operation_metrics"}],
-                "select": [{"alias": "om", "prop": "pu_id", "as": "pu_id"}],
-                "group_by": [{"alias": "om", "prop": "pu_id", "as": "pu_id"}],
-                "aggregations": [
-                    {"op": "avg", "term": {"alias": "om", "prop": "oee_pct"}, "as": "avg_oee_pct"},
-                    {"op": "avg", "term": {"alias": "om", "prop": "availability_pct"}, "as": "avg_availability_pct"},
-                    {"op": "sum", "term": {"alias": "om", "prop": "dt_minutes"}, "as": "total_dt_minutes"},
-                ],
-                "order_by": [{"term": {"value": "avg_oee_pct"}, "dir": "desc"}],
-                "limit": 2000,
-                "where": _overlap_where("om", "operation_start", "operation_end", tw),
-            }
+        def _expand_required_fields(entity_spec: Any, fields: List[str]) -> List[str]:
+            fmap = _field_map(entity_spec)
+            expanded: List[str] = []
+            for name in fields:
+                fs = fmap.get(name)
+                if fs is None:
+                    continue
+                if getattr(fs, "derived", False) and getattr(fs, "depends_on", None):
+                    for dep in fs.depends_on:
+                        if dep in fmap and dep not in expanded:
+                            expanded.append(dep)
+                elif name not in expanded:
+                    expanded.append(name)
+            return expanded
 
-            df_a = run_dynamic_query(builder, spec_a)
-            df_b = run_dynamic_query(builder, spec_b)
-            merged = df_a.merge(df_b, on="pu_id", how="outer") if df_a is not None and df_b is not None else pd.DataFrame()
-            debug_frames = {
-                "_debug_downtime": df_a.to_dict("records") if df_a is not None and not df_a.empty else [],
-                "_debug_oee": df_b.to_dict("records") if df_b is not None and not df_b.empty else [],
-            }
-            return merged, debug_frames
+        def _pick_entity_for_reasoner(reasoner_spec: Any) -> Optional[Any]:
+            if reasoner_spec is None:
+                return None
+            et = str(getattr(reasoner_spec, "entity_type", "") or "").lower()
+            candidates = specs_by_type.get(et) or []
+            if not candidates:
+                return None
+            target_fields = set(str(x) for x in (getattr(reasoner_spec, "outputs", None) or []))
+            for sig in (getattr(reasoner_spec, "signals", None) or []):
+                name = str(getattr(sig, "metric_field", "") or "").strip()
+                if name:
+                    target_fields.add(name)
+            if target_fields:
+                scored = []
+                for cand in candidates:
+                    fields = set(_field_map(cand).keys())
+                    score = len(fields & target_fields)
+                    scored.append((score, cand))
+                scored.sort(key=lambda x: x[0], reverse=True)
+                return scored[0][1]
+            return candidates[0]
 
-        if _is_fallback_spec(spec) and reasoner_ids:
-            downtime_reasoners = {
-                "top_unplanned_downtime_causes",
-                "top_downtime_machines",
-                "recurring_downtime_events_across_machines",
-            }
-            base_entity = (
-                "dt_timed_event_denorm"
-                if any(r in downtime_reasoners for r in reasoner_ids)
-                else "dt_operation_metrics"
-            )
-            spec = {
-                "bind": [{"alias": "base", "entity": base_entity}],
-                "select": [{"alias": "base", "prop": "pu_id", "as": "pu_id"}],
-                "limit": 2000,
-            }
+        def _build_spec_for_entity(entity_spec: Any, required_fields: List[str]) -> Dict[str, Any]:
+            alias = "e0"
+            fmap = _field_map(entity_spec)
+            join_keys = list(getattr(entity_spec, "join_keys", None) or [])
+            dims = [jk for jk in join_keys if jk in fmap]
+            if not dims:
+                dims = [
+                    f.name for f in (getattr(entity_spec, "fields", None) or [])
+                    if str(getattr(f, "role", "")).strip().lower() == "dimension"
+                ][:3]
+
+            select = [{"alias": alias, "prop": d, "as": d} for d in dims]
+            metrics = _expand_required_fields(entity_spec, required_fields or [])
+            if not metrics:
+                default_metric = str(getattr(entity_spec, "default_metric", "") or "")
+                if default_metric and default_metric in fmap:
+                    metrics = [default_metric]
+                else:
+                    metrics = [
+                        f.name for f in (getattr(entity_spec, "fields", None) or [])
+                        if str(getattr(f, "role", "")).strip().lower() in ("metric", "derived")
+                    ][:1]
+
+            aggregations = []
+            for m in metrics:
+                fs = fmap.get(m)
+                if fs is None:
+                    continue
+                op = _agg_op_for_field(fs)
+                aggregations.append({"op": op, "term": {"alias": alias, "prop": m}, "as": m})
+
+            spec = {"bind": [{"alias": alias, "entity": entity_spec.name}], "select": select, "limit": 2000}
+            if aggregations:
+                spec["group_by"] = select
+                spec["aggregations"] = aggregations
+                spec["order_by"] = [{"term": {"value": aggregations[0]["as"]}, "dir": "desc"}]
+            return spec
+
+        if _is_fallback_spec(spec):
+            required_by_entity: Dict[str, List[str]] = {}
+            for rid in (reasoner_ids or []):
+                reasoner_spec = reasoner_map.get(rid)
+                ent = _pick_entity_for_reasoner(reasoner_spec)
+                if ent is None:
+                    continue
+                needed = []
+                needed.extend(list(getattr(reasoner_spec, "outputs", None) or []))
+                for sig in (getattr(reasoner_spec, "signals", None) or []):
+                    mf = str(getattr(sig, "metric_field", "") or "").strip()
+                    if mf:
+                        needed.append(mf)
+                required_by_entity.setdefault(ent.name, [])
+                for nf in needed:
+                    if nf not in required_by_entity[ent.name]:
+                        required_by_entity[ent.name].append(nf)
+
+            if not required_by_entity and specs:
+                primary = specs[0]
+                required_by_entity[primary.name] = []
+
+            for ent_name, needed in required_by_entity.items():
+                ent = specs_by_name.get(ent_name)
+                if ent is None:
+                    continue
+                fallback_specs.append(_build_spec_for_entity(ent, needed))
+
+            if fallback_specs:
+                spec = fallback_specs[0]
+
+        def _run_spec_with_timeout(local_spec: Dict[str, Any]) -> Optional[pd.DataFrame]:
+            rai_timeout = int(os.environ.get("RAI_QUERY_TIMEOUT_SECONDS", "300"))
+            result_holder = [None]
+            exception_holder = [None]
+
+            def rai_thread():
+                try:
+                    result_holder[0] = run_dynamic_query(builder, local_spec)
+                except Exception as e:
+                    exception_holder[0] = e
+
+            t = threading.Thread(target=rai_thread, daemon=True)
+            t.start()
+            t.join(timeout=rai_timeout)
+
+            if t.is_alive():
+                raise TimeoutError(f"RAI query timeout after {rai_timeout}s")
+            if exception_holder[0]:
+                raise exception_holder[0]
+            return result_holder[0]
+
+        def _execute_and_merge_fallback_specs(spec_list: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, Dict[str, List[Dict[str, Any]]]]:
+            frames: List[pd.DataFrame] = []
+            debug: Dict[str, List[Dict[str, Any]]] = {}
+            for idx, sp in enumerate(spec_list):
+                try:
+                    df = _run_spec_with_timeout(sp) or pd.DataFrame()
+                except Exception as exc:
+                    df = pd.DataFrame()
+                    debug[f"_debug_spec_{idx + 1}_error"] = [{"error": str(exc)}]
+                frames.append(df)
+                debug[f"_debug_spec_{idx + 1}"] = df.to_dict("records") if not df.empty else []
+
+            if not frames:
+                return pd.DataFrame(), debug
+            if len(frames) == 1:
+                return frames[0], debug
+
+            common = set(frames[0].columns)
+            for df in frames[1:]:
+                common &= set(df.columns)
+            merge_keys = [k for k in join_keys if k in common] or list(common)
+            if not merge_keys:
+                return frames[0], debug
+
+            merged = frames[0]
+            for df in frames[1:]:
+                merged = merged.merge(df, on=merge_keys, how="outer")
+            return merged, debug
 
         # ============================================================
         # STEP 4: EXECUTE SPEC AGAINST RAI MODEL
@@ -1321,11 +1409,9 @@ def run_orchestrate(
         _update_stage("fetching")
 
         debug_frames: Dict[str, List[Dict[str, Any]]] = {}
-        decompose_mode = _needs_decompose(reasoner_ids, question)
-        if _is_fallback_spec(spec) and decompose_mode:
-            tw = _time_window_from_spec(spec)
-            results_df, debug_frames = _decompose_and_merge(question, tw)
-            print("[DEBUG] Decompose+merge executed (downtime + oee)")
+        if fallback_specs and len(fallback_specs) > 1:
+            results_df, debug_frames = _execute_and_merge_fallback_specs(fallback_specs)
+            print("[DEBUG] Fallback multi-spec merge executed")
             sys.stdout.flush()
         else:
             # Execute the spec with retry logic for transient failures and timeout protection
@@ -1410,13 +1496,6 @@ def run_orchestrate(
                                 "Use dimensions in group_by; aggregate measures only."
                             ),
                         )
-                        decompose_mode = _needs_decompose(reasoner_ids, question)
-                        if _is_fallback_spec(spec) and decompose_mode:
-                            tw = _time_window_from_spec(spec)
-                            results_df, debug_frames = _decompose_and_merge(question, tw)
-                            print("[DEBUG] Decompose+merge executed (downtime + oee) after replanning")
-                            sys.stdout.flush()
-                            break
                     except Exception as replan_err:
                         last_error = replan_err
                     plan_attempt += 1

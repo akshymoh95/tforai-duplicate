@@ -361,20 +361,20 @@ def build_dynamic_query_prompt(
         "===============================\n"
         "If the user says last week/last month/this week/this month/yesterday/past N days, ALWAYS add a concrete time window.\n"
         "Also set meta.time_window with {start,end,mode}.\n"
-        " - mode='overlap' for timed events with start_time/end_time (downtime semantics)\n"
+        " - mode='overlap' for interval events with start/end timestamps (interval semantics)\n"
         " - mode='point' for point-in-time facts (e.g., entry_on)\n"
         "Do NOT use SQL date expressions in values (no CURRENT_DATE, no INTERVAL, no now()).\n"
         "Use ISO timestamps like '2026-01-20 00:00:00'.\n\n"
-        "DOWNTIME WINDOW SEMANTICS (MUST FOLLOW):\n"
+        "INTERVAL WINDOW SEMANTICS (MUST FOLLOW):\n"
         "=======================================\n"
-        "For downtime/timed events, a window means INTERVAL OVERLAP:\n"
+        "For interval/timed events, a window means INTERVAL OVERLAP:\n"
         "  start_time <= window_end AND end_time >= window_start\n"
         "When applying overlap, emit it as an explicit AND clause (two predicates) in `where`.\n"
-        "Do NOT filter only by start_time when answering downtime-in-window questions.\n\n"
-        "RECURRENCE ACROSS MACHINES (MUST FOLLOW):\n"
-        "========================================\n"
-        "If the question asks 'recurring across machines', do NOT group by machine_id/pu_id.\n"
-        "Instead, group by fault/cause and include machines_affected = count_distinct(pu_id).\n\n"
+        "Do NOT filter only by start_time when answering interval-in-window questions.\n\n"
+        "RECURRENCE ACROSS ASSETS (MUST FOLLOW):\n"
+        "======================================\n"
+        "If the question asks 'recurring across assets/entities', do NOT group by the asset identifier field.\n"
+        "Instead, group by fault/cause and include entities_affected = count_distinct(<asset_id_field>).\n\n"
         "GROUP BY + AGGREGATIONS RULES (MUST FOLLOW):\n"
         "============================================\n"
         "If `aggregations` is present:\n"
@@ -398,7 +398,7 @@ def build_dynamic_query_prompt(
         "  AND the required inputs are available in the spec (e.g., window_start/window_end and required keys).\n"
         "\n"
         "DEFAULT BEHAVIOR:\n"
-        "- Prefer binding base entities directly (e.g., dt_timed_event_denorm, dt_operation_metrics).\n"
+        "- Prefer binding base entities directly (e.g., primary event/fact entities).\n"
         "- Use reasoners as selection/routing hints, not as required query sources.\n\n"
         "TEXT FILTER RULE:\n"
         "=================\n"
@@ -602,14 +602,25 @@ def _infer_recent_days(question: str) -> Optional[int]:
 
 
 _TIME_FIELD_PRIORITY = [
-    "operation_start",
+    "event_time",
+    "event_ts",
+    "timestamp",
+    "ts",
+    "created_at",
+    "updated_at",
+    "start_at",
+    "end_at",
     "start_time",
+    "end_time",
+    "operation_start",
     "entry_on",
     "createdon",
     "created_on",
     "result_on",
-    "result_on",
-    "timestamp",
+    "order_date",
+    "invoice_date",
+    "signup_date",
+    "transaction_time",
     "date",
 ]
 
@@ -1527,68 +1538,288 @@ def _find_entity_alias(spec: Dict[str, object], entity: str) -> Optional[str]:
     return None
 
 
-def _semantic_rewrite_for_question(spec: Dict[str, object], question: str) -> Dict[str, object]:
+def _bound_entities(spec: Dict[str, object]) -> List[Tuple[str, str]]:
+    out: List[Tuple[str, str]] = []
+    for b in (spec.get("bind") or []):
+        if isinstance(b, dict) and b.get("entity") and b.get("alias"):
+            out.append((b["entity"], b["alias"]))
+    return out
+
+
+def _extract_fields_for_entity(ontology_text: str, entity: str) -> List[str]:
+    if not ontology_text or not entity:
+        return []
+
+    lines = ontology_text.splitlines()
+    block: List[str] = []
+    in_entity = False
+
+    for line in lines:
+        if line.startswith(f"- {entity} "):
+            in_entity = True
+            continue
+        if in_entity:
+            if line.startswith("- "):
+                break
+            block.append(line)
+
+    text = "\n".join(block)
+    if not text:
+        return []
+
+    fields: List[str] = []
+    m = re.search(r"fields:\s*(.*)$", text, flags=re.IGNORECASE | re.MULTILINE)
+    if m:
+        fields_line = m.group(1)
+        field_pat = r"(?:^|,\s*)([A-Za-z0-9_]+)\s*:\s*[A-Za-z_]+(?:\([0-9,]+\))?\s*:"
+        for match in re.finditer(field_pat, fields_line):
+            fields.append(match.group(1))
+
+    seen = set()
+    out: List[str] = []
+    for f in fields:
+        fl = f.lower()
+        if fl not in seen:
+            seen.add(fl)
+            out.append(f)
+    return out
+
+
+def _pick_interval_entity(
+    spec: Dict[str, object], ontology_text: str
+) -> Optional[Tuple[str, str, str, str]]:
+    pairs = [
+        ("start_time", "end_time"),
+        ("start_ts", "end_ts"),
+        ("start", "end"),
+        ("begin", "finish"),
+    ]
+
+    for entity, alias in _bound_entities(spec):
+        fields = _extract_fields_for_entity(ontology_text, entity)
+        if not fields:
+            continue
+        lower_map = {f.lower(): f for f in fields}
+        for start_name, end_name in pairs:
+            if start_name in lower_map and end_name in lower_map:
+                return (alias, entity, lower_map[start_name], lower_map[end_name])
+
+        time_fields = _extract_time_fields_for_entity(ontology_text, entity)
+        if time_fields:
+            starts = [f for f in time_fields if re.search(r"(start|begin)", f, re.IGNORECASE)]
+            ends = [f for f in time_fields if re.search(r"(end|finish)", f, re.IGNORECASE)]
+            if starts and ends:
+                return (alias, entity, starts[0], ends[0])
+
+    return None
+
+
+def _pick_asset_id_field(fields: List[str]) -> Optional[str]:
+    if not fields:
+        return None
+    lower_map = {f.lower(): f for f in fields}
+    priority = [
+        "machine_id",
+        "asset_id",
+        "device_id",
+        "user_id",
+        "account_id",
+        "customer_id",
+        "employee_id",
+        "pu_id",
+    ]
+    for cand in priority:
+        if cand in lower_map:
+            return lower_map[cand]
+    for f in fields:
+        lf = f.lower()
+        if lf.endswith("_id") or (lf.endswith("id") and len(lf) > 2):
+            return f
+    return None
+
+
+def _pick_row_id_field(fields: List[str]) -> Optional[str]:
+    if not fields:
+        return None
+    lower_map = {f.lower(): f for f in fields}
+    priority = [
+        "event_id",
+        "row_id",
+        "record_id",
+        "incident_id",
+        "ticket_id",
+        "id",
+        "tedet_id",
+    ]
+    for cand in priority:
+        if cand in lower_map:
+            return lower_map[cand]
+    return None
+
+
+def _pick_time_field_for_entity(ontology_text: str, entity: str) -> Optional[str]:
+    time_fields = _extract_time_fields_for_entity(ontology_text, entity)
+    if not time_fields:
+        return None
+    lower_map = {f.lower(): f for f in time_fields}
+    for cand in _TIME_FIELD_PRIORITY:
+        if cand.lower() in lower_map:
+            return lower_map[cand.lower()]
+    return sorted(time_fields, key=_score_time_field, reverse=True)[0]
+
+
+def _pick_availability_field(fields: List[str]) -> Optional[str]:
+    if not fields:
+        return None
+    patterns = ["availability", "uptime", "reliability", "on_time", "ontime", "sla"]
+    for f in fields:
+        lf = f.lower()
+        if any(p in lf for p in patterns):
+            return f
+    return None
+
+
+def _mentions_recurring_across_assets(q: str) -> bool:
+    if "recurring across" in q:
+        return True
+    if "recurring" in q and "across" in q:
+        return True
+    if "across machines" in q or "across assets" in q or "across entities" in q:
+        return True
+    return False
+
+
+def _pick_metrics_entity_for_trend(
+    spec: Dict[str, object], ontology_text: str, interval_alias: Optional[str]
+) -> Optional[Tuple[str, str, str]]:
+    candidates = _bound_entities(spec)
+    if interval_alias:
+        candidates = [b for b in candidates if b[1] != interval_alias] + [
+            b for b in candidates if b[1] == interval_alias
+        ]
+    for entity, alias in candidates:
+        time_field = _pick_time_field_for_entity(ontology_text, entity)
+        if time_field:
+            return (alias, entity, time_field)
+    return None
+
+
+def _semantic_rewrite_for_question(
+    spec: Dict[str, object], question: str, ontology_text: str
+) -> Dict[str, object]:
     """
     Deterministic semantic fixes AFTER the LLM, to ensure the spec answers the question.
-    - Recurring across machines => do not group by pu_id; add machines_affected=count_distinct(pu_id)
+    - Recurring across assets => do not group by asset id; add entities_affected=count_distinct(asset_id)
     - Downtime-in-window for timed events => ensure meta.time_window.mode=overlap if interval table detected
-    - Trends => force time series output (machine + time) when asked
+    - Trends => force time series output (entity + time) when asked
     """
     if not isinstance(spec, dict):
         return spec
 
     q = (question or "").lower()
 
-    te_alias = _find_entity_alias(spec, "dt_timed_event_denorm")
-    om_alias = _find_entity_alias(spec, "dt_operation_metrics")
+    interval_info = _pick_interval_entity(spec, ontology_text)
+    interval_alias = interval_info[0] if interval_info else None
+    interval_entity = interval_info[1] if interval_info else None
 
-    # 1) Recurring across machines
-    if ("recurring" in q or "across machines" in q) and te_alias:
-        # remove pu_id from select/group_by
-        spec["select"] = [
-            s for s in (spec.get("select") or [])
-            if not (isinstance(s, dict) and s.get("alias") == te_alias and s.get("prop") == "pu_id")
-        ]
-        spec["group_by"] = [
-            g for g in (spec.get("group_by") or [])
-            if not (isinstance(g, dict) and g.get("alias") == te_alias and g.get("prop") == "pu_id")
-        ]
+    # 1) Recurring across assets
+    if _mentions_recurring_across_assets(q):
+        rec_alias = interval_alias
+        rec_entity = interval_entity
+        if not rec_alias or not rec_entity:
+            for entity, alias in _bound_entities(spec):
+                fields = _extract_fields_for_entity(ontology_text, entity)
+                if _pick_asset_id_field(fields):
+                    rec_alias = alias
+                    rec_entity = entity
+                    break
 
-        aggs = list(spec.get("aggregations") or [])
-        if not any(isinstance(a, dict) and a.get("op") == "count_distinct" and a.get("as") == "machines_affected" for a in aggs):
-            aggs.append({"op": "count_distinct", "term": {"alias": te_alias, "prop": "pu_id"}, "as": "machines_affected"})
+        if rec_alias and rec_entity:
+            fields = _extract_fields_for_entity(ontology_text, rec_entity)
+            asset_id_field = _pick_asset_id_field(fields)
+            if asset_id_field:
+                # remove asset id from select/group_by
+                spec["select"] = [
+                    s for s in (spec.get("select") or [])
+                    if not (isinstance(s, dict) and s.get("alias") == rec_alias and s.get("prop") == asset_id_field)
+                ]
+                spec["group_by"] = [
+                    g for g in (spec.get("group_by") or [])
+                    if not (isinstance(g, dict) and g.get("alias") == rec_alias and g.get("prop") == asset_id_field)
+                ]
 
-        if not any(isinstance(a, dict) and a.get("as") == "event_count" for a in aggs):
-            aggs.append({"op": "count", "term": {"alias": te_alias, "prop": "tedet_id"}, "as": "event_count"})
+                aggs = list(spec.get("aggregations") or [])
+                aggs = [
+                    a
+                    for a in aggs
+                    if not (isinstance(a, dict) and a.get("as") in ("machines_affected", "entities_affected"))
+                ]
+                aggs.append(
+                    {
+                        "op": "count_distinct",
+                        "term": {"alias": rec_alias, "prop": asset_id_field},
+                        "as": "entities_affected",
+                    }
+                )
 
-        spec["aggregations"] = aggs
-        spec["order_by"] = [{"term": {"value": "machines_affected"}, "dir": "desc"}]
-        if "limit" not in spec:
-            spec["limit"] = 50
+                row_id_field = _pick_row_id_field(fields) or asset_id_field
+                if not any(isinstance(a, dict) and a.get("as") == "event_count" for a in aggs):
+                    aggs.append(
+                        {
+                            "op": "count",
+                            "term": {"alias": rec_alias, "prop": row_id_field},
+                            "as": "event_count",
+                        }
+                    )
+
+                spec["aggregations"] = aggs
+                spec["order_by"] = [{"term": {"value": "entities_affected"}, "dir": "desc"}]
+                if "limit" not in spec:
+                    spec["limit"] = 50
 
     # 2) Trend/deteriorating availability: force time series output
-    if any(k in q for k in ("trend", "deteriorat", "declin", "getting worse")) and om_alias:
-        # Ensure we group by machine + operation_start to provide series (client can bucket)
-        # Add operation_start dimension if missing
-        gb = list(spec.get("group_by") or [])
-        sel = list(spec.get("select") or [])
-        has_op_start = any(isinstance(g, dict) and g.get("alias") == om_alias and g.get("prop") == "operation_start" for g in gb)
-        if not has_op_start:
-            gb.append({"alias": om_alias, "prop": "operation_start", "as": "operation_start"})
-            sel.append({"alias": om_alias, "prop": "operation_start", "as": "operation_start"})
-        spec["group_by"] = gb
-        spec["select"] = sel
+    if any(k in q for k in ("trend", "deteriorat", "declin", "getting worse")):
+        trend_info = _pick_metrics_entity_for_trend(spec, ontology_text, interval_alias)
+        if trend_info:
+            om_alias, om_entity, time_field = trend_info
+            gb = list(spec.get("group_by") or [])
+            sel = list(spec.get("select") or [])
+            has_time = any(
+                isinstance(g, dict) and g.get("alias") == om_alias and g.get("prop") == time_field for g in gb
+            )
+            if not has_time:
+                gb.append({"alias": om_alias, "prop": time_field, "as": time_field})
+                sel.append({"alias": om_alias, "prop": time_field, "as": time_field})
+            spec["group_by"] = gb
+            spec["select"] = sel
 
-        # Ensure availability metric present
-        aggs = list(spec.get("aggregations") or [])
-        if not any(isinstance(a, dict) and a.get("as") == "avg_availability_pct" for a in aggs):
-            aggs.append({"op": "avg", "term": {"alias": om_alias, "prop": "availability_pct"}, "as": "avg_availability_pct"})
-        spec["aggregations"] = aggs
+            aggs = list(spec.get("aggregations") or [])
+            fields = _extract_fields_for_entity(ontology_text, om_entity)
+            availability_field = _pick_availability_field(fields)
+            if availability_field:
+                has_avail = any(
+                    isinstance(a, dict)
+                    and a.get("op") == "avg"
+                    and isinstance(a.get("term"), dict)
+                    and a["term"].get("alias") == om_alias
+                    and a["term"].get("prop") == availability_field
+                    for a in aggs
+                )
+                if not has_avail:
+                    aggs.append(
+                        {
+                            "op": "avg",
+                            "term": {"alias": om_alias, "prop": availability_field},
+                            "as": f"avg_{availability_field}",
+                        }
+                    )
+            spec["aggregations"] = aggs
 
-        # Sort by time for readability
-        spec["order_by"] = [{"term": {"alias": om_alias, "prop": "operation_start", "as": "operation_start"}, "dir": "asc"}]
-        if "limit" not in spec:
-            spec["limit"] = 2000
+            spec["order_by"] = [
+                {"term": {"alias": om_alias, "prop": time_field, "as": time_field}, "dir": "asc"}
+            ]
+            if "limit" not in spec:
+                spec["limit"] = 2000
 
     return spec
 
@@ -1665,7 +1896,7 @@ def generate_dynamic_query_spec(
         spec = _inject_last_n_days_filter_if_missing(spec, question, ontology_text, days=_infer_recent_days(question))
 
         # Deterministic semantic corrections to ensure spec answers the question
-        spec = _semantic_rewrite_for_question(spec, question)
+        spec = _semantic_rewrite_for_question(spec, question, ontology_text)
 
         # De-duplicate output aliases to avoid shadowed-variable errors
         spec = _ensure_unique_output_aliases(spec)
