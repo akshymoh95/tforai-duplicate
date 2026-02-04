@@ -108,6 +108,7 @@ class RegistryConfig:
     """Optional registry config flags."""
     post_compute_derived_metrics: bool = False
     allow_sql_derived_expr: bool = False
+    allow_multi_fact_aggregations: bool = False
 
 
 def _field(
@@ -314,6 +315,7 @@ def _config_from_dict(data: dict) -> RegistryConfig:
     return RegistryConfig(
         post_compute_derived_metrics=bool(data.get("post_compute_derived_metrics", False)),
         allow_sql_derived_expr=bool(data.get("allow_sql_derived_expr", False)),
+        allow_multi_fact_aggregations=bool(data.get("allow_multi_fact_aggregations", False)),
     )
 
 

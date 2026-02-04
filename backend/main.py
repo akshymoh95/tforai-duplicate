@@ -1439,6 +1439,7 @@ def _registry_payload_from_current() -> Dict[str, Any]:
     config_payload = {
         "post_compute_derived_metrics": bool(getattr(cfg, "post_compute_derived_metrics", False)),
         "allow_sql_derived_expr": bool(getattr(cfg, "allow_sql_derived_expr", False)),
+        "allow_multi_fact_aggregations": bool(getattr(cfg, "allow_multi_fact_aggregations", False)),
     }
 
     kg_payload = load_kg_spec() or {"nodes": [], "edges": [], "graphs": []}

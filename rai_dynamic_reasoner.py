@@ -8,7 +8,15 @@ from datetime import timedelta
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from rai_dynamic_query import DYNAMIC_QUERY_SCHEMA
-from rai_semantic_registry import load_reasoners
+from rai_semantic_registry import load_reasoners, load_registry_config
+
+
+def _allow_multi_fact_aggregations() -> bool:
+    try:
+        cfg = load_registry_config()
+        return bool(getattr(cfg, "allow_multi_fact_aggregations", False))
+    except Exception:
+        return False
 
 # ============================================================
 # JSON parsing helpers
@@ -1456,40 +1464,42 @@ def _validate_spec_or_raise(spec: Dict[str, object], mode: str = "base") -> None
         return
 
     # Base mode: fanout / multi-fact prevention
+    allow_multi_fact = _allow_multi_fact_aggregations()
     if spec.get("aggregations"):
         agg_aliases = set(_agg_alias_term_counts(spec).keys())
         alias_kinds = _alias_kind_map(spec)
         can_classify_agg = all(alias_kinds.get(a) in ("fact", "dimension") for a in agg_aliases)
         fact_agg_aliases = {a for a in agg_aliases if alias_kinds.get(a) == "fact"}
 
-        # star-join fanout: multiple aggregation sources connected only via a hub alias
-        if len(bind_aliases) >= 3 and len(agg_aliases) >= 2:
-            if _is_star_fanout(bind_aliases, agg_aliases, edges):
-                raise ValueError(
-                    "Star-join fanout: multiple aggregation sources joined only via a shared hub alias. "
-                    "Split into multiple queries (seed + drilldowns) or use reasoners."
-                )
-
-        # heuristic: 3+ binds and at least 2 aliases contribute aggregation terms -> high risk
-        if isinstance(binds, list) and len(binds) >= 3 and len(agg_aliases) >= 2:
-            if not (can_classify_agg and len(fact_agg_aliases) <= 1):
-                # If the model tried to "launder" by putting event-table fields in group_by,
-                # agg_aliases still catches it because the aggregations reference those aliases.
-                # We keep this as a hard reject to avoid slow/wrong results.
-                raise ValueError(
-                    "Aggregations reference multiple bound aliases in a 3+ bind query -> likely fanout/multi-fact join. "
-                    "Use one primary fact entity for aggregates; use reasoners/drilldowns for event evidence."
-                )
-
-        # two-table strong fanout signal: multiple terms from both aliases
-        counts = _agg_alias_term_counts(spec)
-        if isinstance(binds, list) and len(binds) == 2:
-            if sum(1 for c in counts.values() if c >= 2) >= 2:
-                if not can_classify_agg or len(fact_agg_aliases) >= 2:
+        if not allow_multi_fact:
+            # star-join fanout: multiple aggregation sources connected only via a hub alias
+            if len(bind_aliases) >= 3 and len(agg_aliases) >= 2:
+                if _is_star_fanout(bind_aliases, agg_aliases, edges):
                     raise ValueError(
-                        "Aggregations include multiple terms from both bound entities -> likely multi-fact join fanout. "
-                        "Prefer one primary fact entity for aggregates; use separate drilldown for the other entity."
+                        "Star-join fanout: multiple aggregation sources joined only via a shared hub alias. "
+                        "Split into multiple queries (seed + drilldowns) or use reasoners."
                     )
+
+            # heuristic: 3+ binds and at least 2 aliases contribute aggregation terms -> high risk
+            if isinstance(binds, list) and len(binds) >= 3 and len(agg_aliases) >= 2:
+                if not (can_classify_agg and len(fact_agg_aliases) <= 1):
+                    # If the model tried to "launder" by putting event-table fields in group_by,
+                    # agg_aliases still catches it because the aggregations reference those aliases.
+                    # We keep this as a hard reject to avoid slow/wrong results.
+                    raise ValueError(
+                        "Aggregations reference multiple bound aliases in a 3+ bind query -> likely fanout/multi-fact join. "
+                        "Use one primary fact entity for aggregates; use reasoners/drilldowns for event evidence."
+                    )
+
+            # two-table strong fanout signal: multiple terms from both aliases
+            counts = _agg_alias_term_counts(spec)
+            if isinstance(binds, list) and len(binds) == 2:
+                if sum(1 for c in counts.values() if c >= 2) >= 2:
+                    if not can_classify_agg or len(fact_agg_aliases) >= 2:
+                        raise ValueError(
+                            "Aggregations include multiple terms from both bound entities -> likely multi-fact join fanout. "
+                            "Prefer one primary fact entity for aggregates; use separate drilldown for the other entity."
+                        )
 
     # Aggregation shape check: if aggregations and group_by exist, select must be subset of group_by dims
     if spec.get("aggregations") and spec.get("group_by"):

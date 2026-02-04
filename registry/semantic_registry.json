@@ -2525,6 +2525,7 @@
   },
   "config": {
     "post_compute_derived_metrics": false,
-    "allow_sql_derived_expr": false
+    "allow_sql_derived_expr": false,
+    "allow_multi_fact_aggregations": true
   }
 }
