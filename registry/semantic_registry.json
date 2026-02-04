@@ -302,6 +302,24 @@
             "rm_cost_for_each_mandate"
           ]
         },
+
+        {
+          "name": "risk_signal_count",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "Count of active mandate risk signals (aum decline, low profitability, revenue decline, low engagement, high cost ratio).",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "signal_aum_decline",
+            "signal_low_profitability",
+            "signal_revenue_decline",
+            "signal_low_engagement",
+            "signal_high_cost_ratio"
+          ]
+        },
+
         {
           "name": "signal_low_profitability",
           "dtype": "number",
@@ -523,7 +541,7 @@
           "derived": true,
           "default_agg": "",
           "depends_on": [
-            "mandate_risk_score"
+            "mandate_risk_score", "risk_signal_count"
           ]
         },
         {
@@ -654,6 +672,7 @@
         "signal_aum_decline_severe",
         "signal_meeting_drop",
         "mandate_risk_score",
+        "risk_signal_count",
         "mandate_risk_condition",
         "churn_risk_score",
         "signal_churn_risk",
@@ -1626,6 +1645,17 @@
     },
     {
       "entity": "MandateMonthlySummary",
+      "field": "risk_signal_count",
+      "vars": {},
+      "rules": [
+        {
+          "expr": "signal_aum_decline+signal_low_profitability+signal_revenue_decline+signal_low_engagement+signal_high_cost_ratio"
+        }
+      ]
+    },
+
+    {
+      "entity": "MandateMonthlySummary",
       "field": "profit_margin",
       "vars": {},
       "rules": [
@@ -1913,15 +1943,15 @@
       "vars": {},
       "rules": [
         {
-          "when": "mandate_risk_score>0.75",
+          "when": "(mandate_risk_score>0.70)&(risk_signal_count>=3)",
           "expr": "\"at_risk\""
         },
         {
-          "when": "(mandate_risk_score>0.40)&(mandate_risk_score<=0.75)",
+          "when": "(mandate_risk_score>0.55)&(risk_signal_count>=2)",
           "expr": "\"declining\""
         },
         {
-          "when": "mandate_risk_score<=0.40",
+          "when": "true",
           "expr": "\"healthy\""
         }
       ]
