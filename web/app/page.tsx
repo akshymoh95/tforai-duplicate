@@ -386,7 +386,7 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <p className="text-sm font-medium text-blue-100">Powered by RAI</p>
+              <p className="text-sm font-medium text-blue-100">Powered by O3</p>
               <motion.div 
                 className="h-0.5 bg-gradient-to-r from-transparent via-cyan-300 to-transparent mt-2"
                 animate={{ scaleX: [0, 1, 0] }}
