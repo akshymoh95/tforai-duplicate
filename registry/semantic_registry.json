@@ -1,2627 +1,2530 @@
 {
-"entities": [
-{
-"name": "dt_mandate_monthly_summary",
-"description": "Mandate-level monthly profitability and cost signals. Unique by (rmid, mandateid, posyear, posmon).",
-"database": "TFO_TEST",
-"schema": "ML_TEST",
-"table": "MANDATE_PROFITABILITY_CT",
-"fields": [
-{
-"name": "rmid",
-"dtype": "number(38,0)",
-"role": "dimension",
-"expr": "RMID",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "mandateid",
-"dtype": "number(38,0)",
-"role": "dimension",
-"expr": "MANDATEID",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "relationshipmanager",
-"dtype": "varchar",
-"role": "dimension",
-"expr": "RELATIONSHIPMANAGER",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "email",
-"dtype": "varchar",
-"role": "dimension",
-"expr": "EMAIL",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "posyear",
-"dtype": "number(4,0)",
-"role": "dimension",
-"expr": "POSYEAR",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "posmon",
-"dtype": "number(2,0)",
-"role": "dimension",
-"expr": "POSMON",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "positiondate",
-"dtype": "date",
-"role": "dimension",
-"expr": "POSITIONDATE",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "latest_topup_date",
-"dtype": "date",
-"role": "dimension",
-"expr": "LATEST_TOPUP_DATE",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "total_aum",
-"dtype": "number(38,0)",
-"role": "metric",
-"expr": "TOTAL_AUM",
-"description": "",
-"derived": false,
-"default_agg": "avg",
-"depends_on": []
-},
-{
-"name": "avg_monthly_aum",
-"dtype": "number(38,2)",
-"role": "metric",
-"expr": "AVG_MONTHLY_AUM",
-"description": "",
-"derived": false,
-"default_agg": "avg",
-"depends_on": []
-},
-{
-"name": "revenue_amount",
-"dtype": "number(31,2)",
-"role": "metric",
-"expr": "REVENUE_AMOUNT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "profit_amount",
-"dtype": "float",
-"role": "metric",
-"expr": "PROFIT_AMOUNT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "revenue_percent",
-"dtype": "number(38,2)",
-"role": "metric",
-"expr": "REVENUE_PERCENT",
-"description": "",
-"derived": false,
-"default_agg": "avg",
-"depends_on": []
-},
-{
-"name": "profit_percent",
-"dtype": "float",
-"role": "metric",
-"expr": "PROFIT_PERCENT",
-"description": "",
-"derived": false,
-"default_agg": "avg",
-"depends_on": []
-},
-{
-"name": "annualized_revenue_amount",
-"dtype": "number(38,2)",
-"role": "metric",
-"expr": "ANNUALIZED_REVENUE_AMOUNT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "profit_amount_annualized",
-"dtype": "float",
-"role": "metric",
-"expr": "PROFIT_AMOUNT_ANNUALIZED",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "revenue_percent_annualized",
-"dtype": "number(38,2)",
-"role": "metric",
-"expr": "REVENUE_PERCENT_ANNUALIZED",
-"description": "",
-"derived": false,
-"default_agg": "avg",
-"depends_on": []
-},
-{
-"name": "profit_percent_annualized",
-"dtype": "float",
-"role": "metric",
-"expr": "PROFIT_PERCENT_ANNUALIZED",
-"description": "",
-"derived": false,
-"default_agg": "avg",
-"depends_on": []
-},
-{
-"name": "rm_cost_for_each_mandate",
-"dtype": "float",
-"role": "metric",
-"expr": "RM_COST_FOR_EACH_MANDATE",
-"description": "Monthly RM cost allocated to the mandate (month-level).",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "topup_count",
-"dtype": "number(18,0)",
-"role": "metric",
-"expr": "TOPUP_COUNT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "topup_amount",
-"dtype": "float",
-"role": "metric",
-"expr": "TOPUP_AMOUNT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "dealname_count",
-"dtype": "number(18,0)",
-"role": "metric",
-"expr": "DEALNAME_COUNT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "mandate_count",
-"dtype": "number(18,0)",
-"role": "metric",
-"expr": "MANDATE_COUNT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "month_date",
-"dtype": "date",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "",
-"depends_on": [
-"posyear",
-"posmon"
-]
-},
-{
-"name": "profit_margin",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"profit_amount",
-"revenue_amount"
-]
-},
-{
-"name": "cost_to_revenue",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"rm_cost_for_each_mandate",
-"revenue_amount"
-]
-},
-{
-"name": "revenue_per_cost",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"revenue_amount",
-"rm_cost_for_each_mandate"
-]
-},
-{
-"name": "aum_per_cost",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"total_aum",
-"rm_cost_for_each_mandate"
-]
-},
-{
-"name": "signal_low_profitability",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "max",
-"depends_on": [
-"profit_margin"
-]
-},
-{
-"name": "signal_low_engagement",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "max",
-"depends_on": [
-"topup_count"
-]
-},
-{
-"name": "signal_high_cost_ratio",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "max",
-"depends_on": [
-"cost_to_revenue"
-]
-},
-{
-"name": "signal_high_cost",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "max",
-"depends_on": [
-"cost_to_revenue"
-]
-},
-{
-"name": "signal_profit_eroding",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "max",
-"depends_on": [
-"profit_margin"
-]
-},
-{
-"name": "signal_cost_spike",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "max",
-"depends_on": [
-"cost_to_revenue"
-]
-},
-{
-"name": "cost_driver_impact_score",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"cost_to_revenue"
-]
-},
-{
-"name": "cost_driver_condition",
-"dtype": "text",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "",
-"depends_on": [
-"cost_to_revenue"
-]
-},
-{
-"name": "aum_trend",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"total_aum",
-"avg_monthly_aum"
-]
-},
-{
-"name": "revenue_trend",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"revenue_amount",
-"annualized_revenue_amount"
-]
-},
-{
-"name": "profit_trend",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"profit_amount",
-"profit_amount_annualized"
-]
-},
-{
-"name": "meeting_trend",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"topup_count",
-"mandate_count"
-]
-},
-{
-"name": "signal_aum_decline",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "max",
-"depends_on": [
-"aum_trend"
-]
-},
-{
-"name": "signal_revenue_decline",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "max",
-"depends_on": [
-"revenue_trend"
-]
-},
-{
-"name": "signal_aum_decline_severe",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "max",
-"depends_on": [
-"aum_trend"
-]
-},
-{
-"name": "signal_meeting_drop",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "max",
-"depends_on": [
-"meeting_trend"
-]
-},
-{
-"name": "mandate_risk_score",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"signal_aum_decline",
-"signal_low_profitability",
-"signal_revenue_decline",
-"signal_low_engagement",
-"signal_high_cost_ratio"
-]
-},
-{
-"name": "mandate_risk_condition",
-"dtype": "text",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "",
-"depends_on": [
-"mandate_risk_score"
-]
-},
-{
-"name": "churn_risk_score",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"signal_aum_decline_severe",
-"signal_meeting_drop",
-"signal_profit_eroding",
-"signal_cost_spike"
-]
-},
-{
-"name": "signal_churn_risk",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "max",
-"depends_on": [
-"churn_risk_score"
-]
-},
-{
-"name": "churn_risk_condition",
-"dtype": "text",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "",
-"depends_on": [
-"churn_risk_score"
-]
-},
-{
-"name": "allocation_roi_factor",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"revenue_amount",
-"rm_cost_for_each_mandate"
-]
-},
-{
-"name": "allocation_efficiency_factor",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"revenue_amount",
-"topup_count"
-]
-},
-{
-"name": "allocation_composite_score",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"allocation_roi_factor",
-"allocation_efficiency_factor"
-]
-},
-{
-"name": "allocation_priority",
-"dtype": "text",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "",
-"depends_on": [
-"allocation_composite_score"
-]
-}
-],
-"join_keys": [
-"rmid",
-"mandateid",
-"posyear",
-"posmon"
-],
-"default_metric": "total_aum",
-"entity_type": "mandate",
-"applicable_reasoners": [
-"mandate_risk",
-"trend",
-"churn_risk",
-"cost_driver"
-],
-"applicable_derived_metrics": [
-"month_date",
-"profit_margin",
-"cost_to_revenue",
-"revenue_per_cost",
-"aum_per_cost",
-"signal_low_profitability",
-"signal_low_engagement",
-"signal_high_cost_ratio",
-"signal_high_cost",
-"signal_profit_eroding",
-"signal_cost_spike",
-"cost_driver_impact_score",
-"cost_driver_condition",
-"aum_trend",
-"revenue_trend",
-"profit_trend",
-"meeting_trend",
-"signal_aum_decline",
-"signal_revenue_decline",
-"signal_aum_decline_severe",
-"signal_meeting_drop",
-"mandate_risk_score",
-"mandate_risk_condition",
-"churn_risk_score",
-"signal_churn_risk",
-"churn_risk_condition",
-"allocation_roi_factor",
-"allocation_efficiency_factor",
-"allocation_composite_score",
-"allocation_priority"
-]
-},
-{
-"name": "dt_rm_monthly_summary",
-"description": "RM monthly performance signals. Unique by (rmid, meet_year, meet_mon).",
-"database": "TFO_TEST",
-"schema": "ML_TEST",
-"table": "RM_PERFORMANCE_TBL",
-"fields": [
-{
-"name": "rmid",
-"dtype": "number(38,0)",
-"role": "dimension",
-"expr": "RMID",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "rm_name",
-"dtype": "varchar",
-"role": "dimension",
-"expr": "RM_NAME",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "meet_year",
-"dtype": "number(4,0)",
-"role": "dimension",
-"expr": "MEET_YEAR",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "meet_mon",
-"dtype": "number(2,0)",
-"role": "dimension",
-"expr": "MEET_MON",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "performance",
-"dtype": "float",
-"role": "metric",
-"expr": "PERFORMANCE",
-"description": "",
-"derived": false,
-"default_agg": "avg",
-"depends_on": []
-},
-{
-"name": "aum",
-"dtype": "number(38,6)",
-"role": "metric",
-"expr": "AUM",
-"description": "",
-"derived": false,
-"default_agg": "avg",
-"depends_on": []
-},
-{
-"name": "total_nnm",
-"dtype": "float",
-"role": "metric",
-"expr": "TOTAL_NNM",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "cash_in",
-"dtype": "float",
-"role": "metric",
-"expr": "CASH_IN",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "buy",
-"dtype": "float",
-"role": "metric",
-"expr": "BUY",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "sell",
-"dtype": "float",
-"role": "metric",
-"expr": "SELL",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "topupcommitment",
-"dtype": "float",
-"role": "metric",
-"expr": "TOPUPCOMMITMENT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "firstcommitment",
-"dtype": "float",
-"role": "metric",
-"expr": "FIRSTCOMMITMENT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "total_mandates",
-"dtype": "number(18,0)",
-"role": "metric",
-"expr": "TOTAL_MANDATES",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "total_month_mandates",
-"dtype": "number(18,0)",
-"role": "metric",
-"expr": "TOTAL_MONTH_MANDATES",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "meeting_count_target",
-"dtype": "number(38,0)",
-"role": "metric",
-"expr": "MEETING_COUNT_TARGET",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "clienttarget",
-"dtype": "number(38,0)",
-"role": "metric",
-"expr": "CLIENTTARGET",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "commitmenttarget",
-"dtype": "float",
-"role": "metric",
-"expr": "COMMITMENTTARGET",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "nnmtarget",
-"dtype": "float",
-"role": "metric",
-"expr": "NNMTARGET",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "new_mandate_positive_cnt",
-"dtype": "number(18,0)",
-"role": "metric",
-"expr": "NEW_MANDATE_POSITIVE_CNT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "new_mandate_negative_cnt",
-"dtype": "number(18,0)",
-"role": "metric",
-"expr": "NEW_MANDATE_NEGATIVE_CNT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "new_mandate_neutral_cnt",
-"dtype": "number(18,0)",
-"role": "metric",
-"expr": "NEW_MANDATE_NEUTRAL_CNT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "new_mandate_total_meetings",
-"dtype": "number(18,0)",
-"role": "metric",
-"expr": "NEW_MANDATE_TOTAL_MEETINGS",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "existing_mandate_positive_cnt",
-"dtype": "number(18,0)",
-"role": "metric",
-"expr": "EXISTING_MANDATE_POSITIVE_CNT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "existing_mandate_negative_cnt",
-"dtype": "number(18,0)",
-"role": "metric",
-"expr": "EXISTING_MANDATE_NEGATIVE_CNT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "existing_mandate_neutral_cnt",
-"dtype": "number(18,0)",
-"role": "metric",
-"expr": "EXISTING_MANDATE_NEUTRAL_CNT",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "existing_mandate_total_meetings",
-"dtype": "number(18,0)",
-"role": "metric",
-"expr": "EXISTING_MANDATE_TOTAL_MEETINGS",
-"description": "",
-"derived": false,
-"default_agg": "sum",
-"depends_on": []
-},
-{
-"name": "month_date",
-"dtype": "date",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "",
-"depends_on": [
-"meet_year",
-"meet_mon"
-]
-},
-{
-"name": "signal_low_mandate_count",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "max",
-"depends_on": [
-"total_mandates"
-]
-},
-{
-"name": "meeting_count_variance",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"meeting_count_target",
-"new_mandate_total_meetings",
-"existing_mandate_total_meetings"
-]
-},
-{
-"name": "client_target_variance",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"clienttarget",
-"total_month_mandates"
-]
-},
-{
-"name": "signal_low_aum",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "max",
-"depends_on": [
-"aum"
-]
-},
-{
-"name": "signal_low_performance",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "max",
-"depends_on": [
-"performance"
-]
-},
-{
-"name": "rm_performance_condition",
-"dtype": "text",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "",
-"depends_on": [
-"performance"
-]
-},
-{
-"name": "aum_trend",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"aum",
-"nnmtarget"
-]
-},
-{
-"name": "revenue_trend",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"total_nnm",
-"nnmtarget"
-]
-},
-{
-"name": "profit_trend",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"performance"
-]
-},
-{
-"name": "meeting_trend",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"new_mandate_total_meetings",
-"existing_mandate_total_meetings",
-"meeting_count_target"
-]
-},
-{
-"name": "aum_trend_rm",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"aum",
-"nnmtarget"
-]
-},
-{
-"name": "mandate_growth_trend",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"total_month_mandates",
-"total_mandates"
-]
-}
-],
-"join_keys": [
-"rmid",
-"meet_year",
-"meet_mon"
-],
-"default_metric": "performance",
-"entity_type": "rm",
-"applicable_reasoners": [
-"rm_health"
-],
-"applicable_derived_metrics": [
-"month_date",
-"signal_low_mandate_count",
-"meeting_count_variance",
-"client_target_variance",
-"signal_low_aum",
-"signal_low_performance",
-"rm_performance_condition",
-"aum_trend",
-"revenue_trend",
-"profit_trend",
-"meeting_trend",
-"aum_trend_rm",
-"mandate_growth_trend"
-]
-},
-{
-"name": "t_meeting_sentiment",
-"description": "Meeting sentiment and activity signals. Unique by (rmid, mandateid, meeting_id).",
-"database": "TFO_TEST",
-"schema": "ML_TEST",
-"table": "MEETING_SENTIMENT_ANALYSIS_MANDATE_V",
-"fields": [
-{
-"name": "id",
-"dtype": "number(38,0)",
-"role": "dimension",
-"expr": "ID",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "rmid",
-"dtype": "number(38,0)",
-"role": "dimension",
-"expr": "RMID",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "mandateid",
-"dtype": "number(38,0)",
-"role": "dimension",
-"expr": "MANDATEID",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "meetingdate",
-"dtype": "timestamp_ntz(9)",
-"role": "dimension",
-"expr": "MEETINGDATE",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "sentiment",
-"dtype": "varchar",
-"role": "dimension",
-"expr": "SENTIMENT",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "meetingduration",
-"dtype": "number(38,1)",
-"role": "metric",
-"expr": "MEETINGDURATION",
-"description": "",
-"derived": false,
-"default_agg": "avg",
-"depends_on": []
-},
-{
-"name": "meetingtype",
-"dtype": "varchar",
-"role": "dimension",
-"expr": "MEETINGTYPE",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "meetingnotes",
-"dtype": "varchar",
-"role": "dimension",
-"expr": "MEETINGNOTES",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "cleaned_notes",
-"dtype": "varchar",
-"role": "dimension",
-"expr": "CLEANED_NOTES",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "reasoning",
-"dtype": "varchar",
-"role": "dimension",
-"expr": "REASONING",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "suggestion",
-"dtype": "varchar",
-"role": "dimension",
-"expr": "SUGGESTION",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "hubspotid",
-"dtype": "number(38,0)",
-"role": "dimension",
-"expr": "HUBSPOTID",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "utmsourcefirsttouch",
-"dtype": "varchar",
-"role": "dimension",
-"expr": "UTMSOURCEFIRSTTOUCH",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "ownerid",
-"dtype": "number(38,0)",
-"role": "dimension",
-"expr": "OWNERID",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "create_date",
-"dtype": "timestamp_ntz(9)",
-"role": "dimension",
-"expr": "CREATE_DATE",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "email",
-"dtype": "varchar",
-"role": "dimension",
-"expr": "EMAIL",
-"description": "",
-"derived": false,
-"default_agg": "",
-"depends_on": []
-},
-{
-"name": "meeting_id",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "",
-"depends_on": [
-"id"
-]
-},
-{
-"name": "meeting_date",
-"dtype": "timestamp",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "",
-"depends_on": [
-"meetingdate"
-]
-},
-{
-"name": "duration",
-"dtype": "number",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "avg",
-"depends_on": [
-"meetingduration"
-]
-},
-{
-"name": "meeting_type",
-"dtype": "text",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "",
-"depends_on": [
-"meetingtype"
-]
-},
-{
-"name": "meeting_notes",
-"dtype": "text",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "",
-"depends_on": [
-"meetingnotes"
-]
-},
-{
-"name": "utm_source_first_touch",
-"dtype": "text",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "",
-"depends_on": [
-"utmsourcefirsttouch"
-]
-},
-{
-"name": "month_date",
-"dtype": "date",
-"role": "derived",
-"expr": "",
-"description": "",
-"derived": true,
-"default_agg": "",
-"depends_on": [
-"meetingdate"
-]
-}
-],
-"join_keys": [
-"rmid",
-"mandateid",
-"id"
-],
-"default_metric": "duration",
-"entity_type": "meeting",
-"applicable_reasoners": [
-"meeting_quality"
-],
-"applicable_derived_metrics": [
-"meeting_id",
-"meeting_date",
-"duration",
-"meeting_type",
-"meeting_notes",
-"utm_source_first_touch",
-"month_date"
-]
-}
-],
-"relationships": [
-{
-"name": "rm_to_mandate_month",
-"from_entity": "dt_rm_monthly_summary",
-"to_entity": "dt_mandate_monthly_summary",
-"description": "RM manages mandates in the same month. Join on (rmid, meet_year->posyear, meet_mon->posmon).",
-"join_on": [
-[
-"rmid",
-"rmid"
-],
-[
-"meet_year",
-"posyear"
-],
-[
-"meet_mon",
-"posmon"
-]
-]
-},
-{
-"name": "mandate_to_meetings",
-"from_entity": "dt_mandate_monthly_summary",
-"to_entity": "t_meeting_sentiment",
-"description": "Meetings associated to a mandate (and RM). Join on (mandateid, rmid).",
-"join_on": [
-[
-"mandateid",
-"mandateid"
-],
-[
-"rmid",
-"rmid"
-]
-]
-},
-{
-"name": "rm_to_meetings",
-"from_entity": "dt_rm_monthly_summary",
-"to_entity": "t_meeting_sentiment",
-"description": "Meetings associated to an RM. Join on rmid.",
-"join_on": [
-[
-"rmid",
-"rmid"
-]
-]
-}
-],
-"derived_rel_rules": [
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "month_date",
-"vars": {},
-"rules": [
-{
-"expr": "std.datetime.date(posyear,posmon,1)"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "profit_margin",
-"vars": {},
-"rules": [
-{
-"when": "revenue_amount>0",
-"expr": "profit_amount/revenue_amount"
-},
-{
-"when": "revenue_amount<=0",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "cost_to_revenue",
-"vars": {},
-"rules": [
-{
-"when": "revenue_amount>0",
-"expr": "rm_cost_for_each_mandate/revenue_amount"
-},
-{
-"when": "revenue_amount<=0",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "revenue_per_cost",
-"vars": {},
-"rules": [
-{
-"when": "rm_cost_for_each_mandate>0",
-"expr": "revenue_amount/rm_cost_for_each_mandate"
-},
-{
-"when": "rm_cost_for_each_mandate<=0",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "aum_per_cost",
-"vars": {},
-"rules": [
-{
-"when": "rm_cost_for_each_mandate>0",
-"expr": "total_aum/rm_cost_for_each_mandate"
-},
-{
-"when": "rm_cost_for_each_mandate<=0",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "aum_trend",
-"vars": {
-"prev": "ref"
-},
-"rules": [
-{
-"when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.total_aum!=0)",
-"expr": "(total_aum-prev.total_aum)/prev.total_aum"
-},
-{
-"when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.total_aum==0)",
-"expr": "0.0"
-},
-{
-"when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.total_aum!=0)",
-"expr": "(total_aum-prev.total_aum)/prev.total_aum"
-},
-{
-"when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.total_aum==0)",
-"expr": "0.0"
-},
-{
-"when": "posmon==1",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "revenue_trend",
-"vars": {
-"prev": "ref"
-},
-"rules": [
-{
-"when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.revenue_amount!=0)",
-"expr": "(revenue_amount-prev.revenue_amount)/prev.revenue_amount"
-},
-{
-"when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.revenue_amount==0)",
-"expr": "0.0"
-},
-{
-"when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.revenue_amount!=0)",
-"expr": "(revenue_amount-prev.revenue_amount)/prev.revenue_amount"
-},
-{
-"when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.revenue_amount==0)",
-"expr": "0.0"
-},
-{
-"when": "posmon==1",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "profit_trend",
-"vars": {
-"prev": "ref"
-},
-"rules": [
-{
-"when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.profit_amount!=0)",
-"expr": "(profit_amount-prev.profit_amount)/prev.profit_amount"
-},
-{
-"when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.profit_amount==0)",
-"expr": "0.0"
-},
-{
-"when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.profit_amount!=0)",
-"expr": "(profit_amount-prev.profit_amount)/prev.profit_amount"
-},
-{
-"when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.profit_amount==0)",
-"expr": "0.0"
-},
-{
-"when": "posmon==1",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "meeting_trend",
-"vars": {
-"prev": "ref"
-},
-"rules": [
-{
-"when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.topup_count!=0)",
-"expr": "(topup_count-prev.topup_count)/prev.topup_count"
-},
-{
-"when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.topup_count==0)",
-"expr": "0.0"
-},
-{
-"when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.topup_count!=0)",
-"expr": "(topup_count-prev.topup_count)/prev.topup_count"
-},
-{
-"when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.topup_count==0)",
-"expr": "0.0"
-},
-{
-"when": "posmon==1",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "signal_aum_decline",
-"vars": {},
-"rules": [
-{
-"when": "aum_trend<-0.05",
-"expr": "1.0"
-},
-{
-"when": "aum_trend>=-0.05",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "signal_low_profitability",
-"vars": {},
-"rules": [
-{
-"when": "profit_margin<0.05",
-"expr": "1.0"
-},
-{
-"when": "profit_margin>=0.05",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "signal_revenue_decline",
-"vars": {},
-"rules": [
-{
-"when": "revenue_trend<-0.10",
-"expr": "1.0"
-},
-{
-"when": "revenue_trend>=-0.10",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "signal_low_engagement",
-"vars": {},
-"rules": [
-{
-"when": "topup_count<2",
-"expr": "1.0"
-},
-{
-"when": "topup_count>=2",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "signal_high_cost_ratio",
-"vars": {},
-"rules": [
-{
-"when": "cost_to_revenue>0.30",
-"expr": "1.0"
-},
-{
-"when": "cost_to_revenue<=0.30",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "signal_high_cost",
-"vars": {},
-"rules": [
-{
-"when": "cost_to_revenue>0.30",
-"expr": "1.0"
-},
-{
-"when": "cost_to_revenue<=0.30",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "mandate_risk_score",
-"vars": {
-"score_raw": "(signal_aum_decline*1.5)+(signal_low_profitability*1.2)+(signal_revenue_decline*1.0)+(signal_low_engagement*0.8)+(signal_high_cost_ratio*1.0)"
-},
-"rules": [
-{
-"when": "score_raw>0",
-"expr": "std.math.minimum(1.0,score_raw/5.5)"
-},
-{
-"when": "score_raw<=0",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "mandate_risk_condition",
-"vars": {},
-"rules": [
-{
-"when": "mandate_risk_score>0.75",
-"expr": "at_risk"
-},
-{
-"when": "(mandate_risk_score>0.40)&(mandate_risk_score<=0.75)",
-"expr": "declining"
-},
-{
-"when": "mandate_risk_score<=0.40",
-"expr": "healthy"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "signal_aum_decline_severe",
-"vars": {},
-"rules": [
-{
-"when": "aum_trend<-0.15",
-"expr": "1.0"
-},
-{
-"when": "aum_trend>=-0.15",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "signal_meeting_drop",
-"vars": {},
-"rules": [
-{
-"when": "meeting_trend<-0.30",
-"expr": "1.0"
-},
-{
-"when": "meeting_trend>=-0.30",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "signal_profit_eroding",
-"vars": {},
-"rules": [
-{
-"when": "profit_margin<0.05",
-"expr": "1.0"
-},
-{
-"when": "profit_margin>=0.05",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "signal_cost_spike",
-"vars": {},
-"rules": [
-{
-"when": "cost_to_revenue>0.40",
-"expr": "1.0"
-},
-{
-"when": "cost_to_revenue<=0.40",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "churn_risk_score",
-"vars": {
-"score_raw": "(signal_aum_decline_severe*1.5)+(signal_meeting_drop*1.3)+(signal_profit_eroding*1.4)+(signal_cost_spike*1.2)"
-},
-"rules": [
-{
-"when": "score_raw>0",
-"expr": "std.math.minimum(1.0,score_raw/5.4)"
-},
-{
-"when": "score_raw<=0",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "signal_churn_risk",
-"vars": {},
-"rules": [
-{
-"when": "churn_risk_score>0.75",
-"expr": "1.0"
-},
-{
-"when": "churn_risk_score<=0.75",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "churn_risk_condition",
-"vars": {},
-"rules": [
-{
-"when": "churn_risk_score>0.75",
-"expr": "at_risk"
-},
-{
-"when": "(churn_risk_score>0.40)&(churn_risk_score<=0.75)",
-"expr": "declining"
-},
-{
-"when": "churn_risk_score<=0.40",
-"expr": "healthy"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "cost_driver_impact_score",
-"vars": {},
-"rules": [
-{
-"when": "cost_to_revenue>0.30",
-"expr": "std.math.minimum(1.0,cost_to_revenue*0.5)"
-},
-{
-"when": "cost_to_revenue<=0.30",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "cost_driver_condition",
-"vars": {},
-"rules": [
-{
-"when": "cost_to_revenue>0.40",
-"expr": "high_impact"
-},
-{
-"when": "(cost_to_revenue>0.30)&(cost_to_revenue<=0.40)",
-"expr": "moderate_impact"
-},
-{
-"when": "cost_to_revenue<=0.30",
-"expr": "low_impact"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "allocation_roi_factor",
-"vars": {},
-"rules": [
-{
-"when": "rm_cost_for_each_mandate>0",
-"expr": "(revenue_amount-rm_cost_for_each_mandate)/rm_cost_for_each_mandate"
-},
-{
-"when": "rm_cost_for_each_mandate<=0",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "allocation_efficiency_factor",
-"vars": {},
-"rules": [
-{
-"when": "topup_count>0",
-"expr": "revenue_amount/topup_count"
-},
-{
-"when": "topup_count<=0",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "allocation_composite_score",
-"vars": {},
-"rules": [
-{
-"when": "(topup_count>0)&(rm_cost_for_each_mandate>0)",
-"expr": "(allocation_roi_factor*0.6)+((allocation_efficiency_factor/10000.0)*0.4)"
-},
-{
-"when": "(topup_count<=0)|(rm_cost_for_each_mandate<=0)",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_mandate_monthly_summary",
-"field": "allocation_priority",
-"vars": {},
-"rules": [
-{
-"when": "allocation_composite_score>1.0",
-"expr": "HIGH"
-},
-{
-"when": "(allocation_composite_score>0.5)&(allocation_composite_score<=1.0)",
-"expr": "MEDIUM"
-},
-{
-"when": "allocation_composite_score<=0.5",
-"expr": "LOW"
-}
-]
-},
-{
-"entity": "dt_rm_monthly_summary",
-"field": "month_date",
-"vars": {},
-"rules": [
-{
-"expr": "std.datetime.date(meet_year,meet_mon,1)"
-}
-]
-},
-{
-"entity": "dt_rm_monthly_summary",
-"field": "signal_low_mandate_count",
-"vars": {},
-"rules": [
-{
-"when": "total_mandates<5",
-"expr": "1.0"
-},
-{
-"when": "total_mandates>=5",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_rm_monthly_summary",
-"field": "meeting_count_variance",
-"vars": {},
-"rules": [
-{
-"when": "meeting_count_target>0",
-"expr": "(new_mandate_total_meetings+existing_mandate_total_meetings)/meeting_count_target"
-},
-{
-"when": "meeting_count_target<=0",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_rm_monthly_summary",
-"field": "client_target_variance",
-"vars": {},
-"rules": [
-{
-"when": "clienttarget>0",
-"expr": "total_month_mandates/clienttarget"
-},
-{
-"when": "clienttarget<=0",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_rm_monthly_summary",
-"field": "signal_low_aum",
-"vars": {},
-"rules": [
-{
-"when": "aum<1000000",
-"expr": "1.0"
-},
-{
-"when": "aum>=1000000",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_rm_monthly_summary",
-"field": "signal_low_performance",
-"vars": {},
-"rules": [
-{
-"when": "performance<0.5",
-"expr": "1.0"
-},
-{
-"when": "performance>=0.5",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_rm_monthly_summary",
-"field": "rm_performance_condition",
-"vars": {},
-"rules": [
-{
-"when": "performance>0.75",
-"expr": "performing"
-},
-{
-"when": "(performance>0.40)&(performance<=0.75)",
-"expr": "needs_support"
-},
-{
-"when": "performance<=0.40",
-"expr": "underperforming"
-}
-]
-},
-{
-"entity": "dt_rm_monthly_summary",
-"field": "aum_trend",
-"vars": {
-"prev": "ref"
-},
-"rules": [
-{
-"when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.aum!=0)",
-"expr": "(aum-prev.aum)/prev.aum"
-},
-{
-"when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.aum==0)",
-"expr": "0.0"
-},
-{
-"when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.aum!=0)",
-"expr": "(aum-prev.aum)/prev.aum"
-},
-{
-"when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.aum==0)",
-"expr": "0.0"
-},
-{
-"when": "meet_mon==1",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_rm_monthly_summary",
-"field": "revenue_trend",
-"vars": {
-"prev": "ref"
-},
-"rules": [
-{
-"when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.total_nnm!=0)",
-"expr": "(total_nnm-prev.total_nnm)/prev.total_nnm"
-},
-{
-"when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.total_nnm==0)",
-"expr": "0.0"
-},
-{
-"when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.total_nnm!=0)",
-"expr": "(total_nnm-prev.total_nnm)/prev.total_nnm"
-},
-{
-"when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.total_nnm==0)",
-"expr": "0.0"
-},
-{
-"when": "meet_mon==1",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_rm_monthly_summary",
-"field": "profit_trend",
-"vars": {
-"prev": "ref"
-},
-"rules": [
-{
-"when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.performance!=0)",
-"expr": "(performance-prev.performance)/prev.performance"
-},
-{
-"when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.performance==0)",
-"expr": "0.0"
-},
-{
-"when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.performance!=0)",
-"expr": "(performance-prev.performance)/prev.performance"
-},
-{
-"when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.performance==0)",
-"expr": "0.0"
-},
-{
-"when": "meet_mon==1",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_rm_monthly_summary",
-"field": "aum_trend_rm",
-"vars": {
-"prev": "ref"
-},
-"rules": [
-{
-"when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.aum!=0)",
-"expr": "(aum-prev.aum)/prev.aum"
-},
-{
-"when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.aum==0)",
-"expr": "0.0"
-},
-{
-"when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.aum!=0)",
-"expr": "(aum-prev.aum)/prev.aum"
-},
-{
-"when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.aum==0)",
-"expr": "0.0"
-},
-{
-"when": "meet_mon==1",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_rm_monthly_summary",
-"field": "mandate_growth_trend",
-"vars": {
-"prev": "ref"
-},
-"rules": [
-{
-"when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.total_mandates!=0)",
-"expr": "(total_mandates-prev.total_mandates)/prev.total_mandates"
-},
-{
-"when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.total_mandates==0)",
-"expr": "0.0"
-},
-{
-"when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.total_mandates!=0)",
-"expr": "(total_mandates-prev.total_mandates)/prev.total_mandates"
-},
-{
-"when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.total_mandates==0)",
-"expr": "0.0"
-},
-{
-"when": "meet_mon==1",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "dt_rm_monthly_summary",
-"field": "meeting_trend",
-"vars": {
-"prev": "ref"
-},
-"rules": [
-{
-"when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&((prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)!=0)",
-"expr": "((new_mandate_total_meetings+existing_mandate_total_meetings)-(prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings))/(prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)"
-},
-{
-"when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&((prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)==0)",
-"expr": "0.0"
-},
-{
-"when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&((prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)!=0)",
-"expr": "((new_mandate_total_meetings+existing_mandate_total_meetings)-(prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings))/(prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)"
-},
-{
-"when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&((prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)==0)",
-"expr": "0.0"
-},
-{
-"when": "meet_mon==1",
-"expr": "0.0"
-}
-]
-},
-{
-"entity": "t_meeting_sentiment",
-"field": "meeting_id",
-"vars": {},
-"rules": [
-{
-"expr": "id"
-}
-]
-},
-{
-"entity": "t_meeting_sentiment",
-"field": "meeting_date",
-"vars": {},
-"rules": [
-{
-"expr": "meetingdate"
-}
-]
-},
-{
-"entity": "t_meeting_sentiment",
-"field": "duration",
-"vars": {},
-"rules": [
-{
-"expr": "meetingduration"
-}
-]
-},
-{
-"entity": "t_meeting_sentiment",
-"field": "meeting_type",
-"vars": {},
-"rules": [
-{
-"expr": "meetingtype"
-}
-]
-},
-{
-"entity": "t_meeting_sentiment",
-"field": "meeting_notes",
-"vars": {},
-"rules": [
-{
-"expr": "meetingnotes"
-}
-]
-},
-{
-"entity": "t_meeting_sentiment",
-"field": "utm_source_first_touch",
-"vars": {},
-"rules": [
-{
-"expr": "utmsourcefirsttouch"
-}
-]
-},
-{
-"entity": "t_meeting_sentiment",
-"field": "month_date",
-"vars": {},
-"rules": [
-{
-"expr": "std.datetime.date(std.datetime.datetime.year(meetingdate),std.datetime.datetime.month(meetingdate),1)"
-}
-]
-}
-],
-"kg": {
-"nodes": [
-{
-"id": "rm",
-"entity": "dt_rm_monthly_summary",
-"label": "Relationship Manager",
-"primary_key": [
-"rmid",
-"meet_year",
-"meet_mon"
-]
-},
-{
-"id": "mandate",
-"entity": "dt_mandate_monthly_summary",
-"label": "Mandate",
-"primary_key": [
-"rmid",
-"mandateid",
-"posyear",
-"posmon"
-]
-},
-{
-"id": "meeting",
-"entity": "t_meeting_sentiment",
-"label": "Meeting",
-"primary_key": [
-"rmid",
-"mandateid",
-"id"
-]
-}
-],
-"edges": [
-{
-"id": "rm_to_mandate_month",
-"relationship": "rm_to_mandate_month",
-"from": "rm",
-"to": "mandate",
-"label": "manages"
-},
-{
-"id": "mandate_to_meetings",
-"relationship": "mandate_to_meetings",
-"from": "mandate",
-"to": "meeting",
-"label": "has_meetings"
-},
-{
-"id": "rm_to_meetings",
-"relationship": "rm_to_meetings",
-"from": "rm",
-"to": "meeting",
-"label": "conducts"
-}
-],
-"graphs": [
-{
-"id": "rm_performance_graph",
-"name": "RM Performance Graph",
-"description": "RM month -> mandates -> meetings for performance and activity analysis.",
-"nodes": [
-"rm",
-"mandate",
-"meeting"
-],
-"edges": [
-"rm_to_mandate_month",
-"mandate_to_meetings"
-]
-},
-{
-"id": "mandate_risk_graph",
-"name": "Mandate Risk Graph",
-"description": "Mandate-centric graph for profitability, engagement, and churn risk signals, with meeting context.",
-"nodes": [
-"mandate",
-"meeting"
-],
-"edges": [
-"mandate_to_meetings"
-]
-}
-]
-},
-"reasoners": [
-{
-"id": "mandate_risk",
-"name": "Mandate Risk Reasoner",
-"description": "Identifies mandates at risk of attrition or declining engagement",
-"entity_type": "mandate",
-"type": "signal_based",
-"outputs": [
-"mandate_risk_score",
-"mandate_risk_condition",
-"signal_aum_decline",
-"signal_revenue_decline",
-"signal_low_profitability",
-"signal_low_engagement",
-"signal_high_cost"
-],
-"signals": [
-{
-"name": "aum_decline",
-"description": "Decreasing AUM signals client withdrawal",
-"metric_field": "aum_trend",
-"threshold": -0.05,
-"direction": "below",
-"weight": 1.5
-},
-{
-"name": "low_profitability",
-"description": "Low profit margin indicates unprofitable relationship",
-"metric_field": "profit_margin",
-"threshold": 0.05,
-"direction": "below",
-"weight": 1.2
-},
-{
-"name": "revenue_decline",
-"description": "Declining revenue suggests reduced engagement",
-"metric_field": "revenue_trend",
-"threshold": -0.1,
-"direction": "below",
-"weight": 1
-},
-{
-"name": "low_engagement",
-"description": "Few top-ups indicate poor relationship health",
-"metric_field": "topup_count",
-"threshold": 2,
-"direction": "below",
-"weight": 0.8
-},
-{
-"name": "high_cost_ratio",
-"description": "High cost-to-revenue ratio shows unprofitable servicing",
-"metric_field": "cost_to_revenue",
-"threshold": 0.3,
-"direction": "above",
-"weight": 1
-}
-]
-},
-{
-"id": "churn_risk",
-"name": "Churn Risk Reasoner",
-"description": "Predicts clients at risk of churning or becoming unprofitable within 3 months",
-"entity_type": "mandate",
-"type": "signal_based",
-"outputs": [
-"churn_risk_score",
-"churn_risk_condition",
-"signal_churn_risk"
-],
-"signals": [
-{
-"name": "aum_decline_severe",
-"description": "Severe AUM decline",
-"metric_field": "aum_trend",
-"threshold": -0.15,
-"direction": "below",
-"weight": 1.5
-},
-{
-"name": "meeting_drop",
-"description": "Sharp engagement drop",
-"metric_field": "meeting_trend",
-"threshold": -0.3,
-"direction": "below",
-"weight": 1.3
-},
-{
-"name": "profit_eroding",
-"description": "Profitability eroding",
-"metric_field": "profit_margin",
-"threshold": 0.05,
-"direction": "below",
-"weight": 1.4
-},
-{
-"name": "cost_spike",
-"description": "Cost ratio increasing",
-"metric_field": "cost_to_revenue",
-"threshold": 0.4,
-"direction": "above",
-"weight": 1.2
-}
-]
-},
-{
-"id": "trend",
-"name": "Trend Reasoner",
-"description": "Detects profit, AUM, and revenue trends over time",
-"entity_type": "mandate",
-"type": "signal_based",
-"outputs": [
-"aum_trend",
-"revenue_trend",
-"profit_trend",
-"meeting_trend"
-],
-"signals": [
-{
-"name": "aum_declining",
-"description": "AUM decreasing over time",
-"metric_field": "aum_trend",
-"threshold": -0.05,
-"direction": "below",
-"weight": 1
-},
-{
-"name": "revenue_declining",
-"description": "Revenue decreasing over time",
-"metric_field": "revenue_trend",
-"threshold": -0.1,
-"direction": "below",
-"weight": 1
-},
-{
-"name": "profit_declining",
-"description": "Profit eroding over time",
-"metric_field": "profit_trend",
-"threshold": -0.05,
-"direction": "below",
-"weight": 1.2
-}
-]
-},
-{
-"id": "cost_driver",
-"name": "Cost Driver Reasoner",
-"description": "Identifies which cost components most impact profit margins",
-"entity_type": "mandate",
-"type": "signal_based",
-"outputs": [
-"cost_driver_impact_score",
-"cost_driver_condition",
-"signal_high_cost_ratio"
-],
-"signals": []
-},
-{
-"id": "rm_health",
-"name": "RM Health Reasoner",
-"description": "Summarizes RM health using performance, AUM, meeting execution, and mandate coverage signals.",
-"entity_type": "rm",
-"type": "signal_based",
-"outputs": [
-"rm_performance_condition",
-"signal_low_performance",
-"signal_low_aum",
-"signal_low_mandate_count",
-"meeting_count_variance",
-"client_target_variance"
-],
-"signals": [
-{
-"name": "low_performance",
-"description": "RM performance score is low",
-"metric_field": "performance",
-"threshold": 0.5,
-"direction": "below",
-"weight": 1.5
-},
-{
-"name": "low_aum",
-"description": "RM AUM is low",
-"metric_field": "aum",
-"threshold": 1000000,
-"direction": "below",
-"weight": 1.0
-},
-{
-"name": "low_mandate_count",
-"description": "RM has too few mandates",
-"metric_field": "total_mandates",
-"threshold": 5,
-"direction": "below",
-"weight": 1.0
-}
-]
-},
-{
-"id": "meeting_quality",
-"name": "Meeting Quality Reasoner",
-"description": "Flags meeting quality risks using sentiment and duration patterns (lightweight).",
-"entity_type": "meeting",
-"type": "signal_based",
-"outputs": [
-"duration",
-"sentiment"
-],
-"signals": [
-{
-"name": "very_short",
-"description": "Very short meetings may indicate poor engagement",
-"metric_field": "meetingduration",
-"threshold": 10,
-"direction": "below",
-"weight": 1.0
-}
-]
-}
-]
+  "entities": [
+    {
+      "name": "MandateMonthlySummary",
+      "description": "Mandate-level monthly profitability and cost signals. Unique by (rmid, mandateid, posyear, posmon).",
+      "database": "TFO_TEST",
+      "schema": "ML_TEST",
+      "table": "MANDATE_PROFITABILITY_CT",
+      "fields": [
+        {
+          "name": "rmid",
+          "dtype": "number(38,0)",
+          "role": "dimension",
+          "expr": "RMID",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "mandateid",
+          "dtype": "number(38,0)",
+          "role": "dimension",
+          "expr": "MANDATEID",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "relationshipmanager",
+          "dtype": "varchar",
+          "role": "dimension",
+          "expr": "RELATIONSHIPMANAGER",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "email",
+          "dtype": "varchar",
+          "role": "dimension",
+          "expr": "EMAIL",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "posyear",
+          "dtype": "number(4,0)",
+          "role": "dimension",
+          "expr": "POSYEAR",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "posmon",
+          "dtype": "number(2,0)",
+          "role": "dimension",
+          "expr": "POSMON",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "positiondate",
+          "dtype": "date",
+          "role": "dimension",
+          "expr": "POSITIONDATE",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "latest_topup_date",
+          "dtype": "date",
+          "role": "dimension",
+          "expr": "LATEST_TOPUP_DATE",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "total_aum",
+          "dtype": "number(38,0)",
+          "role": "metric",
+          "expr": "TOTAL_AUM",
+          "description": "",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "avg_monthly_aum",
+          "dtype": "number(38,2)",
+          "role": "metric",
+          "expr": "AVG_MONTHLY_AUM",
+          "description": "",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "revenue_amount",
+          "dtype": "number(31,2)",
+          "role": "metric",
+          "expr": "REVENUE_AMOUNT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "profit_amount",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "PROFIT_AMOUNT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "revenue_percent",
+          "dtype": "number(38,2)",
+          "role": "metric",
+          "expr": "REVENUE_PERCENT",
+          "description": "",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "profit_percent",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "PROFIT_PERCENT",
+          "description": "",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "annualized_revenue_amount",
+          "dtype": "number(38,2)",
+          "role": "metric",
+          "expr": "ANNUALIZED_REVENUE_AMOUNT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "profit_amount_annualized",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "PROFIT_AMOUNT_ANNUALIZED",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "revenue_percent_annualized",
+          "dtype": "number(38,2)",
+          "role": "metric",
+          "expr": "REVENUE_PERCENT_ANNUALIZED",
+          "description": "",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "profit_percent_annualized",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "PROFIT_PERCENT_ANNUALIZED",
+          "description": "",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "rm_cost_for_each_mandate",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "RM_COST_FOR_EACH_MANDATE",
+          "description": "Monthly RM cost allocated to the mandate (month-level).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "topup_count",
+          "dtype": "number(18,0)",
+          "role": "metric",
+          "expr": "TOPUP_COUNT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "topup_amount",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "TOPUP_AMOUNT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "dealname_count",
+          "dtype": "number(18,0)",
+          "role": "metric",
+          "expr": "DEALNAME_COUNT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "mandate_count",
+          "dtype": "number(18,0)",
+          "role": "metric",
+          "expr": "MANDATE_COUNT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "month_date",
+          "dtype": "date",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "posyear",
+            "posmon"
+          ]
+        },
+        {
+          "name": "profit_margin",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "profit_amount",
+            "revenue_amount"
+          ]
+        },
+        {
+          "name": "cost_to_revenue",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "rm_cost_for_each_mandate",
+            "revenue_amount"
+          ]
+        },
+        {
+          "name": "revenue_per_cost",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "revenue_amount",
+            "rm_cost_for_each_mandate"
+          ]
+        },
+        {
+          "name": "aum_per_cost",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "total_aum",
+            "rm_cost_for_each_mandate"
+          ]
+        },
+        {
+          "name": "signal_low_profitability",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "profit_margin"
+          ]
+        },
+        {
+          "name": "signal_low_engagement",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "topup_count"
+          ]
+        },
+        {
+          "name": "signal_high_cost_ratio",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "cost_to_revenue"
+          ]
+        },
+        {
+          "name": "signal_high_cost",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "cost_to_revenue"
+          ]
+        },
+        {
+          "name": "signal_profit_eroding",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "profit_margin"
+          ]
+        },
+        {
+          "name": "signal_cost_spike",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "cost_to_revenue"
+          ]
+        },
+        {
+          "name": "cost_driver_impact_score",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "cost_to_revenue"
+          ]
+        },
+        {
+          "name": "cost_driver_condition",
+          "dtype": "text",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "cost_to_revenue"
+          ]
+        },
+        {
+          "name": "aum_trend",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "total_aum",
+            "avg_monthly_aum"
+          ]
+        },
+        {
+          "name": "revenue_trend",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "revenue_amount",
+            "annualized_revenue_amount"
+          ]
+        },
+        {
+          "name": "profit_trend",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "profit_amount",
+            "profit_amount_annualized"
+          ]
+        },
+        {
+          "name": "meeting_trend",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "topup_count",
+            "mandate_count"
+          ]
+        },
+        {
+          "name": "signal_aum_decline",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "aum_trend"
+          ]
+        },
+        {
+          "name": "signal_revenue_decline",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "revenue_trend"
+          ]
+        },
+        {
+          "name": "signal_aum_decline_severe",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "aum_trend"
+          ]
+        },
+        {
+          "name": "signal_meeting_drop",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "meeting_trend"
+          ]
+        },
+        {
+          "name": "mandate_risk_score",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "signal_aum_decline",
+            "signal_low_profitability",
+            "signal_revenue_decline",
+            "signal_low_engagement",
+            "signal_high_cost_ratio"
+          ]
+        },
+        {
+          "name": "mandate_risk_condition",
+          "dtype": "text",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "mandate_risk_score"
+          ]
+        },
+        {
+          "name": "churn_risk_score",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "signal_aum_decline_severe",
+            "signal_meeting_drop",
+            "signal_profit_eroding",
+            "signal_cost_spike"
+          ]
+        },
+        {
+          "name": "signal_churn_risk",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "churn_risk_score"
+          ]
+        },
+        {
+          "name": "churn_risk_condition",
+          "dtype": "text",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "churn_risk_score"
+          ]
+        },
+        {
+          "name": "allocation_roi_factor",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "revenue_amount",
+            "rm_cost_for_each_mandate"
+          ]
+        },
+        {
+          "name": "allocation_efficiency_factor",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "revenue_amount",
+            "topup_count"
+          ]
+        },
+        {
+          "name": "allocation_composite_score",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "allocation_roi_factor",
+            "allocation_efficiency_factor"
+          ]
+        },
+        {
+          "name": "allocation_priority",
+          "dtype": "text",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "allocation_composite_score"
+          ]
+        }
+      ],
+      "join_keys": [
+        "rmid",
+        "mandateid",
+        "posyear",
+        "posmon"
+      ],
+      "default_metric": "total_aum",
+      "entity_type": "mandate",
+      "applicable_reasoners": [
+        "mandate_risk",
+        "trend",
+        "churn_risk",
+        "cost_driver"
+      ],
+      "applicable_derived_metrics": [
+        "month_date",
+        "profit_margin",
+        "cost_to_revenue",
+        "revenue_per_cost",
+        "aum_per_cost",
+        "signal_low_profitability",
+        "signal_low_engagement",
+        "signal_high_cost_ratio",
+        "signal_high_cost",
+        "signal_profit_eroding",
+        "signal_cost_spike",
+        "cost_driver_impact_score",
+        "cost_driver_condition",
+        "aum_trend",
+        "revenue_trend",
+        "profit_trend",
+        "meeting_trend",
+        "signal_aum_decline",
+        "signal_revenue_decline",
+        "signal_aum_decline_severe",
+        "signal_meeting_drop",
+        "mandate_risk_score",
+        "mandate_risk_condition",
+        "churn_risk_score",
+        "signal_churn_risk",
+        "churn_risk_condition",
+        "allocation_roi_factor",
+        "allocation_efficiency_factor",
+        "allocation_composite_score",
+        "allocation_priority"
+      ]
+    },
+    {
+      "name": "RMMonthlySummary",
+      "description": "RM monthly performance signals. Unique by (rmid, meet_year, meet_mon).",
+      "database": "TFO_TEST",
+      "schema": "ML_TEST",
+      "table": "RM_PERFORMANCE_TBL",
+      "fields": [
+        {
+          "name": "rmid",
+          "dtype": "number(38,0)",
+          "role": "dimension",
+          "expr": "RMID",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "rm_name",
+          "dtype": "varchar",
+          "role": "dimension",
+          "expr": "RM_NAME",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "meet_year",
+          "dtype": "number(4,0)",
+          "role": "dimension",
+          "expr": "MEET_YEAR",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "meet_mon",
+          "dtype": "number(2,0)",
+          "role": "dimension",
+          "expr": "MEET_MON",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "performance",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "PERFORMANCE",
+          "description": "",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "aum",
+          "dtype": "number(38,6)",
+          "role": "metric",
+          "expr": "AUM",
+          "description": "",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "total_nnm",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "TOTAL_NNM",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "cash_in",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "CASH_IN",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "buy",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "BUY",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "sell",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "SELL",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "topupcommitment",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "TOPUPCOMMITMENT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "firstcommitment",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "FIRSTCOMMITMENT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "total_mandates",
+          "dtype": "number(18,0)",
+          "role": "metric",
+          "expr": "TOTAL_MANDATES",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "total_month_mandates",
+          "dtype": "number(18,0)",
+          "role": "metric",
+          "expr": "TOTAL_MONTH_MANDATES",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "meeting_count_target",
+          "dtype": "number(38,0)",
+          "role": "metric",
+          "expr": "MEETING_COUNT_TARGET",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "clienttarget",
+          "dtype": "number(38,0)",
+          "role": "metric",
+          "expr": "CLIENTTARGET",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "commitmenttarget",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "COMMITMENTTARGET",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "nnmtarget",
+          "dtype": "float",
+          "role": "metric",
+          "expr": "NNMTARGET",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "new_mandate_positive_cnt",
+          "dtype": "number(18,0)",
+          "role": "metric",
+          "expr": "NEW_MANDATE_POSITIVE_CNT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "new_mandate_negative_cnt",
+          "dtype": "number(18,0)",
+          "role": "metric",
+          "expr": "NEW_MANDATE_NEGATIVE_CNT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "new_mandate_neutral_cnt",
+          "dtype": "number(18,0)",
+          "role": "metric",
+          "expr": "NEW_MANDATE_NEUTRAL_CNT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "new_mandate_total_meetings",
+          "dtype": "number(18,0)",
+          "role": "metric",
+          "expr": "NEW_MANDATE_TOTAL_MEETINGS",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "existing_mandate_positive_cnt",
+          "dtype": "number(18,0)",
+          "role": "metric",
+          "expr": "EXISTING_MANDATE_POSITIVE_CNT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "existing_mandate_negative_cnt",
+          "dtype": "number(18,0)",
+          "role": "metric",
+          "expr": "EXISTING_MANDATE_NEGATIVE_CNT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "existing_mandate_neutral_cnt",
+          "dtype": "number(18,0)",
+          "role": "metric",
+          "expr": "EXISTING_MANDATE_NEUTRAL_CNT",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "existing_mandate_total_meetings",
+          "dtype": "number(18,0)",
+          "role": "metric",
+          "expr": "EXISTING_MANDATE_TOTAL_MEETINGS",
+          "description": "",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "month_date",
+          "dtype": "date",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "meet_year",
+            "meet_mon"
+          ]
+        },
+        {
+          "name": "signal_low_mandate_count",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "total_mandates"
+          ]
+        },
+        {
+          "name": "meeting_count_variance",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "meeting_count_target",
+            "new_mandate_total_meetings",
+            "existing_mandate_total_meetings"
+          ]
+        },
+        {
+          "name": "client_target_variance",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "clienttarget",
+            "total_month_mandates"
+          ]
+        },
+        {
+          "name": "signal_low_aum",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "aum"
+          ]
+        },
+        {
+          "name": "signal_low_performance",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "max",
+          "depends_on": [
+            "performance"
+          ]
+        },
+        {
+          "name": "rm_performance_condition",
+          "dtype": "text",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "performance"
+          ]
+        },
+        {
+          "name": "aum_trend",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "aum",
+            "nnmtarget"
+          ]
+        },
+        {
+          "name": "revenue_trend",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "total_nnm",
+            "nnmtarget"
+          ]
+        },
+        {
+          "name": "profit_trend",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "performance"
+          ]
+        },
+        {
+          "name": "meeting_trend",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "new_mandate_total_meetings",
+            "existing_mandate_total_meetings",
+            "meeting_count_target"
+          ]
+        },
+        {
+          "name": "aum_trend_rm",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "aum",
+            "nnmtarget"
+          ]
+        },
+        {
+          "name": "mandate_growth_trend",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "total_month_mandates",
+            "total_mandates"
+          ]
+        }
+      ],
+      "join_keys": [
+        "rmid",
+        "meet_year",
+        "meet_mon"
+      ],
+      "default_metric": "performance",
+      "entity_type": "rm",
+      "applicable_reasoners": [],
+      "applicable_derived_metrics": [
+        "month_date",
+        "signal_low_mandate_count",
+        "meeting_count_variance",
+        "client_target_variance",
+        "signal_low_aum",
+        "signal_low_performance",
+        "rm_performance_condition",
+        "aum_trend",
+        "revenue_trend",
+        "profit_trend",
+        "meeting_trend",
+        "aum_trend_rm",
+        "mandate_growth_trend"
+      ]
+    },
+    {
+      "name": "MeetingSentiment",
+      "description": "Meeting sentiment and activity signals. Unique by (rmid, mandateid, meeting_id).",
+      "database": "TFO_TEST",
+      "schema": "ML_TEST",
+      "table": "MEETING_SENTIMENT_ANALYSIS_MANDATE_V",
+      "fields": [
+        {
+          "name": "id",
+          "dtype": "number(38,0)",
+          "role": "dimension",
+          "expr": "ID",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "rmid",
+          "dtype": "number(38,0)",
+          "role": "dimension",
+          "expr": "RMID",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "mandateid",
+          "dtype": "number(38,0)",
+          "role": "dimension",
+          "expr": "MANDATEID",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "meetingdate",
+          "dtype": "timestamp_ntz(9)",
+          "role": "dimension",
+          "expr": "MEETINGDATE",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "sentiment",
+          "dtype": "varchar",
+          "role": "dimension",
+          "expr": "SENTIMENT",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "meetingduration",
+          "dtype": "number(38,1)",
+          "role": "metric",
+          "expr": "MEETINGDURATION",
+          "description": "",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "meetingtype",
+          "dtype": "varchar",
+          "role": "dimension",
+          "expr": "MEETINGTYPE",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "meetingnotes",
+          "dtype": "varchar",
+          "role": "dimension",
+          "expr": "MEETINGNOTES",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "cleaned_notes",
+          "dtype": "varchar",
+          "role": "dimension",
+          "expr": "CLEANED_NOTES",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reasoning",
+          "dtype": "varchar",
+          "role": "dimension",
+          "expr": "REASONING",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "suggestion",
+          "dtype": "varchar",
+          "role": "dimension",
+          "expr": "SUGGESTION",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "hubspotid",
+          "dtype": "number(38,0)",
+          "role": "dimension",
+          "expr": "HUBSPOTID",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "utmsourcefirsttouch",
+          "dtype": "varchar",
+          "role": "dimension",
+          "expr": "UTMSOURCEFIRSTTOUCH",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ownerid",
+          "dtype": "number(38,0)",
+          "role": "dimension",
+          "expr": "OWNERID",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "create_date",
+          "dtype": "timestamp_ntz(9)",
+          "role": "dimension",
+          "expr": "CREATE_DATE",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "email",
+          "dtype": "varchar",
+          "role": "dimension",
+          "expr": "EMAIL",
+          "description": "",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "meeting_id",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "id"
+          ]
+        },
+        {
+          "name": "meeting_date",
+          "dtype": "timestamp",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "meetingdate"
+          ]
+        },
+        {
+          "name": "duration",
+          "dtype": "number",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "meetingduration"
+          ]
+        },
+        {
+          "name": "meeting_type",
+          "dtype": "text",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "meetingtype"
+          ]
+        },
+        {
+          "name": "meeting_notes",
+          "dtype": "text",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "meetingnotes"
+          ]
+        },
+        {
+          "name": "utm_source_first_touch",
+          "dtype": "text",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "utmsourcefirsttouch"
+          ]
+        },
+        {
+          "name": "month_date",
+          "dtype": "date",
+          "role": "derived",
+          "expr": "",
+          "description": "",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "meetingdate"
+          ]
+        }
+      ],
+      "join_keys": [
+        "rmid",
+        "mandateid",
+        "id"
+      ],
+      "default_metric": "duration",
+      "entity_type": "meeting",
+      "applicable_reasoners": [],
+      "applicable_derived_metrics": []
+    }
+  ],
+  "relationships": [
+    {
+      "name": "manages_mandates_month",
+      "from_entity": "RMMonthlySummary",
+      "to_entity": "MandateMonthlySummary",
+      "description": "RM manages mandates in the same month. Aligned join on (rmid, year, month).",
+      "join_on": [
+        [
+          "rmid",
+          "rmid"
+        ],
+        [
+          "meet_year",
+          "posyear"
+        ],
+        [
+          "meet_mon",
+          "posmon"
+        ]
+      ]
+    },
+    {
+      "name": "assigned_rm_month",
+      "from_entity": "MandateMonthlySummary",
+      "to_entity": "RMMonthlySummary",
+      "description": "Mandate belongs to an RM in the same month. Aligned join on (rmid, year, month).",
+      "join_on": [
+        [
+          "rmid",
+          "rmid"
+        ],
+        [
+          "posyear",
+          "meet_year"
+        ],
+        [
+          "posmon",
+          "meet_mon"
+        ]
+      ]
+    },
+    {
+      "name": "mandate_meetings",
+      "from_entity": "MandateMonthlySummary",
+      "to_entity": "MeetingSentiment",
+      "description": "Meetings for a mandate. Join on mandateid.",
+      "join_on": [
+        [
+          "mandateid",
+          "mandateid"
+        ],
+        [
+          "rmid",
+          "rmid"
+        ]
+      ]
+    },
+    {
+      "name": "rm_meetings",
+      "from_entity": "RMMonthlySummary",
+      "to_entity": "MeetingSentiment",
+      "description": "Meetings for an RM. Join on rmid.",
+      "join_on": [
+        [
+          "rmid",
+          "rmid"
+        ]
+      ]
+    }
+  ],
+  "reasoners": [
+    {
+      "id": "mandate_risk",
+      "name": "Mandate Risk Reasoner",
+      "description": "Identifies mandates at risk of attrition or declining engagement",
+      "entity_type": "mandate",
+      "type": "signal_based",
+      "outputs": [
+        "mandate_risk_score",
+        "mandate_risk_condition",
+        "signal_aum_decline",
+        "signal_revenue_decline",
+        "signal_low_profitability",
+        "signal_low_engagement",
+        "signal_high_cost"
+      ],
+      "signals": [
+        {
+          "name": "aum_decline",
+          "description": "Decreasing AUM signals client withdrawal",
+          "metric_field": "aum_trend",
+          "threshold": -0.05,
+          "direction": "below",
+          "weight": 1.5
+        },
+        {
+          "name": "low_profitability",
+          "description": "Low profit margin indicates unprofitable relationship",
+          "metric_field": "profit_margin",
+          "threshold": 0.05,
+          "direction": "below",
+          "weight": 1.2
+        },
+        {
+          "name": "revenue_decline",
+          "description": "Declining revenue suggests reduced engagement",
+          "metric_field": "revenue_trend",
+          "threshold": -0.1,
+          "direction": "below",
+          "weight": 1
+        },
+        {
+          "name": "low_engagement",
+          "description": "Few top-ups indicate poor relationship health",
+          "metric_field": "topup_count",
+          "threshold": 2,
+          "direction": "below",
+          "weight": 0.8
+        },
+        {
+          "name": "high_cost_ratio",
+          "description": "High cost-to-revenue ratio shows unprofitable servicing",
+          "metric_field": "cost_to_revenue",
+          "threshold": 0.3,
+          "direction": "above",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "churn_risk",
+      "name": "Churn Risk Reasoner",
+      "description": "Predicts clients at risk of churning or becoming unprofitable within 3 months",
+      "entity_type": "mandate",
+      "type": "signal_based",
+      "outputs": [
+        "churn_risk_score",
+        "churn_risk_condition",
+        "signal_churn_risk"
+      ],
+      "signals": [
+        {
+          "name": "aum_decline_severe",
+          "description": "Severe AUM decline",
+          "metric_field": "aum_trend",
+          "threshold": -0.15,
+          "direction": "below",
+          "weight": 1.5
+        },
+        {
+          "name": "meeting_drop",
+          "description": "Sharp engagement drop",
+          "metric_field": "meeting_trend",
+          "threshold": -0.3,
+          "direction": "below",
+          "weight": 1.3
+        },
+        {
+          "name": "profit_eroding",
+          "description": "Profitability eroding",
+          "metric_field": "profit_margin",
+          "threshold": 0.05,
+          "direction": "below",
+          "weight": 1.4
+        },
+        {
+          "name": "cost_spike",
+          "description": "Cost ratio increasing",
+          "metric_field": "cost_to_revenue",
+          "threshold": 0.4,
+          "direction": "above",
+          "weight": 1.2
+        }
+      ]
+    },
+    {
+      "id": "trend",
+      "name": "Trend Reasoner",
+      "description": "Detects profit, AUM, and revenue trends over time",
+      "entity_type": "mandate",
+      "type": "signal_based",
+      "outputs": [
+        "aum_trend",
+        "revenue_trend",
+        "profit_trend",
+        "meeting_trend"
+      ],
+      "signals": [
+        {
+          "name": "aum_declining",
+          "description": "AUM decreasing over time",
+          "metric_field": "aum_trend",
+          "threshold": -0.05,
+          "direction": "below",
+          "weight": 1
+        },
+        {
+          "name": "revenue_declining",
+          "description": "Revenue decreasing over time",
+          "metric_field": "revenue_trend",
+          "threshold": -0.1,
+          "direction": "below",
+          "weight": 1
+        },
+        {
+          "name": "profit_declining",
+          "description": "Profit eroding over time",
+          "metric_field": "profit_trend",
+          "threshold": -0.05,
+          "direction": "below",
+          "weight": 1.2
+        }
+      ]
+    },
+    {
+      "id": "cost_driver",
+      "name": "Cost Driver Reasoner",
+      "description": "Identifies which cost components most impact profit margins",
+      "entity_type": "mandate",
+      "type": "signal_based",
+      "outputs": [
+        "cost_driver_impact_score",
+        "cost_driver_condition",
+        "signal_high_cost_ratio"
+      ],
+      "signals": []
+    }
+  ],
+  "derived_rel_rules": [
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "month_date",
+      "vars": {},
+      "rules": [
+        {
+          "expr": "std.datetime.date(posyear,posmon,1)"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "profit_margin",
+      "vars": {},
+      "rules": [
+        {
+          "when": "revenue_amount>0",
+          "expr": "profit_amount/revenue_amount"
+        },
+        {
+          "when": "revenue_amount<=0",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "cost_to_revenue",
+      "vars": {},
+      "rules": [
+        {
+          "when": "revenue_amount>0",
+          "expr": "rm_cost_for_each_mandate/revenue_amount"
+        },
+        {
+          "when": "revenue_amount<=0",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "revenue_per_cost",
+      "vars": {},
+      "rules": [
+        {
+          "when": "rm_cost_for_each_mandate>0",
+          "expr": "revenue_amount/rm_cost_for_each_mandate"
+        },
+        {
+          "when": "rm_cost_for_each_mandate<=0",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "aum_per_cost",
+      "vars": {},
+      "rules": [
+        {
+          "when": "rm_cost_for_each_mandate>0",
+          "expr": "total_aum/rm_cost_for_each_mandate"
+        },
+        {
+          "when": "rm_cost_for_each_mandate<=0",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "aum_trend",
+      "vars": {
+        "prev": "ref"
+      },
+      "rules": [
+        {
+          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.total_aum!=0)",
+          "expr": "(total_aum-prev.total_aum)/prev.total_aum"
+        },
+        {
+          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.total_aum==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.total_aum!=0)",
+          "expr": "(total_aum-prev.total_aum)/prev.total_aum"
+        },
+        {
+          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.total_aum==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "posmon==1",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "revenue_trend",
+      "vars": {
+        "prev": "ref"
+      },
+      "rules": [
+        {
+          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.revenue_amount!=0)",
+          "expr": "(revenue_amount-prev.revenue_amount)/prev.revenue_amount"
+        },
+        {
+          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.revenue_amount==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.revenue_amount!=0)",
+          "expr": "(revenue_amount-prev.revenue_amount)/prev.revenue_amount"
+        },
+        {
+          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.revenue_amount==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "posmon==1",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "profit_trend",
+      "vars": {
+        "prev": "ref"
+      },
+      "rules": [
+        {
+          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.profit_amount!=0)",
+          "expr": "(profit_amount-prev.profit_amount)/prev.profit_amount"
+        },
+        {
+          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.profit_amount==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.profit_amount!=0)",
+          "expr": "(profit_amount-prev.profit_amount)/prev.profit_amount"
+        },
+        {
+          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.profit_amount==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "posmon==1",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "meeting_trend",
+      "vars": {
+        "prev": "ref"
+      },
+      "rules": [
+        {
+          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.topup_count!=0)",
+          "expr": "(topup_count-prev.topup_count)/prev.topup_count"
+        },
+        {
+          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.topup_count==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.topup_count!=0)",
+          "expr": "(topup_count-prev.topup_count)/prev.topup_count"
+        },
+        {
+          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.topup_count==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "posmon==1",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "signal_aum_decline",
+      "vars": {},
+      "rules": [
+        {
+          "when": "aum_trend<-0.05",
+          "expr": "1.0"
+        },
+        {
+          "when": "aum_trend>=-0.05",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "signal_low_profitability",
+      "vars": {},
+      "rules": [
+        {
+          "when": "profit_margin<0.05",
+          "expr": "1.0"
+        },
+        {
+          "when": "profit_margin>=0.05",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "signal_revenue_decline",
+      "vars": {},
+      "rules": [
+        {
+          "when": "revenue_trend<-0.10",
+          "expr": "1.0"
+        },
+        {
+          "when": "revenue_trend>=-0.10",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "signal_low_engagement",
+      "vars": {},
+      "rules": [
+        {
+          "when": "topup_count<2",
+          "expr": "1.0"
+        },
+        {
+          "when": "topup_count>=2",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "signal_high_cost_ratio",
+      "vars": {},
+      "rules": [
+        {
+          "when": "cost_to_revenue>0.30",
+          "expr": "1.0"
+        },
+        {
+          "when": "cost_to_revenue<=0.30",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "signal_high_cost",
+      "vars": {},
+      "rules": [
+        {
+          "when": "cost_to_revenue>0.30",
+          "expr": "1.0"
+        },
+        {
+          "when": "cost_to_revenue<=0.30",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "mandate_risk_score",
+      "vars": {
+        "score_raw": "(signal_aum_decline*1.5)+(signal_low_profitability*1.2)+(signal_revenue_decline*1.0)+(signal_low_engagement*0.8)+(signal_high_cost_ratio*1.0)"
+      },
+      "rules": [
+        {
+          "when": "score_raw>0",
+          "expr": "std.math.minimum(1.0,score_raw/5.5)"
+        },
+        {
+          "when": "score_raw<=0",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "mandate_risk_condition",
+      "vars": {},
+      "rules": [
+        {
+          "when": "mandate_risk_score>0.75",
+          "expr": "\"at_risk\""
+        },
+        {
+          "when": "(mandate_risk_score>0.40)&(mandate_risk_score<=0.75)",
+          "expr": "\"declining\""
+        },
+        {
+          "when": "mandate_risk_score<=0.40",
+          "expr": "\"healthy\""
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "signal_aum_decline_severe",
+      "vars": {},
+      "rules": [
+        {
+          "when": "aum_trend<-0.15",
+          "expr": "1.0"
+        },
+        {
+          "when": "aum_trend>=-0.15",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "signal_meeting_drop",
+      "vars": {},
+      "rules": [
+        {
+          "when": "meeting_trend<-0.30",
+          "expr": "1.0"
+        },
+        {
+          "when": "meeting_trend>=-0.30",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "signal_profit_eroding",
+      "vars": {},
+      "rules": [
+        {
+          "when": "profit_margin<0.05",
+          "expr": "1.0"
+        },
+        {
+          "when": "profit_margin>=0.05",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "signal_cost_spike",
+      "vars": {},
+      "rules": [
+        {
+          "when": "cost_to_revenue>0.40",
+          "expr": "1.0"
+        },
+        {
+          "when": "cost_to_revenue<=0.40",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "churn_risk_score",
+      "vars": {
+        "score_raw": "(signal_aum_decline_severe*1.5)+(signal_meeting_drop*1.3)+(signal_profit_eroding*1.4)+(signal_cost_spike*1.2)"
+      },
+      "rules": [
+        {
+          "when": "score_raw>0",
+          "expr": "std.math.minimum(1.0,score_raw/5.4)"
+        },
+        {
+          "when": "score_raw<=0",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "signal_churn_risk",
+      "vars": {},
+      "rules": [
+        {
+          "when": "churn_risk_score>0.75",
+          "expr": "1.0"
+        },
+        {
+          "when": "churn_risk_score<=0.75",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "churn_risk_condition",
+      "vars": {},
+      "rules": [
+        {
+          "when": "churn_risk_score>0.75",
+          "expr": "\"at_risk\""
+        },
+        {
+          "when": "(churn_risk_score>0.40)&(churn_risk_score<=0.75)",
+          "expr": "\"declining\""
+        },
+        {
+          "when": "churn_risk_score<=0.40",
+          "expr": "\"healthy\""
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "cost_driver_impact_score",
+      "vars": {},
+      "rules": [
+        {
+          "when": "cost_to_revenue>0.30",
+          "expr": "std.math.minimum(1.0,cost_to_revenue*0.5)"
+        },
+        {
+          "when": "cost_to_revenue<=0.30",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "cost_driver_condition",
+      "vars": {},
+      "rules": [
+        {
+          "when": "cost_to_revenue>0.40",
+          "expr": "\"high_impact\""
+        },
+        {
+          "when": "(cost_to_revenue>0.30)&(cost_to_revenue<=0.40)",
+          "expr": "\"moderate_impact\""
+        },
+        {
+          "when": "cost_to_revenue<=0.30",
+          "expr": "\"low_impact\""
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "allocation_roi_factor",
+      "vars": {},
+      "rules": [
+        {
+          "when": "rm_cost_for_each_mandate>0",
+          "expr": "(revenue_amount-rm_cost_for_each_mandate)/rm_cost_for_each_mandate"
+        },
+        {
+          "when": "rm_cost_for_each_mandate<=0",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "allocation_efficiency_factor",
+      "vars": {},
+      "rules": [
+        {
+          "when": "topup_count>0",
+          "expr": "revenue_amount/topup_count"
+        },
+        {
+          "when": "topup_count<=0",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "allocation_composite_score",
+      "vars": {},
+      "rules": [
+        {
+          "when": "(topup_count>0)&(rm_cost_for_each_mandate>0)",
+          "expr": "(allocation_roi_factor*0.6)+((allocation_efficiency_factor/10000.0)*0.4)"
+        },
+        {
+          "when": "(topup_count<=0)|(rm_cost_for_each_mandate<=0)",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MandateMonthlySummary",
+      "field": "allocation_priority",
+      "vars": {},
+      "rules": [
+        {
+          "when": "allocation_composite_score>1.0",
+          "expr": "\"HIGH\""
+        },
+        {
+          "when": "(allocation_composite_score>0.5)&(allocation_composite_score<=1.0)",
+          "expr": "\"MEDIUM\""
+        },
+        {
+          "when": "allocation_composite_score<=0.5",
+          "expr": "\"LOW\""
+        }
+      ]
+    },
+    {
+      "entity": "RMMonthlySummary",
+      "field": "month_date",
+      "vars": {},
+      "rules": [
+        {
+          "expr": "std.datetime.date(meet_year,meet_mon,1)"
+        }
+      ]
+    },
+    {
+      "entity": "RMMonthlySummary",
+      "field": "signal_low_mandate_count",
+      "vars": {},
+      "rules": [
+        {
+          "when": "total_mandates<5",
+          "expr": "1.0"
+        },
+        {
+          "when": "total_mandates>=5",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "RMMonthlySummary",
+      "field": "meeting_count_variance",
+      "vars": {},
+      "rules": [
+        {
+          "when": "meeting_count_target>0",
+          "expr": "(new_mandate_total_meetings+existing_mandate_total_meetings)/meeting_count_target"
+        },
+        {
+          "when": "meeting_count_target<=0",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "RMMonthlySummary",
+      "field": "client_target_variance",
+      "vars": {},
+      "rules": [
+        {
+          "when": "clienttarget>0",
+          "expr": "total_month_mandates/clienttarget"
+        },
+        {
+          "when": "clienttarget<=0",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "RMMonthlySummary",
+      "field": "signal_low_aum",
+      "vars": {},
+      "rules": [
+        {
+          "when": "aum<1000000",
+          "expr": "1.0"
+        },
+        {
+          "when": "aum>=1000000",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "RMMonthlySummary",
+      "field": "signal_low_performance",
+      "vars": {},
+      "rules": [
+        {
+          "when": "performance<0.5",
+          "expr": "1.0"
+        },
+        {
+          "when": "performance>=0.5",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "RMMonthlySummary",
+      "field": "rm_performance_condition",
+      "vars": {},
+      "rules": [
+        {
+          "when": "performance>0.75",
+          "expr": "\"performing\""
+        },
+        {
+          "when": "(performance>0.40)&(performance<=0.75)",
+          "expr": "\"needs_support\""
+        },
+        {
+          "when": "performance<=0.40",
+          "expr": "\"underperforming\""
+        }
+      ]
+    },
+    {
+      "entity": "RMMonthlySummary",
+      "field": "aum_trend",
+      "vars": {
+        "prev": "ref"
+      },
+      "rules": [
+        {
+          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.aum!=0)",
+          "expr": "(aum-prev.aum)/prev.aum"
+        },
+        {
+          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.aum==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.aum!=0)",
+          "expr": "(aum-prev.aum)/prev.aum"
+        },
+        {
+          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.aum==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "meet_mon==1",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "RMMonthlySummary",
+      "field": "revenue_trend",
+      "vars": {
+        "prev": "ref"
+      },
+      "rules": [
+        {
+          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.total_nnm!=0)",
+          "expr": "(total_nnm-prev.total_nnm)/prev.total_nnm"
+        },
+        {
+          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.total_nnm==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.total_nnm!=0)",
+          "expr": "(total_nnm-prev.total_nnm)/prev.total_nnm"
+        },
+        {
+          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.total_nnm==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "meet_mon==1",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "RMMonthlySummary",
+      "field": "profit_trend",
+      "vars": {
+        "prev": "ref"
+      },
+      "rules": [
+        {
+          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.performance!=0)",
+          "expr": "(performance-prev.performance)/prev.performance"
+        },
+        {
+          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.performance==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.performance!=0)",
+          "expr": "(performance-prev.performance)/prev.performance"
+        },
+        {
+          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.performance==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "meet_mon==1",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "RMMonthlySummary",
+      "field": "aum_trend_rm",
+      "vars": {
+        "prev": "ref"
+      },
+      "rules": [
+        {
+          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.aum!=0)",
+          "expr": "(aum-prev.aum)/prev.aum"
+        },
+        {
+          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.aum==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.aum!=0)",
+          "expr": "(aum-prev.aum)/prev.aum"
+        },
+        {
+          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.aum==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "meet_mon==1",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "RMMonthlySummary",
+      "field": "mandate_growth_trend",
+      "vars": {
+        "prev": "ref"
+      },
+      "rules": [
+        {
+          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.total_mandates!=0)",
+          "expr": "(total_mandates-prev.total_mandates)/prev.total_mandates"
+        },
+        {
+          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.total_mandates==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.total_mandates!=0)",
+          "expr": "(total_mandates-prev.total_mandates)/prev.total_mandates"
+        },
+        {
+          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.total_mandates==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "meet_mon==1",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "RMMonthlySummary",
+      "field": "meeting_trend",
+      "vars": {
+        "prev": "ref"
+      },
+      "rules": [
+        {
+          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&((prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)!=0)",
+          "expr": "((new_mandate_total_meetings+existing_mandate_total_meetings)-(prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings))/(prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)"
+        },
+        {
+          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&((prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&((prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)!=0)",
+          "expr": "((new_mandate_total_meetings+existing_mandate_total_meetings)-(prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings))/(prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)"
+        },
+        {
+          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&((prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)==0)",
+          "expr": "0.0"
+        },
+        {
+          "when": "meet_mon==1",
+          "expr": "0.0"
+        }
+      ]
+    },
+    {
+      "entity": "MeetingSentiment",
+      "field": "meeting_id",
+      "vars": {},
+      "rules": [
+        {
+          "expr": "id"
+        }
+      ]
+    },
+    {
+      "entity": "MeetingSentiment",
+      "field": "meeting_date",
+      "vars": {},
+      "rules": [
+        {
+          "expr": "meetingdate"
+        }
+      ]
+    },
+    {
+      "entity": "MeetingSentiment",
+      "field": "duration",
+      "vars": {},
+      "rules": [
+        {
+          "expr": "meetingduration"
+        }
+      ]
+    },
+    {
+      "entity": "MeetingSentiment",
+      "field": "meeting_type",
+      "vars": {},
+      "rules": [
+        {
+          "expr": "meetingtype"
+        }
+      ]
+    },
+    {
+      "entity": "MeetingSentiment",
+      "field": "meeting_notes",
+      "vars": {},
+      "rules": [
+        {
+          "expr": "meetingnotes"
+        }
+      ]
+    },
+    {
+      "entity": "MeetingSentiment",
+      "field": "utm_source_first_touch",
+      "vars": {},
+      "rules": [
+        {
+          "expr": "utmsourcefirsttouch"
+        }
+      ]
+    },
+    {
+      "entity": "MeetingSentiment",
+      "field": "month_date",
+      "vars": {},
+      "rules": [
+        {
+          "expr": "std.datetime.date(std.datetime.datetime.year(meetingdate),std.datetime.datetime.month(meetingdate),1)"
+        }
+      ]
+    }
+  ],
+  "prompt_templates": {
+    "visual_builder_logic_to_rules": "You are a KG rule builder. Convert the user's natural language into derived_rel_rules JSON. Use ONLY fields from the ontology. Return JSON only in this shape: {\"entity\":\"<Entity>\",\"field\":\"<DerivedField>\",\"vars\":{},\"rules\":[{\"when\":\"<condition or empty>\",\"expr\":\"<rel expr>\"}]}. Use m.<field> for fields if needed. If you need a prior-row reference, include vars: {\"prev\":\"ref\"} and reference prev.<field>.",
+    "visual_builder_rule_validate": "Validate the derived_rel_rules JSON. Check: entity exists, field exists and is derived, all fields used exist, no SQL syntax. Return JSON only: {\"valid\":true|false,\"issues\":[\"...\"]}.",
+    "visual_builder_rule_explain": "Explain a derived_rel_rules JSON in plain English in 2-4 bullets. Use the entity and field names exactly."
+  },
+  "analysis_config": {
+    "default_months_window": 12,
+    "join_keys_preference": [
+      "RMID",
+      "MANDATEID",
+      "MANDATEID_STR",
+      "RM_NAME",
+      "MONTH_DATE",
+      "MEET_YEAR"
+    ],
+    "entity_priority": [
+      "rm",
+      "mandate",
+      "client"
+    ],
+    "dimension_hint": "RMID",
+    "entity_aliases": {
+      "rm_prefixes": [
+        "RM",
+        "Advisor",
+        "Relationship Manager"
+      ],
+      "mandate_prefixes": [
+        "Mandate",
+        "Client",
+        "Account"
+      ]
+    },
+    "driver_metric_synonyms": {},
+    "driver_question_core_terms": [],
+    "driver_question_change_terms": [],
+    "driver_question_special_phrases": [],
+    "driver_question_prescriptive_phrases": []
+  },
+  "config": {
+    "post_compute_derived_metrics": false,
+    "allow_sql_derived_expr": false
+  }
 }
