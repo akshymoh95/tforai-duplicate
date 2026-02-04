@@ -326,12 +326,36 @@ def ensure_rai_config(config_path: Optional[str] = None) -> str:
     if os.environ.get(env_key):
         return os.environ[env_key]
     if not config_path:
-        config_path = os.path.join(_repo_root(), "rai-getting-started", "raiconfig.toml")
+        local_config = os.path.join(_repo_root(), "rai_config", "raiconfig.toml")
+        config_path = local_config if os.path.exists(local_config) else os.path.join(_repo_root(), "rai-getting-started", "raiconfig.toml")
     if os.path.exists(config_path):
-        os.environ[env_key] = config_path
-        if not os.environ.get("RAI_PROFILE"):
+        token_override = os.environ.get("RAI_TOKEN_FILE_PATH", "").strip()
+        if token_override:
             try:
                 with open(config_path, "r", encoding="utf-8") as f:
+                    raw = f.read()
+                if "token_file_path" in raw:
+                    raw = re.sub(
+                        r'(?m)^(\\s*token_file_path\\s*=\\s*)\"[^\"]*\"\\s*$',
+                        rf'\\1\"{token_override}\"',
+                        raw,
+                        count=1,
+                    )
+                else:
+                    raw = raw + f"\n\ntoken_file_path = \"{token_override}\"\n"
+                gen_dir = os.path.join(_repo_root(), "rai_config", ".generated")
+                os.makedirs(gen_dir, exist_ok=True)
+                gen_path = os.path.join(gen_dir, "raiconfig.env.toml")
+                with open(gen_path, "w", encoding="utf-8") as f:
+                    f.write(raw)
+                os.environ[env_key] = gen_path
+            except Exception:
+                os.environ[env_key] = config_path
+        else:
+            os.environ[env_key] = config_path
+        if not os.environ.get("RAI_PROFILE"):
+            try:
+                with open(os.environ.get(env_key, config_path), "r", encoding="utf-8") as f:
                     for line in f:
                         m = re.match(r'active_profile\s*=\s*"([^"]+)"', line.strip())
                         if m:

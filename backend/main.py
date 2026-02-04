@@ -25,7 +25,13 @@ from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from ai_insights_orchestrator import run_orchestrate, set_stage_callback, _ORCHESTRATION_STATE, set_request_id
+from ai_insights_orchestrator import (
+    run_orchestrate,
+    set_stage_callback,
+    _ORCHESTRATION_STATE,
+    set_request_id,
+    AuthExpiredError,
+)
 from snowflake.snowpark import Session
 from dotenv import load_dotenv
 from relationalai.semantics.rel.rel_utils import sanitize_identifier
@@ -1744,6 +1750,20 @@ def create_session() -> Session:
     return sess
 
 
+def _refresh_session_for_retry(sess: Session) -> Session:
+    """Close an expired session and create a fresh one."""
+    global _session
+    try:
+        if sess is not None:
+            sess.close()
+    except Exception:
+        pass
+    new_sess = create_session()
+    if _session is sess:
+        _session = new_sess
+    return new_sess
+
+
 def acquire_session() -> Session:
     """Acquire a session from the pool or create a new one up to pool size."""
     global _session_pool_total
@@ -2392,11 +2412,15 @@ def ask(req: AskRequest, async_mode: bool = Query(False, alias="async")) -> AskR
         def _worker():
             session = None
             set_request_id(request_id)
-            try:
-                session = acquire_session()
-                payload = run_orchestrate(session, question)
-                with _request_lock:
-                    _request_store[request_id]["status"] = "done"
+              try:
+                  session = acquire_session()
+                  try:
+                      payload = run_orchestrate(session, question)
+                  except AuthExpiredError:
+                      session = _refresh_session_for_retry(session)
+                      payload = run_orchestrate(session, question)
+                  with _request_lock:
+                      _request_store[request_id]["status"] = "done"
                     _request_store[request_id]["result"] = payload
                     _request_store[request_id]["stage"] = _ORCHESTRATION_STATE.get("requests", {}).get(request_id, {}).get("stage", "done")
                     _request_store[request_id]["thinking"] = _ORCHESTRATION_STATE.get("requests", {}).get(request_id, {}).get("thinking", "")
@@ -2431,13 +2455,17 @@ def ask(req: AskRequest, async_mode: bool = Query(False, alias="async")) -> AskR
         )
 
     session = acquire_session()
-    try:
-        # Start with planning stage (provisioning/initializing will be detected from orchestrator output)
-        _ORCHESTRATION_STATE['current_stage'] = 'planning'
-        _current_stage['current'] = 'planning'
-        set_request_id(request_id)
-        payload = run_orchestrate(session, question)
-        _current_stage['current'] = _ORCHESTRATION_STATE.get('current_stage', 'done')
+      try:
+          # Start with planning stage (provisioning/initializing will be detected from orchestrator output)
+          _ORCHESTRATION_STATE['current_stage'] = 'planning'
+          _current_stage['current'] = 'planning'
+          set_request_id(request_id)
+          try:
+              payload = run_orchestrate(session, question)
+          except AuthExpiredError:
+              session = _refresh_session_for_retry(session)
+              payload = run_orchestrate(session, question)
+          _current_stage['current'] = _ORCHESTRATION_STATE.get('current_stage', 'done')
     except Exception as exc:
         _current_stage['current'] = 'error'
         detail = getattr(exc, "raw_content", None) or getattr(exc, "content", None)

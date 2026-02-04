@@ -135,6 +135,8 @@ def _cortex_complete_with_timeout(
     if t.is_alive():
         raise TimeoutError(f"Cortex LLM call timed out after {cortex_timeout}s")
     if exception_holder[0]:
+        if _is_auth_expired_error(exception_holder[0]):
+            raise AuthExpiredError(str(exception_holder[0]))
         raise exception_holder[0]
 
     result = result_holder[0]
@@ -145,6 +147,20 @@ def _cortex_complete_with_timeout(
         except Exception:
             return str(result[0][0]).strip()
     return ""
+
+
+class AuthExpiredError(RuntimeError):
+    pass
+
+
+def _is_auth_expired_error(exc: Exception) -> bool:
+    msg = str(exc or "").lower()
+    return (
+        "authentication token has expired" in msg
+        or "token has expired" in msg
+        or "must authenticate again" in msg
+        or "390114" in msg
+    )
 
 
 def _coerce_json_response(resp_text: str) -> Dict[str, Any]:
@@ -428,12 +444,14 @@ Output ONLY the JSON object above - no other text:
             "reasoning": ""
         }
 
-    except Exception as e:
-        print(f"[ERROR] Failed to generate narrative: {e}", file=sys.stderr)
-        import traceback
-        traceback.print_exc(file=sys.stderr)
-        sys.stderr.flush()
-        return {
+      except Exception as e:
+          if isinstance(e, AuthExpiredError):
+              raise
+          print(f"[ERROR] Failed to generate narrative: {e}", file=sys.stderr)
+          import traceback
+          traceback.print_exc(file=sys.stderr)
+          sys.stderr.flush()
+          return {
             "narrative": "\n".join(insights or []),
             "kpis": [],
             "reasoning": ""
@@ -1014,19 +1032,23 @@ def run_orchestrate(
         req_state["updated_at"] = time.time()
 
     # Verify session has warehouse configured
-    try:
-        current_wh = session.get_current_warehouse()
-        print(f"[DEBUG] Current warehouse: {current_wh}")
-    except Exception as e:
-        print(f"[WARNING] Could not get current warehouse: {e}")
-        # Set warehouse explicitly from environment
-        wh_env = os.environ.get("SNOWFLAKE_WAREHOUSE")
-        if wh_env:
-            try:
-                session.sql(f"USE WAREHOUSE {wh_env}").collect()
-                print(f"[DEBUG] Switched to warehouse: {wh_env}")
-            except Exception as wh_err:
-                print(f"[WARNING] Could not switch warehouse: {wh_err}")
+      try:
+          current_wh = session.get_current_warehouse()
+          print(f"[DEBUG] Current warehouse: {current_wh}")
+      except Exception as e:
+          if _is_auth_expired_error(e):
+              raise AuthExpiredError(str(e))
+          print(f"[WARNING] Could not get current warehouse: {e}")
+          # Set warehouse explicitly from environment
+          wh_env = os.environ.get("SNOWFLAKE_WAREHOUSE")
+          if wh_env:
+              try:
+                  session.sql(f"USE WAREHOUSE {wh_env}").collect()
+                  print(f"[DEBUG] Switched to warehouse: {wh_env}")
+              except Exception as wh_err:
+                  if _is_auth_expired_error(wh_err):
+                      raise AuthExpiredError(str(wh_err))
+                  print(f"[WARNING] Could not switch warehouse: {wh_err}")
     
     print(f"[DEBUG] run_orchestrate: START - question='{question}'")
     import sys
@@ -1152,9 +1174,11 @@ def run_orchestrate(
                 sys.stdout.flush()
                 return ""
                 
-            except Exception as e:
-                error_msg = str(e)
-                print(f"[ERROR] Cortex LLM call failed: {error_msg}", file=sys.stderr)
+              except Exception as e:
+                  error_msg = str(e)
+                  if _is_auth_expired_error(e):
+                      raise AuthExpiredError(error_msg)
+                  print(f"[ERROR] Cortex LLM call failed: {error_msg}", file=sys.stderr)
                 
                 # Log specific error types
                 if "NETWORK_ERROR" in error_msg or "timeout" in error_msg.lower():
@@ -1195,10 +1219,12 @@ def run_orchestrate(
                 if spec is not None:
                     print(f"[DEBUG] Generated spec on attempt {retry_count + 1}")
                     break
-            except Exception as e:
-                last_error = e
-                retry_count += 1
-                print(f"[WARNING] Spec generation failed (attempt {retry_count}/{max_retries}): {str(e)[:200]}")
+              except Exception as e:
+                  if isinstance(e, AuthExpiredError):
+                      raise
+                  last_error = e
+                  retry_count += 1
+                  print(f"[WARNING] Spec generation failed (attempt {retry_count}/{max_retries}): {str(e)[:200]}")
                 
                 # Wait before retry (exponential backoff)
                 if retry_count < max_retries:
@@ -1465,10 +1491,12 @@ def run_orchestrate(
                             print(f"[DEBUG] Query executed successfully on attempt {retry_count + 1}")
                             break
 
-                    except Exception as e:
-                        last_error = e
-                        retry_count += 1
-                        print(f"[WARNING] Query execution failed (attempt {retry_count}/{max_retries}): {str(e)[:200]}")
+                      except Exception as e:
+                          if isinstance(e, AuthExpiredError):
+                              raise
+                          last_error = e
+                          retry_count += 1
+                          print(f"[WARNING] Query execution failed (attempt {retry_count}/{max_retries}): {str(e)[:200]}")
                         sys.stdout.flush()
 
                         # Wait before retry
@@ -1647,9 +1675,11 @@ def run_orchestrate(
                 print("[DEBUG] Chart generation returned None", file=sys.stderr)
                 sys.stderr.flush()
                 
-        except Exception as e:
-            print(f"[WARNING] Chart generation failed (non-critical): {e}", file=sys.stderr)
-            sys.stderr.flush()
+      except Exception as e:
+          if isinstance(e, AuthExpiredError):
+              raise
+          print(f"[WARNING] Chart generation failed (non-critical): {e}", file=sys.stderr)
+          sys.stderr.flush()
         
         # Apply KG enhancements if enabled
         payload = _apply_kg_enhancements(payload)
@@ -1665,11 +1695,13 @@ def run_orchestrate(
         print("[DEBUG] run_orchestrate: COMPLETE")
         return payload
         
-    except Exception as e:
-        print(f"[ERROR] Orchestration failed: {e}", file=sys.stderr)
-        import traceback
-        traceback.print_exc()
-        _update_stage("error")
+      except Exception as e:
+          if isinstance(e, AuthExpiredError):
+              raise
+          print(f"[ERROR] Orchestration failed: {e}", file=sys.stderr)
+          import traceback
+          traceback.print_exc()
+          _update_stage("error")
         
         return {
             "frames": {},
