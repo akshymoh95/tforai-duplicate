@@ -1,6 +1,6 @@
-active_profile = "RAITFOTEST"
+active_profile = "RAITFOTEST2"
 
-[profile.RAITFOTEST]
+[profile.RAITFOTEST2]
 platform = "snowflake"
 authenticator = "programmatic_access_token"
 role = "ACCOUNTADMIN"
