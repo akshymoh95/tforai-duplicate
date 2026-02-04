@@ -329,7 +329,18 @@ def ensure_rai_config(config_path: Optional[str] = None) -> str:
         local_config = os.path.join(_repo_root(), "rai_config", "raiconfig.toml")
         config_path = local_config if os.path.exists(local_config) else os.path.join(_repo_root(), "rai-getting-started", "raiconfig.toml")
     if os.path.exists(config_path):
+        pat_env = os.environ.get("RAI_SNOWFLAKE_PAT", "").strip()
+        if pat_env:
+            secrets_path = "/home/site/secrets/snowflake_pat.txt"
+            try:
+                os.makedirs(os.path.dirname(secrets_path), exist_ok=True)
+                with open(secrets_path, "w", encoding="utf-8") as f:
+                    f.write(pat_env)
+            except Exception:
+                pass
         token_override = os.environ.get("RAI_TOKEN_FILE_PATH", "").strip()
+        if not token_override:
+            token_override = os.environ.get("RAI_SECRETS_FILE_PATH", "").strip()
         if token_override:
             try:
                 with open(config_path, "r", encoding="utf-8") as f:
