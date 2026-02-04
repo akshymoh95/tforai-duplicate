@@ -63,6 +63,25 @@ from prompt_defaults import DEFAULT_PROMPT_TEMPLATES
 ENV_PATH = Path(os.environ.get("AI_INSIGHTS_ENV", Path(__file__).with_name(".env")))
 load_dotenv(ENV_PATH, override=False)
 
+# Ensure PAT file is written if provided via env (Azure-friendly path)
+def _ensure_pat_file() -> None:
+    pat = os.environ.get("RAI_SNOWFLAKE_PAT", "").strip()
+    if not pat:
+        return
+    pat_path = "/home/site/secrets/snowflake_pat.txt"
+    try:
+        Path(pat_path).parent.mkdir(parents=True, exist_ok=True)
+        Path(pat_path).write_text(pat, encoding="utf-8")
+        # Best-effort permission hardening on *nix
+        try:
+            os.chmod(pat_path, 0o600)
+        except Exception:
+            pass
+    except Exception as exc:
+        print(f"[WARN] Failed to write PAT file at {pat_path}: {exc}", file=sys.stderr)
+
+_ensure_pat_file()
+
 # Validate required environment variables
 _REQUIRED_ENV_VARS = [
     "SNOWFLAKE_ACCOUNT",
@@ -2457,17 +2476,17 @@ def ask(req: AskRequest, async_mode: bool = Query(False, alias="async")) -> AskR
     session = acquire_session()
     try:
         # Start with planning stage (provisioning/initializing will be detected from orchestrator output)
-        _ORCHESTRATION_STATE['current_stage'] = 'planning'
-        _current_stage['current'] = 'planning'
+        _ORCHESTRATION_STATE["current_stage"] = "planning"
+        _current_stage["current"] = "planning"
         set_request_id(request_id)
         try:
             payload = run_orchestrate(session, question)
         except AuthExpiredError:
             session = _refresh_session_for_retry(session)
             payload = run_orchestrate(session, question)
-        _current_stage['current'] = _ORCHESTRATION_STATE.get('current_stage', 'done')
+        _current_stage["current"] = _ORCHESTRATION_STATE.get("current_stage", "done")
     except Exception as exc:
-        _current_stage['current'] = 'error'
+        _current_stage["current"] = "error"
         detail = getattr(exc, "raw_content", None) or getattr(exc, "content", None)
         if not detail:
             table_objects = getattr(exc, "table_objects", None)
