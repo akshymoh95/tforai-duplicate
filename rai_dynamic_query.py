@@ -727,19 +727,30 @@ def _has_group_by_agg_conflict(spec: dict) -> bool:
     aggs = list(spec.get("aggregations") or [])
     if not aggs:
         return False
-    agg_terms = set()
+    agg_terms: dict[tuple, set] = {}
     for a in aggs:
-        term = a.get("term") if isinstance(a, dict) else None
-        if isinstance(term, dict):
-            alias = term.get("alias")
-            prop = term.get("prop")
-            if alias and prop:
-                agg_terms.add((alias, prop))
+        if not isinstance(a, dict):
+            continue
+        term = a.get("term")
+        if not isinstance(term, dict):
+            continue
+        alias = term.get("alias")
+        prop = term.get("prop")
+        if not alias or not prop:
+            continue
+        key = (alias, prop)
+        agg_terms.setdefault(key, set()).add(str(a.get("op") or "").lower())
     if not agg_terms:
         return False
     for g in (spec.get("group_by") or []):
-        if isinstance(g, dict) and (g.get("alias"), g.get("prop")) in agg_terms:
-            return True
+        if not isinstance(g, dict):
+            continue
+        key = (g.get("alias"), g.get("prop"))
+        if key in agg_terms:
+            # Allow common safe pattern: group by a field and count it.
+            ops = agg_terms.get(key) or set()
+            if not ops.issubset({"count", "count_distinct"}):
+                return True
     return False
 
 
