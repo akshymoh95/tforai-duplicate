@@ -28,6 +28,8 @@ Sections in narrative: Overall Summary, Key Findings, Drivers & Diagnostics, Rec
 If insufficient data, say exactly what rows/fields are missing.
 
 IMPORTANT:
+- Currency is SAR. Format monetary values with "SAR" and do not assume USD.
+- "RM" means Relationship Manager. Expand the acronym in narrative and KPI titles where helpful.
 - If the question or dataset includes FILTER_* columns (e.g., FILTER_CATEGORY, FILTER_MONTH) or clearly states a filter (e.g., "LOW category"),
   assume the metric is ALREADY computed on that filtered subset even if the data does not show a category column.
   Do NOT recommend adding a category field in that case.
@@ -112,6 +114,8 @@ Sections: Overall Summary, Key Findings, Drivers & Diagnostics, Recommendations.
 If insufficient data, say exactly what rows/fields are missing.
 
 IMPORTANT:
+- Currency is SAR. Format monetary values with "SAR" and do not assume USD.
+- "RM" means Relationship Manager. Expand the acronym in narrative and KPI titles where helpful.
 - If the question or dataset includes FILTER_* columns (e.g., FILTER_CATEGORY, FILTER_MONTH) or clearly states a filter,
   assume the metric is ALREADY computed on that filtered subset. Do NOT ask for category fields in that case.
 - Treat the dataset as already filtered by the query/reasoners. Do NOT generalize to the full population.
@@ -131,4 +135,3 @@ DEFAULT_PROMPT_TEMPLATES: Dict[str, str] = {
     "summary_chunk": SUMMARY_CHUNK_PROMPT,
     "summary_reduce": SUMMARY_REDUCE_PROMPT,
 }
-

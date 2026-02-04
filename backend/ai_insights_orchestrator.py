@@ -395,6 +395,8 @@ Sections in narrative: Overall Summary, Key Findings, Drivers & Diagnostics, Rec
 If insufficient data, say exactly what rows/fields are missing.
 
 IMPORTANT:
+- Currency is SAR. Format monetary values with "SAR" and do not assume USD.
+- "RM" means Relationship Manager. Expand the acronym in narrative and KPI titles where helpful.
 - Treat the dataset as already filtered by the query/reasoners. Do NOT generalize to the full population.
 - Columns like signal_*, *_condition, *_score are derived outputs; describe them as flags/labels.
 - Do NOT invent correlations, regressions, or projections.
