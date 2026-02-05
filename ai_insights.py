@@ -13498,16 +13498,9 @@ LOOP-CONTROL:
                         import sys
                         print(f"[DEBUG] reasoner_ids selected: {reasoner_ids}", file=sys.stderr)
                     raw_spec = json.loads(json.dumps(spec, default=str)) if isinstance(spec, dict) else spec
-                    normalize_enabled = os.environ.get("AI_INSIGHTS_ENABLE_NORMALIZER", "1").strip().lower() not in (
-                        "0",
-                        "false",
-                        "no",
-                        "off",
-                    )
-                    if normalize_enabled:
-                        spec = _normalize_rai_spec(question, spec, specs)
-                    else:
-                        spec = raw_spec
+                    # Normalizer disabled by request: keep the raw LLM spec as-is.
+                    normalize_enabled = False
+                    spec = raw_spec
                     if reasoners_enabled and inline_reasoners and inline_reasoner_ids:
                         before_inline = json.loads(json.dumps(spec, default=str)) if isinstance(spec, dict) else spec
                         spec = inject_reasoner_relations_into_spec(spec, inline_reasoner_ids)
