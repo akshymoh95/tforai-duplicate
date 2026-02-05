@@ -1270,9 +1270,31 @@ def run_dynamic_query(builder, spec: dict) -> pd.DataFrame:
     
     def execute_query():
         try:
+            # Ensure config is set in this worker thread too
+            ensure_rai_config()
+            try:
+                from relationalai.clients import config as rai_config
+                cfg_path = getattr(rai_config, "CONFIG_FILE", None)
+            except Exception:
+                cfg_path = None
+            print(
+                f"[DEBUG] RAI config: env.RAI_CONFIG_FILE={os.environ.get('RAI_CONFIG_FILE')} "
+                f"env.RAI_PROFILE={os.environ.get('RAI_PROFILE')} "
+                f"rai_config.CONFIG_FILE={cfg_path}",
+                file=sys.stderr,
+            )
+            sys.stderr.flush()
             print(f"[DEBUG] RAI: Starting q.select(...).to_df() call", file=sys.stderr)
             sys.stderr.flush()
-            df_holder[0] = q.select(*select_terms).to_df()
+            try:
+                df_holder[0] = q.select(*select_terms).to_df()
+            except Exception as inner:
+                # Retry once if config got stale
+                if "Missing config value for 'role'" in str(inner):
+                    ensure_rai_config()
+                    df_holder[0] = q.select(*select_terms).to_df()
+                else:
+                    raise
             print(f"[DEBUG] RAI: Query returned successfully with {len(df_holder[0])} rows", file=sys.stderr)
             sys.stderr.flush()
         except Exception as e:
