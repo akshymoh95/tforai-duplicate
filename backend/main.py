@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent))
 
 import requests
+import logging
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -62,6 +63,23 @@ from prompt_defaults import DEFAULT_PROMPT_TEMPLATES
 
 ENV_PATH = Path(os.environ.get("AI_INSIGHTS_ENV", Path(__file__).with_name(".env")))
 load_dotenv(ENV_PATH, override=False)
+
+# Reduce noisy access logs for high-frequency polling endpoints
+class _AccessLogFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        try:
+            args = record.args or ()
+            if len(args) >= 3:
+                path = args[2]
+                if isinstance(path, str) and (
+                    path.startswith("/api/stages") or path.startswith("/api/result")
+                ):
+                    return False
+        except Exception:
+            pass
+        return True
+
+logging.getLogger("uvicorn.access").addFilter(_AccessLogFilter())
 
 # Ensure PAT file is written if provided via env (Azure-friendly path)
 def _ensure_pat_file() -> None:

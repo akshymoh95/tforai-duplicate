@@ -7,7 +7,7 @@ from typing import Optional, Tuple
 import pandas as pd
 import relationalai.semantics as qb
 from relationalai.semantics.std import strings as rstr
-from rai_ai_insights_ontology import load_ai_insights_specs
+from rai_ai_insights_ontology import ensure_rai_config, load_ai_insights_specs
 from rai_semantic_registry import load_registry_config
 
 _DEBUG_AGG = os.environ.get("AI_INSIGHTS_DEBUG_AGG", "").strip().lower() in ("1", "true", "yes")
@@ -834,6 +834,8 @@ def run_dynamic_query(builder, spec: dict) -> pd.DataFrame:
     - Automatic timed-event overlap semantics when a window is present
     - Proper derived-metric post-compute by passing entity name
     """
+    # Ensure RAI client config is loaded (prevents missing role/profile errors)
+    ensure_rai_config()
     if _DEBUG_AGG:
         print(f"[DEBUG][agg] run_dynamic_query module: {__file__}", file=sys.stderr)
 
