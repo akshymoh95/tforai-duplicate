@@ -696,7 +696,7 @@
           "dtype": "varchar",
           "role": "dimension",
           "expr": "RM_NAME",
-          "description": "",
+          "description": "Filter with ILIKE (case-insensitive substring match).",
           "derived": false,
           "default_agg": "",
           "depends_on": []
