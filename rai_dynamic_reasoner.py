@@ -1788,7 +1788,13 @@ def _semantic_rewrite_for_question(
                     spec["limit"] = 50
 
     # 2) Trend/deteriorating availability: force time series output
-    if any(k in q for k in ("trend", "deteriorat", "declin", "getting worse")):
+    # Disabled by default (opt-in) to avoid unintended group_by injection.
+    enable_trend_rewrite = os.environ.get("AI_INSIGHTS_ENABLE_TREND_REWRITE", "").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+    if enable_trend_rewrite and any(k in q for k in ("trend", "deteriorat", "declin", "getting worse")):
         trend_info = _pick_metrics_entity_for_trend(spec, ontology_text, interval_alias)
         if trend_info:
             om_alias, om_entity, time_field = trend_info
