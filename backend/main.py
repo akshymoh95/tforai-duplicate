@@ -81,6 +81,53 @@ class _AccessLogFilter(logging.Filter):
 
 logging.getLogger("uvicorn.access").addFilter(_AccessLogFilter())
 
+# Best-effort JSON sanitizer for async results + response payloads
+def _json_sanitize(value):
+    try:
+        import numpy as _np  # type: ignore
+    except Exception:
+        _np = None
+    try:
+        import pandas as _pd  # type: ignore
+    except Exception:
+        _pd = None
+
+    from datetime import date, datetime
+    from decimal import Decimal
+
+    if _np is not None:
+        if isinstance(value, _np.ndarray):
+            return [_json_sanitize(v) for v in value.tolist()]
+        if isinstance(value, (_np.integer, _np.floating, _np.bool_)):
+            return value.item()
+        if isinstance(value, (_np.datetime64, _np.timedelta64)):
+            return str(value)
+    if _pd is not None:
+        if isinstance(value, _pd.Timestamp):
+            return value.isoformat()
+        if isinstance(value, _pd.Timedelta):
+            return str(value)
+        if isinstance(value, _pd.Period):
+            try:
+                return value.to_timestamp().isoformat()
+            except Exception:
+                return str(value)
+        if isinstance(value, _pd.DataFrame):
+            return _json_sanitize(value.to_dict(orient="records"))
+        if isinstance(value, _pd.Series):
+            return _json_sanitize(value.tolist())
+        if isinstance(value, _pd.Index):
+            return _json_sanitize(value.tolist())
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
+    if isinstance(value, Decimal):
+        return float(value)
+    if isinstance(value, dict):
+        return {str(k): _json_sanitize(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple, set)):
+        return [_json_sanitize(v) for v in value]
+    return value
+
 # Ensure PAT file is written if provided via env (Azure-friendly path)
 def _ensure_pat_file() -> None:
     pat = os.environ.get("RAI_SNOWFLAKE_PAT", "").strip()
@@ -2457,6 +2504,9 @@ def ask(req: AskRequest, async_mode: bool = Query(False, alias="async")) -> AskR
                 except AuthExpiredError:
                     session = _refresh_session_for_retry(session)
                     payload = run_orchestrate(session, question)
+                # Sanitize payload for JSON serialization (async poller uses raw payload)
+                if isinstance(payload, dict):
+                    payload = _json_sanitize(payload)
                 with _request_lock:
                     _request_store[request_id]["status"] = "done"
                     _request_store[request_id]["result"] = payload
@@ -2595,6 +2645,8 @@ def ask(req: AskRequest, async_mode: bool = Query(False, alias="async")) -> AskR
                 except Exception:
                     fixed_frames[k] = []
         cleaned_payload["frames"] = fixed_frames
+
+    cleaned_payload = _json_sanitize(cleaned_payload)
     
     # Try to construct AskResponse with comprehensive error handling
     try:
@@ -2868,7 +2920,7 @@ def get_result(request_id: str) -> Dict[str, Any]:
         return {"status": "unknown", "error": "request_id not found (server may have restarted)"}
     status = entry.get("status")
     if status == "done":
-        return {"status": "done", "result": entry.get("result")}
+        return {"status": "done", "result": _json_sanitize(entry.get("result"))}
     if status == "error":
         return {"status": "error", "error": entry.get("error")}
     return {"status": "running"}
