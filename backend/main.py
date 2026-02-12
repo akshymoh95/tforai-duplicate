@@ -756,7 +756,8 @@ def _quote_ident(name: str) -> str:
     trimmed = name.strip()
     if trimmed.startswith('"') and trimmed.endswith('"'):
         return trimmed
-    return f"\"{trimmed.replace('\"', '\"\"')}\""
+    escaped = trimmed.replace('"', '""')
+    return f'"{escaped}"'
 
 
 def _quote_table(table: str) -> str:
