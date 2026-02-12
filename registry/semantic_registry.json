@@ -1,2552 +1,2194 @@
 {
   "entities": [
     {
-      "name": "MandateMonthlySummary",
-      "description": "Mandate-level monthly profitability and cost signals. Unique by (rmid, mandateid, posyear, posmon).",
-      "database": "TFO_TEST",
-      "schema": "ML_TEST",
-      "table": "MANDATE_PROFITABILITY_CT",
+      "name": "dt_unit_config",
+      "description": "Machine/unit configuration (dimension). Grain: pu_id. Holds plant, machine label, OEM type, production variable and category mappings, and rate unit conversion settings.",
+      "database": "RAI",
+      "schema": "RAI1",
+      "table": "DT_UNIT_CONFIG",
       "fields": [
         {
-          "name": "rmid",
-          "dtype": "number(38,0)",
+          "name": "pu_id",
+          "dtype": "NUMBER(38,0)",
           "role": "dimension",
-          "expr": "RMID",
-          "description": "",
+          "expr": "PU_ID",
+          "description": "Machine/unit id.",
           "derived": false,
           "default_agg": "",
           "depends_on": []
         },
         {
-          "name": "mandateid",
-          "dtype": "number(38,0)",
+          "name": "pl_id",
+          "dtype": "NUMBER(38,0)",
           "role": "dimension",
-          "expr": "MANDATEID",
-          "description": "",
+          "expr": "PL_ID",
+          "description": "Plant id.",
           "derived": false,
           "default_agg": "",
           "depends_on": []
         },
         {
-          "name": "relationshipmanager",
-          "dtype": "varchar",
+          "name": "pu_desc",
+          "dtype": "VARCHAR(16777216)",
           "role": "dimension",
-          "expr": "RELATIONSHIPMANAGER",
-          "description": "",
+          "expr": "PU_DESC",
+          "description": "Machine label/description.",
           "derived": false,
           "default_agg": "",
           "depends_on": []
         },
         {
-          "name": "email",
-          "dtype": "varchar",
+          "name": "oem_type",
+          "dtype": "NUMBER(38,0)",
           "role": "dimension",
-          "expr": "EMAIL",
-          "description": "",
+          "expr": "OEM_TYPE",
+          "description": "OEM / output type id.",
           "derived": false,
           "default_agg": "",
           "depends_on": []
         },
         {
-          "name": "posyear",
-          "dtype": "number(4,0)",
+          "name": "production_var_id",
+          "dtype": "NUMBER(38,0)",
           "role": "dimension",
-          "expr": "POSYEAR",
-          "description": "",
+          "expr": "PRODUCTION_VAR_ID",
+          "description": "Production variable id used for execution/throughput normalization.",
           "derived": false,
           "default_agg": "",
           "depends_on": []
         },
         {
-          "name": "posmon",
-          "dtype": "number(2,0)",
+          "name": "setup_waste_ct",
+          "dtype": "NUMBER(38,0)",
           "role": "dimension",
-          "expr": "POSMON",
-          "description": "",
+          "expr": "SETUP_WASTE_CT",
+          "description": "Setup waste category id.",
           "derived": false,
           "default_agg": "",
           "depends_on": []
         },
-  
         {
-          "name": "latest_topup_date",
-          "dtype": "date",
+          "name": "performance_dt_cat",
+          "dtype": "NUMBER(38,0)",
           "role": "dimension",
-          "expr": "LATEST_TOPUP_DATE",
-          "description": "",
+          "expr": "PERFORMANCE_DT_CAT",
+          "description": "Performance downtime category id.",
           "derived": false,
           "default_agg": "",
           "depends_on": []
         },
         {
-          "name": "total_aum",
-          "dtype": "number(38,0)",
-          "role": "metric",
-          "expr": "TOTAL_AUM",
-          "description": "",
-          "derived": false,
-          "default_agg": "avg",
-          "depends_on": []
-        },
-        {
-          "name": "avg_monthly_aum",
-          "dtype": "number(38,2)",
-          "role": "metric",
-          "expr": "AVG_MONTHLY_AUM",
-          "description": "",
-          "derived": false,
-          "default_agg": "avg",
-          "depends_on": []
-        },
-        {
-          "name": "revenue_amount",
-          "dtype": "number(31,2)",
-          "role": "metric",
-          "expr": "REVENUE_AMOUNT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "profit_amount",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "PROFIT_AMOUNT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "revenue_percent",
-          "dtype": "number(38,2)",
-          "role": "metric",
-          "expr": "REVENUE_PERCENT",
-          "description": "",
-          "derived": false,
-          "default_agg": "avg",
-          "depends_on": []
-        },
-        {
-          "name": "profit_percent",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "PROFIT_PERCENT",
-          "description": "",
-          "derived": false,
-          "default_agg": "avg",
-          "depends_on": []
-        },
-        {
-          "name": "annualized_revenue_amount",
-          "dtype": "number(38,2)",
-          "role": "metric",
-          "expr": "ANNUALIZED_REVENUE_AMOUNT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "profit_amount_annualized",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "PROFIT_AMOUNT_ANNUALIZED",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "revenue_percent_annualized",
-          "dtype": "number(38,2)",
-          "role": "metric",
-          "expr": "REVENUE_PERCENT_ANNUALIZED",
-          "description": "",
-          "derived": false,
-          "default_agg": "avg",
-          "depends_on": []
-        },
-        {
-          "name": "profit_percent_annualized",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "PROFIT_PERCENT_ANNUALIZED",
-          "description": "",
-          "derived": false,
-          "default_agg": "avg",
-          "depends_on": []
-        },
-        {
-          "name": "rm_cost_for_each_mandate",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "RM_COST_FOR_EACH_MANDATE",
-          "description": "Monthly RM cost allocated to the mandate (month-level).",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "topup_count",
-          "dtype": "number(18,0)",
-          "role": "metric",
-          "expr": "TOPUP_COUNT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "topup_amount",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "TOPUP_AMOUNT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "dealname_count",
-          "dtype": "number(18,0)",
-          "role": "metric",
-          "expr": "DEALNAME_COUNT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "mandate_count",
-          "dtype": "number(18,0)",
-          "role": "metric",
-          "expr": "MANDATE_COUNT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "month_date",
-          "dtype": "date",
+          "name": "production_rate_timeunits_id",
+          "dtype": "NUMBER(38,0)",
           "role": "dimension",
-          "expr": "",
-          "description": "",
-          "derived": true,
+          "expr": "PRODUCTION_RATE_TIMEUNITS_ID",
+          "description": "Production rate time units id.",
+          "derived": false,
           "default_agg": "",
-          "depends_on": [
-            "posyear",
-            "posmon"
-          ]
+          "depends_on": []
         },
         {
-          "name": "profit_margin",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "profit_amount",
-            "revenue_amount"
-          ]
+          "name": "rateunit_raw",
+          "dtype": "NUMBER(38,0)",
+          "role": "metric",
+          "expr": "RATEUNIT_RAW",
+          "description": "Raw rate unit value (as stored).",
+          "derived": false,
+          "default_agg": "last",
+          "depends_on": []
         },
         {
-          "name": "cost_to_revenue",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "rm_cost_for_each_mandate",
-            "revenue_amount"
-          ]
-        },
-        {
-          "name": "revenue_per_cost",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "revenue_amount",
-            "rm_cost_for_each_mandate"
-          ]
-        },
-        {
-          "name": "aum_per_cost",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "total_aum",
-            "rm_cost_for_each_mandate"
-          ]
-        },
-
-        {
-          "name": "risk_signal_count",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "Count of active mandate risk signals (aum decline, low profitability, revenue decline, low engagement, high cost ratio).",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "signal_aum_decline",
-            "signal_low_profitability",
-            "signal_revenue_decline",
-            "signal_low_engagement",
-            "signal_high_cost_ratio"
-          ]
-        },
-
-        {
-          "name": "signal_low_profitability",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "profit_margin"
-          ]
-        },
-        {
-          "name": "signal_low_engagement",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "topup_count"
-          ]
-        },
-        {
-          "name": "signal_high_cost_ratio",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "cost_to_revenue"
-          ]
-        },
-        {
-          "name": "signal_high_cost",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "cost_to_revenue"
-          ]
-        },
-        {
-          "name": "signal_profit_eroding",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "profit_margin"
-          ]
-        },
-        {
-          "name": "signal_cost_spike",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "cost_to_revenue"
-          ]
-        },
-        {
-          "name": "cost_driver_impact_score",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "cost_to_revenue"
-          ]
-        },
-        {
-          "name": "cost_driver_condition",
-          "dtype": "text",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "",
-          "depends_on": [
-            "cost_to_revenue"
-          ]
-        },
-        {
-          "name": "aum_trend",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "total_aum",
-            "avg_monthly_aum"
-          ]
-        },
-        {
-          "name": "revenue_trend",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "revenue_amount",
-            "annualized_revenue_amount"
-          ]
-        },
-        {
-          "name": "profit_trend",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "profit_amount",
-            "profit_amount_annualized"
-          ]
-        },
-        {
-          "name": "meeting_trend",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "topup_count",
-            "mandate_count"
-          ]
-        },
-        {
-          "name": "signal_aum_decline",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "aum_trend"
-          ]
-        },
-        {
-          "name": "signal_revenue_decline",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "revenue_trend"
-          ]
-        },
-        {
-          "name": "signal_aum_decline_severe",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "aum_trend"
-          ]
-        },
-        {
-          "name": "signal_meeting_drop",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "meeting_trend"
-          ]
-        },
-        {
-          "name": "mandate_risk_score",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "signal_aum_decline",
-            "signal_low_profitability",
-            "signal_revenue_decline",
-            "signal_low_engagement",
-            "signal_high_cost_ratio"
-          ]
-        },
-        {
-          "name": "mandate_risk_condition",
-          "dtype": "text",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "",
-          "depends_on": [
-            "mandate_risk_score", "risk_signal_count"
-          ]
-        },
-        {
-          "name": "churn_risk_score",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "signal_aum_decline_severe",
-            "signal_meeting_drop",
-            "signal_profit_eroding",
-            "signal_cost_spike"
-          ]
-        },
-        {
-          "name": "signal_churn_risk",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "churn_risk_score"
-          ]
-        },
-        {
-          "name": "churn_risk_condition",
-          "dtype": "text",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "",
-          "depends_on": [
-            "churn_risk_score"
-          ]
-        },
-        {
-          "name": "allocation_roi_factor",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "revenue_amount",
-            "rm_cost_for_each_mandate"
-          ]
-        },
-        {
-          "name": "allocation_efficiency_factor",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "revenue_amount",
-            "topup_count"
-          ]
-        },
-        {
-          "name": "allocation_composite_score",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "allocation_roi_factor",
-            "allocation_efficiency_factor"
-          ]
-        },
-        {
-          "name": "allocation_priority",
-          "dtype": "text",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "",
-          "depends_on": [
-            "allocation_composite_score"
-          ]
+          "name": "rateunit_value",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "RATEUNIT_VALUE",
+          "description": "Rate unit conversion value.",
+          "derived": false,
+          "default_agg": "last",
+          "depends_on": []
         }
       ],
       "join_keys": [
-        "rmid",
-        "mandateid",
-        "posyear",
-        "posmon"
+        "pu_id",
+        "pl_id",
+        "oem_type",
+        "production_var_id",
+        "setup_waste_ct",
+        "performance_dt_cat",
+        "production_rate_timeunits_id"
       ],
-      "default_metric": "total_aum",
-      "entity_type": "mandate",
-      "applicable_reasoners": [
-        "mandate_risk",
-        "trend",
-        "churn_risk",
-        "cost_driver"
-      ],
-      "applicable_derived_metrics": [
-        "month_date",
-        "profit_margin",
-        "cost_to_revenue",
-        "revenue_per_cost",
-        "aum_per_cost",
-        "signal_low_profitability",
-        "signal_low_engagement",
-        "signal_high_cost_ratio",
-        "signal_high_cost",
-        "signal_profit_eroding",
-        "signal_cost_spike",
-        "cost_driver_impact_score",
-        "cost_driver_condition",
-        "aum_trend",
-        "revenue_trend",
-        "profit_trend",
-        "meeting_trend",
-        "signal_aum_decline",
-        "signal_revenue_decline",
-        "signal_aum_decline_severe",
-        "signal_meeting_drop",
-        "mandate_risk_score",
-        "risk_signal_count",
-        "mandate_risk_condition",
-        "churn_risk_score",
-        "signal_churn_risk",
-        "churn_risk_condition",
-        "allocation_roi_factor",
-        "allocation_efficiency_factor",
-        "allocation_composite_score",
-        "allocation_priority"
-      ]
-    },
-    {
-      "name": "RMMonthlySummary",
-      "description": "RM monthly performance signals. Unique by (rmid, meet_year, meet_mon).",
-      "database": "TFO_TEST",
-      "schema": "ML_TEST",
-      "table": "RM_PERFORMANCE_TBL",
-      "fields": [
-        {
-          "name": "rmid",
-          "dtype": "number(38,0)",
-          "role": "dimension",
-          "expr": "RMID",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "rm_name",
-          "dtype": "varchar",
-          "role": "dimension",
-          "expr": "RM_NAME",
-          "description": "Filter with ILIKE (case-insensitive substring match).",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "meet_year",
-          "dtype": "number(4,0)",
-          "role": "dimension",
-          "expr": "MEET_YEAR",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "meet_mon",
-          "dtype": "number(2,0)",
-          "role": "dimension",
-          "expr": "MEET_MON",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "performance",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "PERFORMANCE",
-          "description": "",
-          "derived": false,
-          "default_agg": "avg",
-          "depends_on": []
-        },
-        {
-          "name": "aum",
-          "dtype": "number(38,6)",
-          "role": "metric",
-          "expr": "AUM",
-          "description": "",
-          "derived": false,
-          "default_agg": "avg",
-          "depends_on": []
-        },
-        {
-          "name": "total_nnm",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "TOTAL_NNM",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "cash_in",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "CASH_IN",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "buy",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "BUY",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "sell",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "SELL",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "topupcommitment",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "TOPUPCOMMITMENT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "firstcommitment",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "FIRSTCOMMITMENT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "total_mandates",
-          "dtype": "number(18,0)",
-          "role": "metric",
-          "expr": "TOTAL_MANDATES",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "total_month_mandates",
-          "dtype": "number(18,0)",
-          "role": "metric",
-          "expr": "TOTAL_MONTH_MANDATES",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "meeting_count_target",
-          "dtype": "number(38,0)",
-          "role": "metric",
-          "expr": "MEETING_COUNT_TARGET",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "clienttarget",
-          "dtype": "number(38,0)",
-          "role": "metric",
-          "expr": "CLIENTTARGET",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "commitmenttarget",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "COMMITMENTTARGET",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "nnmtarget",
-          "dtype": "float",
-          "role": "metric",
-          "expr": "NNMTARGET",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "new_mandate_positive_cnt",
-          "dtype": "number(18,0)",
-          "role": "metric",
-          "expr": "NEW_MANDATE_POSITIVE_CNT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "new_mandate_negative_cnt",
-          "dtype": "number(18,0)",
-          "role": "metric",
-          "expr": "NEW_MANDATE_NEGATIVE_CNT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "new_mandate_neutral_cnt",
-          "dtype": "number(18,0)",
-          "role": "metric",
-          "expr": "NEW_MANDATE_NEUTRAL_CNT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "new_mandate_total_meetings",
-          "dtype": "number(18,0)",
-          "role": "metric",
-          "expr": "NEW_MANDATE_TOTAL_MEETINGS",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "existing_mandate_positive_cnt",
-          "dtype": "number(18,0)",
-          "role": "metric",
-          "expr": "EXISTING_MANDATE_POSITIVE_CNT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "existing_mandate_negative_cnt",
-          "dtype": "number(18,0)",
-          "role": "metric",
-          "expr": "EXISTING_MANDATE_NEGATIVE_CNT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "existing_mandate_neutral_cnt",
-          "dtype": "number(18,0)",
-          "role": "metric",
-          "expr": "EXISTING_MANDATE_NEUTRAL_CNT",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "existing_mandate_total_meetings",
-          "dtype": "number(18,0)",
-          "role": "metric",
-          "expr": "EXISTING_MANDATE_TOTAL_MEETINGS",
-          "description": "",
-          "derived": false,
-          "default_agg": "sum",
-          "depends_on": []
-        },
-        {
-          "name": "month_date",
-          "dtype": "date",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "",
-          "depends_on": [
-            "meet_year",
-            "meet_mon"
-          ]
-        },
-        {
-          "name": "signal_low_mandate_count",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "total_mandates"
-          ]
-        },
-        {
-          "name": "meeting_count_variance",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "meeting_count_target",
-            "new_mandate_total_meetings",
-            "existing_mandate_total_meetings"
-          ]
-        },
-        {
-          "name": "client_target_variance",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "clienttarget",
-            "total_month_mandates"
-          ]
-        },
-        {
-          "name": "signal_low_aum",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "aum"
-          ]
-        },
-        {
-          "name": "signal_low_performance",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "max",
-          "depends_on": [
-            "performance"
-          ]
-        },
-        {
-          "name": "rm_performance_condition",
-          "dtype": "text",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "",
-          "depends_on": [
-            "performance"
-          ]
-        },
-        {
-          "name": "aum_trend",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "aum",
-            "nnmtarget"
-          ]
-        },
-        {
-          "name": "revenue_trend",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "total_nnm",
-            "nnmtarget"
-          ]
-        },
-        {
-          "name": "profit_trend",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "performance"
-          ]
-        },
-        {
-          "name": "meeting_trend",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "new_mandate_total_meetings",
-            "existing_mandate_total_meetings",
-            "meeting_count_target"
-          ]
-        },
-        {
-          "name": "aum_trend_rm",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "aum",
-            "nnmtarget"
-          ]
-        },
-        {
-          "name": "mandate_growth_trend",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "total_month_mandates",
-            "total_mandates"
-          ]
-        }
-      ],
-      "join_keys": [
-        "rmid",
-        "meet_year",
-        "meet_mon"
-      ],
-      "default_metric": "performance",
-      "entity_type": "rm",
-      "applicable_reasoners": [],
-      "applicable_derived_metrics": [
-        "month_date",
-        "signal_low_mandate_count",
-        "meeting_count_variance",
-        "client_target_variance",
-        "signal_low_aum",
-        "signal_low_performance",
-        "rm_performance_condition",
-        "aum_trend",
-        "revenue_trend",
-        "profit_trend",
-        "meeting_trend",
-        "aum_trend_rm",
-        "mandate_growth_trend"
-      ]
-    },
-    {
-      "name": "MeetingSentiment",
-      "description": "Meeting sentiment and activity signals. Unique by (rmid, mandateid, meeting_id).",
-      "database": "TFO_TEST",
-      "schema": "ML_TEST",
-      "table": "MEETING_SENTIMENT_ANALYSIS_MANDATE_V",
-      "fields": [
-        {
-          "name": "id",
-          "dtype": "number(38,0)",
-          "role": "dimension",
-          "expr": "ID",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "rmid",
-          "dtype": "number(38,0)",
-          "role": "dimension",
-          "expr": "RMID",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "mandateid",
-          "dtype": "number(38,0)",
-          "role": "dimension",
-          "expr": "MANDATEID",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "meetingdate",
-          "dtype": "timestamp_ntz(9)",
-          "role": "dimension",
-          "expr": "MEETINGDATE",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "sentiment",
-          "dtype": "varchar",
-          "role": "dimension",
-          "expr": "SENTIMENT",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "meetingduration",
-          "dtype": "number(38,1)",
-          "role": "metric",
-          "expr": "MEETINGDURATION",
-          "description": "",
-          "derived": false,
-          "default_agg": "avg",
-          "depends_on": []
-        },
-        {
-          "name": "meetingtype",
-          "dtype": "varchar",
-          "role": "dimension",
-          "expr": "MEETINGTYPE",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "meetingnotes",
-          "dtype": "varchar",
-          "role": "dimension",
-          "expr": "MEETINGNOTES",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "cleaned_notes",
-          "dtype": "varchar",
-          "role": "dimension",
-          "expr": "CLEANED_NOTES",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "reasoning",
-          "dtype": "varchar",
-          "role": "dimension",
-          "expr": "REASONING",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "suggestion",
-          "dtype": "varchar",
-          "role": "dimension",
-          "expr": "SUGGESTION",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "hubspotid",
-          "dtype": "number(38,0)",
-          "role": "dimension",
-          "expr": "HUBSPOTID",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "utmsourcefirsttouch",
-          "dtype": "varchar",
-          "role": "dimension",
-          "expr": "UTMSOURCEFIRSTTOUCH",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "ownerid",
-          "dtype": "number(38,0)",
-          "role": "dimension",
-          "expr": "OWNERID",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "create_date",
-          "dtype": "timestamp_ntz(9)",
-          "role": "dimension",
-          "expr": "CREATE_DATE",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "email",
-          "dtype": "varchar",
-          "role": "dimension",
-          "expr": "EMAIL",
-          "description": "",
-          "derived": false,
-          "default_agg": "",
-          "depends_on": []
-        },
-        {
-          "name": "meeting_id",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "",
-          "depends_on": [
-            "id"
-          ]
-        },
-        {
-          "name": "meeting_date",
-          "dtype": "timestamp",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "",
-          "depends_on": [
-            "meetingdate"
-          ]
-        },
-        {
-          "name": "duration",
-          "dtype": "number",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "avg",
-          "depends_on": [
-            "meetingduration"
-          ]
-        },
-        {
-          "name": "meeting_type",
-          "dtype": "text",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "",
-          "depends_on": [
-            "meetingtype"
-          ]
-        },
-        {
-          "name": "meeting_notes",
-          "dtype": "text",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "",
-          "depends_on": [
-            "meetingnotes"
-          ]
-        },
-        {
-          "name": "utm_source_first_touch",
-          "dtype": "text",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "",
-          "depends_on": [
-            "utmsourcefirsttouch"
-          ]
-        },
-        {
-          "name": "month_date",
-          "dtype": "date",
-          "role": "derived",
-          "expr": "",
-          "description": "",
-          "derived": true,
-          "default_agg": "",
-          "depends_on": [
-            "meetingdate"
-          ]
-        }
-      ],
-      "join_keys": [
-        "rmid",
-        "mandateid",
-        "id"
-      ],
-      "default_metric": "duration",
-      "entity_type": "meeting",
+      "default_metric": "",
+      "entity_type": "machine",
       "applicable_reasoners": [],
       "applicable_derived_metrics": []
+    },
+    {
+      "name": "dt_operations",
+      "description": "Operation windows. Grain: start_id. Contains plan detail, machine, product and operation start/end timestamps.",
+      "database": "RAI",
+      "schema": "RAI1",
+      "table": "DT_OPERATIONS",
+      "fields": [
+        {
+          "name": "start_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "START_ID",
+          "description": "Operation start identifier.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ppd_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PPD_ID",
+          "description": "Production plan detail id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "pu_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PU_ID",
+          "description": "Machine/unit id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "prod_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PROD_ID",
+          "description": "Product id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "targetquantity",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "TARGETQUANTITY",
+          "description": "Target quantity for the operation window.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "operation_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "OPERATION_START",
+          "description": "Operation start timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "operation_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "OPERATION_END",
+          "description": "Operation end timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "is_open",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "IS_OPEN",
+          "description": "Whether operation is open.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        }
+      ],
+      "join_keys": [
+        "start_id",
+        "ppd_id",
+        "pu_id",
+        "prod_id"
+      ],
+      "default_metric": "",
+      "entity_type": "operation",
+      "applicable_reasoners": [],
+      "applicable_derived_metrics": []
+    },
+    {
+      "name": "dt_timed_event_denorm",
+      "description": "Timed downtime events (denormalized). Grain: tedet_id. Contains machine, fault type (value/name), time window, effective duration, and reason hierarchy fields.",
+      "database": "RAI",
+      "schema": "RAI1",
+      "table": "DT_TIMED_EVENT_DENORM",
+      "fields": [
+        {
+          "name": "tedet_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "TEDET_ID",
+          "description": "Timed event detail id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "pu_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PU_ID",
+          "description": "Machine/unit id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "tefault_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "TEFAULT_ID",
+          "description": "Fault id (not stable cross-machine for recurrence).",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "testatus_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "TESTATUS_ID",
+          "description": "Event status id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "uptime",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "UPTIME",
+          "description": "Uptime metric if populated.",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "user_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "USER_ID",
+          "description": "User id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "work_order_number",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "WORK_ORDER_NUMBER",
+          "description": "Work order number.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "remarks",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REMARKS",
+          "description": "Remarks.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "createdon",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "CREATEDON",
+          "description": "Created timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "createdby",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "CREATEDBY",
+          "description": "Created by.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "user_code",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "USER_CODE",
+          "description": "User code.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "start_time",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "START_TIME",
+          "description": "Event start timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "end_time",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "END_TIME",
+          "description": "Event end timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "duration_minutes_raw",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "DURATION_MINUTES_RAW",
+          "description": "Raw duration in minutes.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "duration_minutes_eff",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "DURATION_MINUTES_EFF",
+          "description": "Effective duration in minutes.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "tefault_name",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "TEFAULT_NAME",
+          "description": "Fault name/label.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "tefault_value",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "TEFAULT_VALUE",
+          "description": "Fault value/code (preferred cross-machine key).",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ertd_id_from_fault",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ERTD_ID_FROM_FAULT",
+          "description": "Event reason tree data id from fault.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ertd_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ERTD_ID",
+          "description": "Event reason tree data id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level1_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL1_ID",
+          "description": "Reason level 1 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level2_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL2_ID",
+          "description": "Reason level 2 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level3_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL3_ID",
+          "description": "Reason level 3 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level4_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL4_ID",
+          "description": "Reason level 4 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason1",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON1",
+          "description": "Reason level 1 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason2",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON2",
+          "description": "Reason level 2 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason3",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON3",
+          "description": "Reason level 3 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason4",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON4",
+          "description": "Reason level 4 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "erc_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ERC_ID",
+          "description": "Event reason category id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "erc_desc",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "ERC_DESC",
+          "description": "Event reason category description.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "erc_is_null",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "ERC_IS_NULL",
+          "description": "Whether ERC fields are null.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "is_unplanned",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "",
+          "description": "Derived flag: ERC_DESC indicates unplanned downtime.",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "erc_desc"
+          ]
+        },
+        {
+          "name": "machines_affected",
+          "dtype": "NUMBER(38,0)",
+          "role": "metric",
+          "expr": "",
+          "description": "Helper metric: count_distinct(pu_id) when grouped by tefault_value.",
+          "derived": true,
+          "default_agg": "count_distinct",
+          "depends_on": [
+            "pu_id"
+          ]
+        }
+      ],
+      "join_keys": [
+        "tedet_id",
+        "pu_id",
+        "tefault_id",
+        "tefault_value",
+        "ertd_id",
+        "level1_id",
+        "erc_id"
+      ],
+      "default_metric": "duration_minutes_eff",
+      "entity_type": "downtime_event",
+      "applicable_reasoners": [
+        "recurring_downtime_events_across_machines",
+        "top_downtime_machines",
+        "top_unplanned_downtime_causes"
+      ],
+      "applicable_derived_metrics": [
+        "is_unplanned",
+        "machines_affected"
+      ]
+    },
+    {
+      "name": "dt_waste_event_denorm",
+      "description": "Waste event (denormalized) facts. Grain: wed_id. Contains machine, waste fault type, timestamps, amount, and reason fields.",
+      "database": "RAI",
+      "schema": "RAI1",
+      "table": "DT_WASTE_EVENT_DENORM",
+      "fields": [
+        {
+          "name": "wed_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "WED_ID",
+          "description": "Waste event detail id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "pu_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PU_ID",
+          "description": "Machine/unit id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "entry_on",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "ENTRY_ON",
+          "description": "Entry timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "wefault_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "WEFAULT_ID",
+          "description": "Waste fault id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "wet_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "WET_ID",
+          "description": "Waste event type id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "work_order_number",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "WORK_ORDER_NUMBER",
+          "description": "Work order number.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "amount",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "AMOUNT",
+          "description": "Waste amount.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "createdon",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "CREATEDON",
+          "description": "Created timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "createdby",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "CREATEDBY",
+          "description": "Created by.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "wefault_name",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "WEFAULT_NAME",
+          "description": "Waste fault name/label.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "wefault_value",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "WEFAULT_VALUE",
+          "description": "Waste fault value/code (preferred cross-machine key).",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ertd_id_from_fault",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ERTD_ID_FROM_FAULT",
+          "description": "Event reason tree data id from fault.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ertd_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ERTD_ID",
+          "description": "Event reason tree data id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level1_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL1_ID",
+          "description": "Reason level 1 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level2_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL2_ID",
+          "description": "Reason level 2 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level3_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL3_ID",
+          "description": "Reason level 3 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "level4_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LEVEL4_ID",
+          "description": "Reason level 4 id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason1",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON1",
+          "description": "Reason level 1 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason2",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON2",
+          "description": "Reason level 2 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason3",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON3",
+          "description": "Reason level 3 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "reason4",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "REASON4",
+          "description": "Reason level 4 text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "erc_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ERC_ID",
+          "description": "Event reason category id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "erc_desc",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "ERC_DESC",
+          "description": "Event reason category description.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "erc_is_null",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "ERC_IS_NULL",
+          "description": "Whether ERC fields are null.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "is_setup_waste",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "",
+          "description": "Derived flag: setup waste based on WEFAULT_NAME.",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "wefault_name"
+          ]
+        },
+        {
+          "name": "is_operational_waste",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "",
+          "description": "Derived flag: operational waste based on WEFAULT_NAME.",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "wefault_name"
+          ]
+        }
+      ],
+      "join_keys": [
+        "wed_id",
+        "pu_id",
+        "wefault_id",
+        "wefault_value",
+        "ertd_id",
+        "level1_id",
+        "erc_id"
+      ],
+      "default_metric": "amount",
+      "entity_type": "waste_event",
+      "applicable_reasoners": [
+        "waste_by_machine",
+        "setup_waste_amount"
+      ],
+      "applicable_derived_metrics": [
+        "is_setup_waste",
+        "is_operational_waste"
+      ]
+    },
+    {
+      "name": "dt_target_speed",
+      "description": "Target speed reference by machine+product with effective dating. Equi-join uses (pu_id, prod_id). Correct validity requires effective_date/expiration_date filtering vs an operation timestamp.",
+      "database": "RAI",
+      "schema": "RAI1",
+      "table": "DT_TARGET_SPEED",
+      "fields": [
+        {
+          "name": "pu_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PU_ID",
+          "description": "Machine/unit id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "prod_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PROD_ID",
+          "description": "Product id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "effective_date",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "EFFECTIVE_DATE",
+          "description": "Effective timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "expiration_date",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "EXPIRATION_DATE",
+          "description": "Expiration timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "target_speed",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "TARGET_SPEED",
+          "description": "Target speed.",
+          "derived": false,
+          "default_agg": "last",
+          "depends_on": []
+        }
+      ],
+      "join_keys": [
+        "pu_id",
+        "prod_id"
+      ],
+      "default_metric": "target_speed",
+      "entity_type": "target_speed",
+      "applicable_reasoners": [],
+      "applicable_derived_metrics": []
+    },
+    {
+      "name": "dt_operation_metrics",
+      "description": "Operation-level metrics (fact) keyed by start_id. Combines operation window, unit config attributes, throughput, downtime, waste, and quality signals. Suitable primary fact for OEE analytics.",
+      "database": "RAI",
+      "schema": "RAI1",
+      "table": "DT_OPERATION_METRICS",
+      "fields": [
+        {
+          "name": "start_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "START_ID",
+          "description": "Operation start identifier.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ppd_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PPD_ID",
+          "description": "Production plan detail id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "pu_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PU_ID",
+          "description": "Machine/unit id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "prod_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PROD_ID",
+          "description": "Product id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "oem_type",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "OEM_TYPE",
+          "description": "OEM/output type id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "production_var_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PRODUCTION_VAR_ID",
+          "description": "Production variable id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "setup_waste_ct",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "SETUP_WASTE_CT",
+          "description": "Setup waste category id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "performance_dt_cat",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "PERFORMANCE_DT_CAT",
+          "description": "Performance downtime category id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "rateunit_raw",
+          "dtype": "NUMBER(38,0)",
+          "role": "metric",
+          "expr": "RATEUNIT_RAW",
+          "description": "Raw rate unit value.",
+          "derived": false,
+          "default_agg": "last",
+          "depends_on": []
+        },
+        {
+          "name": "rateunit_value",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "RATEUNIT_VALUE",
+          "description": "Rate unit conversion value.",
+          "derived": false,
+          "default_agg": "last",
+          "depends_on": []
+        },
+        {
+          "name": "operation_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "OPERATION_START",
+          "description": "Operation start timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "operation_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "OPERATION_END",
+          "description": "Operation end timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "ideal_time_seconds",
+          "dtype": "NUMBER(18,0)",
+          "role": "metric",
+          "expr": "IDEAL_TIME_SECONDS",
+          "description": "Ideal time (seconds).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "dt_minutes",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "DT_MINUTES",
+          "description": "Downtime (minutes).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "dt_seconds",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "DT_SECONDS",
+          "description": "Downtime (seconds).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "actual_run_seconds",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "ACTUAL_RUN_SECONDS",
+          "description": "Actual run time (seconds).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "target_speed",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "TARGET_SPEED",
+          "description": "Target speed used for the operation (may be null).",
+          "derived": false,
+          "default_agg": "last",
+          "depends_on": []
+        },
+        {
+          "name": "waste_excl_setup_raw",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "WASTE_EXCL_SETUP_RAW",
+          "description": "Waste excl setup (raw).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "waste_cf",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "WASTE_CF",
+          "description": "Waste conversion factor.",
+          "derived": false,
+          "default_agg": "last",
+          "depends_on": []
+        },
+        {
+          "name": "waste_excl_setup_conv",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "WASTE_EXCL_SETUP_CONV",
+          "description": "Waste excl setup (converted).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "actual_produce_exec",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "ACTUAL_PRODUCE_EXEC",
+          "description": "Actual produced value (from execution).",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "actual_produce_adjusted",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "ACTUAL_PRODUCE_ADJUSTED",
+          "description": "Actual produce adjusted.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "ideal_produce",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "IDEAL_PRODUCE",
+          "description": "Ideal produce.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "performance_pct",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "PERFORMANCE_PCT",
+          "description": "Performance percentage.",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "gross_produce",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "GROSS_PRODUCE",
+          "description": "Gross produce.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "net_produce",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "NET_PRODUCE",
+          "description": "Net produce.",
+          "derived": false,
+          "default_agg": "sum",
+          "depends_on": []
+        },
+        {
+          "name": "quality_rate_pct",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "QUALITY_RATE_PCT",
+          "description": "Quality rate percentage.",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "availability_pct",
+          "dtype": "DOUBLE",
+          "role": "metric",
+          "expr": "",
+          "description": "Availability % = (actual_run_seconds / ideal_time_seconds) * 100 with zero-division guard.",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "actual_run_seconds",
+            "ideal_time_seconds"
+          ]
+        },
+        {
+          "name": "availability_loss_pct",
+          "dtype": "DOUBLE",
+          "role": "metric",
+          "expr": "",
+          "description": "Availability loss % = (dt_seconds / ideal_time_seconds) * 100 with zero-division guard.",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "dt_seconds",
+            "ideal_time_seconds"
+          ]
+        },
+        {
+          "name": "oee_pct",
+          "dtype": "DOUBLE",
+          "role": "metric",
+          "expr": "",
+          "description": "OEE % = ((availability_pct/100) * (performance_pct/100) * (quality_rate_pct/100)) * 100.",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "availability_pct",
+            "performance_pct",
+            "quality_rate_pct"
+          ]
+        },
+        {
+          "name": "yield_pct",
+          "dtype": "DOUBLE",
+          "role": "metric",
+          "expr": "",
+          "description": "Yield % = (net_produce / gross_produce) * 100 with zero-division guard.",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "net_produce",
+            "gross_produce"
+          ]
+        },
+        {
+          "name": "produce_per_second",
+          "dtype": "DOUBLE",
+          "role": "metric",
+          "expr": "",
+          "description": "Produce per second = actual_produce_adjusted / actual_run_seconds with zero-division guard.",
+          "derived": true,
+          "default_agg": "avg",
+          "depends_on": [
+            "actual_produce_adjusted",
+            "actual_run_seconds"
+          ]
+        },
+        {
+          "name": "oee_efficiency_flag",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "",
+          "description": "Flag computed when oee_pct < 60 (threshold can be tuned).",
+          "derived": true,
+          "default_agg": "",
+          "depends_on": [
+            "oee_pct"
+          ]
+        }
+      ],
+      "join_keys": [
+        "start_id",
+        "ppd_id",
+        "pu_id",
+        "prod_id"
+      ],
+      "default_metric": "dt_minutes",
+      "entity_type": "operation_metrics",
+      "applicable_reasoners": [
+        "availability_trend_by_machine",
+        "oee_by_machine",
+        "downtime_by_product"
+      ],
+      "applicable_derived_metrics": [
+        "availability_pct",
+        "availability_loss_pct",
+        "oee_pct",
+        "yield_pct",
+        "produce_per_second",
+        "oee_efficiency_flag"
+      ]
     }
   ],
   "relationships": [
     {
-      "name": "manages_mandates_month",
-      "from_entity": "RMMonthlySummary",
-      "to_entity": "MandateMonthlySummary",
-      "description": "RM manages mandates in the same month. Aligned join on (rmid, year, month).",
+      "name": "dt_operations_to_dt_operation_metrics__by__start_id",
+      "from_entity": "dt_operations",
+      "to_entity": "dt_operation_metrics",
+      "description": "Operation to operation_metrics by start_id (same operation window).",
       "join_on": [
         [
-          "rmid",
-          "rmid"
-        ],
-        [
-          "meet_year",
-          "posyear"
-        ],
-        [
-          "meet_mon",
-          "posmon"
+          "start_id",
+          "start_id"
         ]
       ]
     },
     {
-      "name": "assigned_rm_month",
-      "from_entity": "MandateMonthlySummary",
-      "to_entity": "RMMonthlySummary",
-      "description": "Mandate belongs to an RM in the same month. Aligned join on (rmid, year, month).",
+      "name": "dt_operation_metrics_to_dt_target_speed__by__pu_id_prod_id",
+      "from_entity": "dt_operation_metrics",
+      "to_entity": "dt_target_speed",
+      "description": "Reverse traversal of target speed candidates from operation_metrics by (pu_id, prod_id). Correctness still requires effective_date/expiration_date filtering vs operation_start in the query.",
       "join_on": [
         [
-          "rmid",
-          "rmid"
+          "pu_id",
+          "pu_id"
         ],
         [
-          "posyear",
-          "meet_year"
-        ],
-        [
-          "posmon",
-          "meet_mon"
+          "prod_id",
+          "prod_id"
         ]
       ]
     },
     {
-      "name": "mandate_meetings",
-      "from_entity": "MandateMonthlySummary",
-      "to_entity": "MeetingSentiment",
-      "description": "Meetings for a mandate. Join on mandateid.",
+      "name": "dt_operation_metrics_to_dt_unit_config__by__pu_id",
+      "from_entity": "dt_operation_metrics",
+      "to_entity": "dt_unit_config",
+      "description": "Operation_metrics to unit_config by pu_id (machine attributes).",
       "join_on": [
         [
-          "mandateid",
-          "mandateid"
-        ],
-        [
-          "rmid",
-          "rmid"
+          "pu_id",
+          "pu_id"
         ]
       ]
     },
     {
-      "name": "rm_meetings",
-      "from_entity": "RMMonthlySummary",
-      "to_entity": "MeetingSentiment",
-      "description": "Meetings for an RM. Join on rmid.",
+      "name": "dt_operations_to_dt_unit_config__by__pu_id",
+      "from_entity": "dt_operations",
+      "to_entity": "dt_unit_config",
+      "description": "Operations to unit_config by pu_id (machine attributes).",
       "join_on": [
         [
-          "rmid",
-          "rmid"
+          "pu_id",
+          "pu_id"
+        ]
+      ]
+    },
+    {
+      "name": "dt_timed_event_denorm_to_dt_unit_config__by__pu_id",
+      "from_entity": "dt_timed_event_denorm",
+      "to_entity": "dt_unit_config",
+      "description": "Timed downtime events to unit_config by pu_id (machine attributes).",
+      "join_on": [
+        [
+          "pu_id",
+          "pu_id"
+        ]
+      ]
+    },
+    {
+      "name": "dt_waste_event_denorm_to_dt_unit_config__by__pu_id",
+      "from_entity": "dt_waste_event_denorm",
+      "to_entity": "dt_unit_config",
+      "description": "Waste events to unit_config by pu_id (machine attributes).",
+      "join_on": [
+        [
+          "pu_id",
+          "pu_id"
+        ]
+      ]
+    },
+    {
+      "name": "dt_target_speed_to_dt_unit_config__by__pu_id",
+      "from_entity": "dt_target_speed",
+      "to_entity": "dt_unit_config",
+      "description": "Target speed rows to unit_config by pu_id (machine attributes).",
+      "join_on": [
+        [
+          "pu_id",
+          "pu_id"
+        ]
+      ]
+    },
+    {
+      "name": "dt_target_speed_to_dt_operation_metrics__by__pu_id_prod_id",
+      "from_entity": "dt_target_speed",
+      "to_entity": "dt_operation_metrics",
+      "description": "Target speed to operation_metrics by (pu_id, prod_id). Correctness requires effective/expiration date filtering vs operation_start.",
+      "join_on": [
+        [
+          "pu_id",
+          "pu_id"
+        ],
+        [
+          "prod_id",
+          "prod_id"
+        ]
+      ]
+    },
+    {
+      "name": "dt_target_speed_to_dt_operations__by__pu_id_prod_id",
+      "from_entity": "dt_target_speed",
+      "to_entity": "dt_operations",
+      "description": "Target speed to operations by (pu_id, prod_id). Correctness requires effective/expiration date filtering vs operation_start.",
+      "join_on": [
+        [
+          "pu_id",
+          "pu_id"
+        ],
+        [
+          "prod_id",
+          "prod_id"
+        ]
+      ]
+    },
+    {
+      "name": "dt_operation_metrics_to_dt_target_speed",
+      "from_entity": "dt_operation_metrics",
+      "to_entity": "dt_target_speed",
+      "description": "User defined relationship",
+      "join_on": [
+        [
+          "pu_id",
+          "pu_id"
+        ],
+        [
+          "prod_id",
+          "prod_id"
         ]
       ]
     }
   ],
   "reasoners": [
     {
-      "id": "mandate_risk",
-      "name": "Mandate Risk Reasoner",
-      "description": "Identifies mandates at risk of attrition or declining engagement",
-      "entity_type": "mandate",
-      "type": "signal_based",
+      "id": "recurring_downtime_events_across_machines",
+      "name": "Recurring downtime events across machines",
+      "description": "Groups downtime by tefault_value and counts distinct machines (pu_id) within a time window.",
+      "type": "native_query",
+      "entity_type": "downtime_event",
       "outputs": [
-        "mandate_risk_score",
-        "mandate_risk_condition",
-        "signal_aum_decline",
-        "signal_revenue_decline",
-        "signal_low_profitability",
-        "signal_low_engagement",
-        "signal_high_cost"
+        "fault_value",
+        "fault_name",
+        "machines_affected",
+        "event_count",
+        "total_duration_minutes"
       ],
-      "signals": [
+      "signals": [],
+      "params": [
         {
-          "name": "aum_decline",
-          "description": "Decreasing AUM signals client withdrawal",
-          "metric_field": "aum_trend",
-          "threshold": -0.05,
-          "direction": "below",
-          "weight": 1.5
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
         },
         {
-          "name": "low_profitability",
-          "description": "Low profit margin indicates unprofitable relationship",
-          "metric_field": "profit_margin",
-          "threshold": 0.05,
-          "direction": "below",
-          "weight": 1.2
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
         },
         {
-          "name": "revenue_decline",
-          "description": "Declining revenue suggests reduced engagement",
-          "metric_field": "revenue_trend",
-          "threshold": -0.1,
-          "direction": "below",
-          "weight": 1
-        },
-        {
-          "name": "low_engagement",
-          "description": "Few top-ups indicate poor relationship health",
-          "metric_field": "topup_count",
-          "threshold": 2,
-          "direction": "below",
-          "weight": 0.8
-        },
-        {
-          "name": "high_cost_ratio",
-          "description": "High cost-to-revenue ratio shows unprofitable servicing",
-          "metric_field": "cost_to_revenue",
-          "threshold": 0.3,
-          "direction": "above",
-          "weight": 1
+          "name": "limit",
+          "dtype": "NUMBER(38,0)",
+          "required": false
         }
-      ]
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
     },
     {
-      "id": "churn_risk",
-      "name": "Churn Risk Reasoner",
-      "description": "Predicts clients at risk of churning or becoming unprofitable within 3 months",
-      "entity_type": "mandate",
-      "type": "signal_based",
+      "id": "top_downtime_machines",
+      "name": "Top downtime machines",
+      "description": "Ranks machines by total downtime minutes within a time window.",
+      "type": "native_query",
+      "entity_type": "downtime_event",
       "outputs": [
-        "churn_risk_score",
-        "churn_risk_condition",
-        "signal_churn_risk"
+        "pu_id",
+        "total_downtime_minutes",
+        "event_count"
       ],
-      "signals": [
+      "signals": [],
+      "params": [
         {
-          "name": "aum_decline_severe",
-          "description": "Severe AUM decline",
-          "metric_field": "aum_trend",
-          "threshold": -0.15,
-          "direction": "below",
-          "weight": 1.5
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
         },
         {
-          "name": "meeting_drop",
-          "description": "Sharp engagement drop",
-          "metric_field": "meeting_trend",
-          "threshold": -0.3,
-          "direction": "below",
-          "weight": 1.3
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
         },
         {
-          "name": "profit_eroding",
-          "description": "Profitability eroding",
-          "metric_field": "profit_margin",
-          "threshold": 0.05,
-          "direction": "below",
-          "weight": 1.4
-        },
-        {
-          "name": "cost_spike",
-          "description": "Cost ratio increasing",
-          "metric_field": "cost_to_revenue",
-          "threshold": 0.4,
-          "direction": "above",
-          "weight": 1.2
+          "name": "limit",
+          "dtype": "NUMBER(38,0)",
+          "required": false
         }
-      ]
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
     },
     {
-      "id": "trend",
-      "name": "Trend Reasoner",
-      "description": "Detects profit, AUM, and revenue trends over time",
-      "entity_type": "mandate",
-      "type": "signal_based",
+      "id": "top_unplanned_downtime_causes",
+      "name": "Top unplanned downtime causes",
+      "description": "Ranks unplanned downtime fault types by total duration within a window (based on ERC_DESC flag).",
+      "type": "native_query",
+      "entity_type": "downtime_event",
       "outputs": [
-        "aum_trend",
-        "revenue_trend",
-        "profit_trend",
-        "meeting_trend"
+        "fault_value",
+        "fault_name",
+        "machines_affected",
+        "event_count",
+        "total_duration_minutes"
       ],
       "signals": [
+        "is_unplanned"
+      ],
+      "params": [
         {
-          "name": "aum_declining",
-          "description": "AUM decreasing over time",
-          "metric_field": "aum_trend",
-          "threshold": -0.05,
-          "direction": "below",
-          "weight": 1
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
         },
         {
-          "name": "revenue_declining",
-          "description": "Revenue decreasing over time",
-          "metric_field": "revenue_trend",
-          "threshold": -0.1,
-          "direction": "below",
-          "weight": 1
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
         },
         {
-          "name": "profit_declining",
-          "description": "Profit eroding over time",
-          "metric_field": "profit_trend",
-          "threshold": -0.05,
-          "direction": "below",
-          "weight": 1.2
+          "name": "limit",
+          "dtype": "NUMBER(38,0)",
+          "required": false
         }
-      ]
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
     },
     {
-      "id": "cost_driver",
-      "name": "Cost Driver Reasoner",
-      "description": "Identifies which cost components most impact profit margins",
-      "entity_type": "mandate",
-      "type": "signal_based",
+      "id": "availability_trend_by_machine",
+      "name": "Availability trend by machine",
+      "description": "Returns operation-level availability signals within a window for trend analysis using operation_metrics.",
+      "type": "native_query",
+      "entity_type": "operation_metrics",
       "outputs": [
-        "cost_driver_impact_score",
-        "cost_driver_condition",
-        "signal_high_cost_ratio"
+        "pu_id",
+        "operation_start",
+        "operation_end",
+        "availability_pct",
+        "availability_loss_pct",
+        "dt_minutes",
+        "performance_pct",
+        "quality_rate_pct",
+        "oee_pct"
       ],
-      "signals": []
+      "signals": [],
+      "params": [
+        {
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "pu_id",
+          "dtype": "NUMBER(38,0)",
+          "required": false
+        }
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
+    },
+    {
+      "id": "oee_by_machine",
+      "name": "OEE by machine",
+      "description": "Ranks machines by avg OEE and total downtime within a window using operation_metrics.",
+      "type": "native_query",
+      "entity_type": "operation_metrics",
+      "outputs": [
+        "pu_id",
+        "avg_oee_pct",
+        "total_dt_minutes",
+        "avg_availability_pct"
+      ],
+      "signals": [],
+      "params": [
+        {
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "dtype": "NUMBER(38,0)",
+          "required": false
+        }
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
+    },
+    {
+      "id": "downtime_by_product",
+      "name": "Downtime by product",
+      "description": "Ranks products by downtime minutes within a window using operation_metrics.",
+      "type": "native_query",
+      "entity_type": "operation_metrics",
+      "outputs": [
+        "prod_id",
+        "total_dt_minutes",
+        "avg_oee_pct"
+      ],
+      "signals": [],
+      "params": [
+        {
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "dtype": "NUMBER(38,0)",
+          "required": false
+        }
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
+    },
+    {
+      "id": "waste_by_machine",
+      "name": "Waste by machine",
+      "description": "Ranks machines by total waste amount within a time window using waste_event_denorm.",
+      "type": "native_query",
+      "entity_type": "waste_event",
+      "outputs": [
+        "pu_id",
+        "total_waste_amount",
+        "event_count"
+      ],
+      "signals": [],
+      "params": [
+        {
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "dtype": "NUMBER(38,0)",
+          "required": false
+        }
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
+    },
+    {
+      "id": "setup_waste_amount",
+      "name": "Setup waste amount",
+      "description": "Ranks machines by total setup waste amount within a time window using is_setup_waste derived flag.",
+      "type": "native_query",
+      "entity_type": "waste_event",
+      "outputs": [
+        "pu_id",
+        "setup_waste_amount",
+        "event_count"
+      ],
+      "signals": [
+        "is_setup_waste"
+      ],
+      "params": [
+        {
+          "name": "window_start",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "window_end",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "dtype": "NUMBER(38,0)",
+          "required": false
+        }
+      ],
+      "graph_id": "",
+      "graph_build": {},
+      "drilldown_plan": {}
     }
   ],
   "derived_rel_rules": [
     {
-      "entity": "MandateMonthlySummary",
-      "field": "month_date",
+      "entity": "dt_timed_event_denorm",
+      "field": "is_unplanned",
       "vars": {},
       "rules": [
         {
-          "expr": "std.datetime.date(posyear,posmon,1)"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "risk_signal_count",
-      "vars": {},
-      "rules": [
-        {
-          "expr": "signal_aum_decline+signal_low_profitability+signal_revenue_decline+signal_low_engagement+signal_high_cost_ratio"
-        }
-      ]
-    },
-
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "profit_margin",
-      "vars": {},
-      "rules": [
-        {
-          "when": "revenue_amount>0",
-          "expr": "profit_amount/revenue_amount"
-        },
-        {
-          "when": "revenue_amount<=0",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "cost_to_revenue",
-      "vars": {},
-      "rules": [
-        {
-          "when": "revenue_amount>0",
-          "expr": "rm_cost_for_each_mandate/revenue_amount"
-        },
-        {
-          "when": "revenue_amount<=0",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "revenue_per_cost",
-      "vars": {},
-      "rules": [
-        {
-          "when": "rm_cost_for_each_mandate>0",
-          "expr": "revenue_amount/rm_cost_for_each_mandate"
-        },
-        {
-          "when": "rm_cost_for_each_mandate<=0",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "aum_per_cost",
-      "vars": {},
-      "rules": [
-        {
-          "when": "rm_cost_for_each_mandate>0",
-          "expr": "total_aum/rm_cost_for_each_mandate"
-        },
-        {
-          "when": "rm_cost_for_each_mandate<=0",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "aum_trend",
-      "vars": {
-        "prev": "ref"
-      },
-      "rules": [
-        {
-          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.total_aum!=0)",
-          "expr": "(total_aum-prev.total_aum)/prev.total_aum"
-        },
-        {
-          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.total_aum==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.total_aum!=0)",
-          "expr": "(total_aum-prev.total_aum)/prev.total_aum"
-        },
-        {
-          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.total_aum==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "posmon==1",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "revenue_trend",
-      "vars": {
-        "prev": "ref"
-      },
-      "rules": [
-        {
-          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.revenue_amount!=0)",
-          "expr": "(revenue_amount-prev.revenue_amount)/prev.revenue_amount"
-        },
-        {
-          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.revenue_amount==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.revenue_amount!=0)",
-          "expr": "(revenue_amount-prev.revenue_amount)/prev.revenue_amount"
-        },
-        {
-          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.revenue_amount==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "posmon==1",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "profit_trend",
-      "vars": {
-        "prev": "ref"
-      },
-      "rules": [
-        {
-          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.profit_amount!=0)",
-          "expr": "(profit_amount-prev.profit_amount)/prev.profit_amount"
-        },
-        {
-          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.profit_amount==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.profit_amount!=0)",
-          "expr": "(profit_amount-prev.profit_amount)/prev.profit_amount"
-        },
-        {
-          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.profit_amount==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "posmon==1",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "meeting_trend",
-      "vars": {
-        "prev": "ref"
-      },
-      "rules": [
-        {
-          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.topup_count!=0)",
-          "expr": "(topup_count-prev.topup_count)/prev.topup_count"
-        },
-        {
-          "when": "(posmon>1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear)&(prev.posmon==posmon-1)&(prev.topup_count==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.topup_count!=0)",
-          "expr": "(topup_count-prev.topup_count)/prev.topup_count"
-        },
-        {
-          "when": "(posmon==1)&(prev.mandateid==mandateid)&(prev.rmid==rmid)&(prev.posyear==posyear-1)&(prev.posmon==12)&(prev.topup_count==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "posmon==1",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "signal_aum_decline",
-      "vars": {},
-      "rules": [
-        {
-          "when": "aum_trend<-0.05",
-          "expr": "1.0"
-        },
-        {
-          "when": "aum_trend>=-0.05",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "signal_low_profitability",
-      "vars": {},
-      "rules": [
-        {
-          "when": "profit_margin<0.05",
-          "expr": "1.0"
-        },
-        {
-          "when": "profit_margin>=0.05",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "signal_revenue_decline",
-      "vars": {},
-      "rules": [
-        {
-          "when": "revenue_trend<-0.10",
-          "expr": "1.0"
-        },
-        {
-          "when": "revenue_trend>=-0.10",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "signal_low_engagement",
-      "vars": {},
-      "rules": [
-        {
-          "when": "topup_count<2",
-          "expr": "1.0"
-        },
-        {
-          "when": "topup_count>=2",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "signal_high_cost_ratio",
-      "vars": {},
-      "rules": [
-        {
-          "when": "cost_to_revenue>0.30",
-          "expr": "1.0"
-        },
-        {
-          "when": "cost_to_revenue<=0.30",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "signal_high_cost",
-      "vars": {},
-      "rules": [
-        {
-          "when": "cost_to_revenue>0.30",
-          "expr": "1.0"
-        },
-        {
-          "when": "cost_to_revenue<=0.30",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "mandate_risk_score",
-      "vars": {
-        "score_raw": "(signal_aum_decline*1.5)+(signal_low_profitability*1.2)+(signal_revenue_decline*1.0)+(signal_low_engagement*0.8)+(signal_high_cost_ratio*1.0)"
-      },
-      "rules": [
-        {
-          "when": "score_raw>0",
-          "expr": "std.math.minimum(1.0,score_raw/5.5)"
-        },
-        {
-          "when": "score_raw<=0",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "mandate_risk_condition",
-      "vars": {},
-      "rules": [
-        {
-          "when": "(mandate_risk_score>0.70)&(risk_signal_count>=3)",
-          "expr": "\"at_risk\""
-        },
-        {
-          "when": "(mandate_risk_score>0.55)&(risk_signal_count>=2)",
-          "expr": "\"declining\""
+          "when": "ilike(erc_desc, '%unplanned%')",
+          "expr": "true"
         },
         {
           "when": "true",
-          "expr": "\"healthy\""
+          "expr": "false"
         }
-      ]
+      ],
+      "description": "Unplanned downtime flag inferred from ERC_DESC containing 'unplanned'."
     },
     {
-      "entity": "MandateMonthlySummary",
-      "field": "signal_aum_decline_severe",
+      "entity": "dt_timed_event_denorm",
+      "field": "machines_affected",
       "vars": {},
       "rules": [
         {
-          "when": "aum_trend<-0.15",
-          "expr": "1.0"
-        },
-        {
-          "when": "aum_trend>=-0.15",
-          "expr": "0.0"
+          "when": "true",
+          "expr": "pu_id"
         }
-      ]
+      ],
+      "description": "Helper for count_distinct(pu_id) when grouped by tefault_value."
     },
     {
-      "entity": "MandateMonthlySummary",
-      "field": "signal_meeting_drop",
+      "entity": "dt_waste_event_denorm",
+      "field": "is_setup_waste",
       "vars": {},
       "rules": [
         {
-          "when": "meeting_trend<-0.30",
-          "expr": "1.0"
+          "when": "ilike(wefault_name, '%make ready%')",
+          "expr": "true"
         },
         {
-          "when": "meeting_trend>=-0.30",
-          "expr": "0.0"
+          "when": "ilike(wefault_name, '%setup%')",
+          "expr": "true"
+        },
+        {
+          "when": "true",
+          "expr": "false"
         }
-      ]
+      ],
+      "description": "Setup waste flag inferred from WEFAULT_NAME."
     },
     {
-      "entity": "MandateMonthlySummary",
-      "field": "signal_profit_eroding",
+      "entity": "dt_waste_event_denorm",
+      "field": "is_operational_waste",
       "vars": {},
       "rules": [
         {
-          "when": "profit_margin<0.05",
-          "expr": "1.0"
+          "when": "ilike(wefault_name, '%operational%')",
+          "expr": "true"
         },
         {
-          "when": "profit_margin>=0.05",
-          "expr": "0.0"
+          "when": "true",
+          "expr": "false"
         }
-      ]
+      ],
+      "description": "Operational waste flag inferred from WEFAULT_NAME."
     },
     {
-      "entity": "MandateMonthlySummary",
-      "field": "signal_cost_spike",
+      "entity": "dt_operation_metrics",
+      "field": "availability_pct",
       "vars": {},
       "rules": [
         {
-          "when": "cost_to_revenue>0.40",
-          "expr": "1.0"
+          "when": "(ideal_time_seconds > 0)",
+          "expr": "(actual_run_seconds / ideal_time_seconds) * 100.0"
         },
         {
-          "when": "cost_to_revenue<=0.40",
+          "when": "true",
           "expr": "0.0"
         }
-      ]
+      ],
+      "description": "Availability percentage with zero-division guard."
     },
     {
-      "entity": "MandateMonthlySummary",
-      "field": "churn_risk_score",
-      "vars": {
-        "score_raw": "(signal_aum_decline_severe*1.5)+(signal_meeting_drop*1.3)+(signal_profit_eroding*1.4)+(signal_cost_spike*1.2)"
-      },
-      "rules": [
-        {
-          "when": "score_raw>0",
-          "expr": "std.math.minimum(1.0,score_raw/5.4)"
-        },
-        {
-          "when": "score_raw<=0",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "signal_churn_risk",
+      "entity": "dt_operation_metrics",
+      "field": "availability_loss_pct",
       "vars": {},
       "rules": [
         {
-          "when": "churn_risk_score>0.75",
-          "expr": "1.0"
+          "when": "(ideal_time_seconds > 0)",
+          "expr": "(dt_seconds / ideal_time_seconds) * 100.0"
         },
         {
-          "when": "churn_risk_score<=0.75",
+          "when": "true",
           "expr": "0.0"
         }
-      ]
+      ],
+      "description": "Downtime loss percentage with zero-division guard."
     },
     {
-      "entity": "MandateMonthlySummary",
-      "field": "churn_risk_condition",
+      "entity": "dt_operation_metrics",
+      "field": "oee_pct",
       "vars": {},
       "rules": [
         {
-          "when": "churn_risk_score>0.75",
-          "expr": "\"at_risk\""
-        },
-        {
-          "when": "(churn_risk_score>0.40)&(churn_risk_score<=0.75)",
-          "expr": "\"declining\""
-        },
-        {
-          "when": "churn_risk_score<=0.40",
-          "expr": "\"healthy\""
+          "when": "true",
+          "expr": "((availability_pct / 100.0) * (performance_pct / 100.0) * (quality_rate_pct / 100.0)) * 100.0"
         }
-      ]
+      ],
+      "description": "OEE computed from availability/performance/quality percentages."
     },
     {
-      "entity": "MandateMonthlySummary",
-      "field": "cost_driver_impact_score",
+      "entity": "dt_operation_metrics",
+      "field": "yield_pct",
       "vars": {},
       "rules": [
         {
-          "when": "cost_to_revenue>0.30",
-          "expr": "std.math.minimum(1.0,cost_to_revenue*0.5)"
+          "when": "(gross_produce > 0)",
+          "expr": "(net_produce / gross_produce) * 100.0"
         },
         {
-          "when": "cost_to_revenue<=0.30",
+          "when": "true",
           "expr": "0.0"
         }
-      ]
+      ],
+      "description": "Yield percentage with zero-division guard."
     },
     {
-      "entity": "MandateMonthlySummary",
-      "field": "cost_driver_condition",
+      "entity": "dt_operation_metrics",
+      "field": "produce_per_second",
       "vars": {},
       "rules": [
         {
-          "when": "cost_to_revenue>0.40",
-          "expr": "\"high_impact\""
+          "when": "(actual_run_seconds > 0)",
+          "expr": "actual_produce_adjusted / actual_run_seconds"
         },
         {
-          "when": "(cost_to_revenue>0.30)&(cost_to_revenue<=0.40)",
-          "expr": "\"moderate_impact\""
-        },
-        {
-          "when": "cost_to_revenue<=0.30",
-          "expr": "\"low_impact\""
+          "when": "true",
+          "expr": "0.0"
         }
-      ]
+      ],
+      "description": "Produce per second with zero-division guard."
     },
     {
-      "entity": "MandateMonthlySummary",
-      "field": "allocation_roi_factor",
+      "entity": "dt_operation_metrics",
+      "field": "oee_efficiency_flag",
       "vars": {},
       "rules": [
         {
-          "when": "rm_cost_for_each_mandate>0",
-          "expr": "(revenue_amount-rm_cost_for_each_mandate)/rm_cost_for_each_mandate"
+          "when": "(oee_pct < 60.0)",
+          "expr": "true"
         },
         {
-          "when": "rm_cost_for_each_mandate<=0",
-          "expr": "0.0"
+          "when": "true",
+          "expr": "false"
         }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "allocation_efficiency_factor",
-      "vars": {},
-      "rules": [
-        {
-          "when": "topup_count>0",
-          "expr": "revenue_amount/topup_count"
-        },
-        {
-          "when": "topup_count<=0",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "allocation_composite_score",
-      "vars": {},
-      "rules": [
-        {
-          "when": "(topup_count>0)&(rm_cost_for_each_mandate>0)",
-          "expr": "(allocation_roi_factor*0.6)+((allocation_efficiency_factor/10000.0)*0.4)"
-        },
-        {
-          "when": "(topup_count<=0)|(rm_cost_for_each_mandate<=0)",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MandateMonthlySummary",
-      "field": "allocation_priority",
-      "vars": {},
-      "rules": [
-        {
-          "when": "allocation_composite_score>1.0",
-          "expr": "\"HIGH\""
-        },
-        {
-          "when": "(allocation_composite_score>0.5)&(allocation_composite_score<=1.0)",
-          "expr": "\"MEDIUM\""
-        },
-        {
-          "when": "allocation_composite_score<=0.5",
-          "expr": "\"LOW\""
-        }
-      ]
-    },
-    {
-      "entity": "RMMonthlySummary",
-      "field": "month_date",
-      "vars": {},
-      "rules": [
-        {
-          "expr": "std.datetime.date(meet_year,meet_mon,1)"
-        }
-      ]
-    },
-    {
-      "entity": "RMMonthlySummary",
-      "field": "signal_low_mandate_count",
-      "vars": {},
-      "rules": [
-        {
-          "when": "total_mandates<5",
-          "expr": "1.0"
-        },
-        {
-          "when": "total_mandates>=5",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "RMMonthlySummary",
-      "field": "meeting_count_variance",
-      "vars": {},
-      "rules": [
-        {
-          "when": "meeting_count_target>0",
-          "expr": "(new_mandate_total_meetings+existing_mandate_total_meetings)/meeting_count_target"
-        },
-        {
-          "when": "meeting_count_target<=0",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "RMMonthlySummary",
-      "field": "client_target_variance",
-      "vars": {},
-      "rules": [
-        {
-          "when": "clienttarget>0",
-          "expr": "total_month_mandates/clienttarget"
-        },
-        {
-          "when": "clienttarget<=0",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "RMMonthlySummary",
-      "field": "signal_low_aum",
-      "vars": {},
-      "rules": [
-        {
-          "when": "aum<1000000",
-          "expr": "1.0"
-        },
-        {
-          "when": "aum>=1000000",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "RMMonthlySummary",
-      "field": "signal_low_performance",
-      "vars": {},
-      "rules": [
-        {
-          "when": "performance<0.5",
-          "expr": "1.0"
-        },
-        {
-          "when": "performance>=0.5",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "RMMonthlySummary",
-      "field": "rm_performance_condition",
-      "vars": {},
-      "rules": [
-        {
-          "when": "performance>0.75",
-          "expr": "\"performing\""
-        },
-        {
-          "when": "(performance>0.40)&(performance<=0.75)",
-          "expr": "\"needs_support\""
-        },
-        {
-          "when": "performance<=0.40",
-          "expr": "\"underperforming\""
-        }
-      ]
-    },
-    {
-      "entity": "RMMonthlySummary",
-      "field": "aum_trend",
-      "vars": {
-        "prev": "ref"
-      },
-      "rules": [
-        {
-          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.aum!=0)",
-          "expr": "(aum-prev.aum)/prev.aum"
-        },
-        {
-          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.aum==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.aum!=0)",
-          "expr": "(aum-prev.aum)/prev.aum"
-        },
-        {
-          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.aum==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "meet_mon==1",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "RMMonthlySummary",
-      "field": "revenue_trend",
-      "vars": {
-        "prev": "ref"
-      },
-      "rules": [
-        {
-          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.total_nnm!=0)",
-          "expr": "(total_nnm-prev.total_nnm)/prev.total_nnm"
-        },
-        {
-          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.total_nnm==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.total_nnm!=0)",
-          "expr": "(total_nnm-prev.total_nnm)/prev.total_nnm"
-        },
-        {
-          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.total_nnm==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "meet_mon==1",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "RMMonthlySummary",
-      "field": "profit_trend",
-      "vars": {
-        "prev": "ref"
-      },
-      "rules": [
-        {
-          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.performance!=0)",
-          "expr": "(performance-prev.performance)/prev.performance"
-        },
-        {
-          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.performance==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.performance!=0)",
-          "expr": "(performance-prev.performance)/prev.performance"
-        },
-        {
-          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.performance==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "meet_mon==1",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "RMMonthlySummary",
-      "field": "aum_trend_rm",
-      "vars": {
-        "prev": "ref"
-      },
-      "rules": [
-        {
-          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.aum!=0)",
-          "expr": "(aum-prev.aum)/prev.aum"
-        },
-        {
-          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.aum==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.aum!=0)",
-          "expr": "(aum-prev.aum)/prev.aum"
-        },
-        {
-          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.aum==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "meet_mon==1",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "RMMonthlySummary",
-      "field": "mandate_growth_trend",
-      "vars": {
-        "prev": "ref"
-      },
-      "rules": [
-        {
-          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.total_mandates!=0)",
-          "expr": "(total_mandates-prev.total_mandates)/prev.total_mandates"
-        },
-        {
-          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&(prev.total_mandates==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.total_mandates!=0)",
-          "expr": "(total_mandates-prev.total_mandates)/prev.total_mandates"
-        },
-        {
-          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&(prev.total_mandates==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "meet_mon==1",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "RMMonthlySummary",
-      "field": "meeting_trend",
-      "vars": {
-        "prev": "ref"
-      },
-      "rules": [
-        {
-          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&((prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)!=0)",
-          "expr": "((new_mandate_total_meetings+existing_mandate_total_meetings)-(prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings))/(prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)"
-        },
-        {
-          "when": "(meet_mon>1)&(prev.rmid==rmid)&(prev.meet_year==meet_year)&(prev.meet_mon==meet_mon-1)&((prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&((prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)!=0)",
-          "expr": "((new_mandate_total_meetings+existing_mandate_total_meetings)-(prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings))/(prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)"
-        },
-        {
-          "when": "(meet_mon==1)&(prev.rmid==rmid)&(prev.meet_year==meet_year-1)&(prev.meet_mon==12)&((prev.new_mandate_total_meetings+prev.existing_mandate_total_meetings)==0)",
-          "expr": "0.0"
-        },
-        {
-          "when": "meet_mon==1",
-          "expr": "0.0"
-        }
-      ]
-    },
-    {
-      "entity": "MeetingSentiment",
-      "field": "meeting_id",
-      "vars": {},
-      "rules": [
-        {
-          "expr": "id"
-        }
-      ]
-    },
-    {
-      "entity": "MeetingSentiment",
-      "field": "meeting_date",
-      "vars": {},
-      "rules": [
-        {
-          "expr": "meetingdate"
-        }
-      ]
-    },
-    {
-      "entity": "MeetingSentiment",
-      "field": "duration",
-      "vars": {},
-      "rules": [
-        {
-          "expr": "meetingduration"
-        }
-      ]
-    },
-    {
-      "entity": "MeetingSentiment",
-      "field": "meeting_type",
-      "vars": {},
-      "rules": [
-        {
-          "expr": "meetingtype"
-        }
-      ]
-    },
-    {
-      "entity": "MeetingSentiment",
-      "field": "meeting_notes",
-      "vars": {},
-      "rules": [
-        {
-          "expr": "meetingnotes"
-        }
-      ]
-    },
-    {
-      "entity": "MeetingSentiment",
-      "field": "utm_source_first_touch",
-      "vars": {},
-      "rules": [
-        {
-          "expr": "utmsourcefirsttouch"
-        }
-      ]
-    },
-    {
-      "entity": "MeetingSentiment",
-      "field": "month_date",
-      "vars": {},
-      "rules": [
-        {
-          "expr": "std.datetime.date(std.datetime.datetime.year(meetingdate),std.datetime.datetime.month(meetingdate),1)"
-        }
-      ]
+      ],
+      "description": "Low OEE flag using threshold 60%."
     }
   ],
-  "prompt_templates": {
-    "visual_builder_logic_to_rules": "You are a KG rule builder. Convert the user's natural language into derived_rel_rules JSON. Use ONLY fields from the ontology. Return JSON only in this shape: {\"entity\":\"<Entity>\",\"field\":\"<DerivedField>\",\"vars\":{},\"rules\":[{\"when\":\"<condition or empty>\",\"expr\":\"<rel expr>\"}]}. Use m.<field> for fields if needed. If you need a prior-row reference, include vars: {\"prev\":\"ref\"} and reference prev.<field>.",
-    "visual_builder_rule_validate": "Validate the derived_rel_rules JSON. Check: entity exists, field exists and is derived, all fields used exist, no SQL syntax. Return JSON only: {\"valid\":true|false,\"issues\":[\"...\"]}.",
-    "visual_builder_rule_explain": "Explain a derived_rel_rules JSON in plain English in 2-4 bullets. Use the entity and field names exactly."
-  },
-  "analysis_config": {
-    "default_months_window": 12,
-    "join_keys_preference": [
-      "RMID",
-      "MANDATEID",
-      "MANDATEID_STR",
-      "RM_NAME",
-      "montg_date",
-      "MEET_YEAR"
+  "prompt_templates": {},
+  "analysis_config": {},
+  "config": {},
+  "kg": {
+    "nodes": [
+      {
+        "entity": "dt_unit_config",
+        "node_type": "machine",
+        "key_field": "pu_id",
+        "label_field": "pu_desc",
+        "properties": [
+          "pl_id",
+          "oem_type",
+          "production_var_id",
+          "setup_waste_ct",
+          "performance_dt_cat",
+          "production_rate_timeunits_id",
+          "rateunit_raw",
+          "rateunit_value"
+        ]
+      },
+      {
+        "entity": "dt_operations",
+        "node_type": "operation",
+        "key_field": "start_id",
+        "label_field": "operation_start",
+        "properties": [
+          "ppd_id",
+          "pu_id",
+          "prod_id",
+          "targetquantity",
+          "operation_end",
+          "is_open"
+        ]
+      },
+      {
+        "entity": "dt_operation_metrics",
+        "node_type": "operation_metrics",
+        "key_field": "start_id",
+        "label_field": "operation_start",
+        "properties": [
+          "ppd_id",
+          "pu_id",
+          "prod_id",
+          "ideal_time_seconds",
+          "dt_minutes",
+          "dt_seconds",
+          "actual_run_seconds",
+          "target_speed",
+          "performance_pct",
+          "quality_rate_pct",
+          "availability_pct",
+          "oee_pct"
+        ]
+      },
+      {
+        "entity": "dt_timed_event_denorm",
+        "node_type": "downtime_event",
+        "key_field": "tedet_id",
+        "label_field": "tefault_name",
+        "properties": [
+          "pu_id",
+          "tefault_value",
+          "start_time",
+          "end_time",
+          "duration_minutes_eff",
+          "erc_desc",
+          "reason1",
+          "reason2",
+          "is_unplanned"
+        ]
+      },
+      {
+        "entity": "dt_waste_event_denorm",
+        "node_type": "waste_event",
+        "key_field": "wed_id",
+        "label_field": "wefault_name",
+        "properties": [
+          "pu_id",
+          "wefault_value",
+          "entry_on",
+          "amount",
+          "erc_desc",
+          "reason1",
+          "is_setup_waste",
+          "is_operational_waste"
+        ]
+      },
+      {
+        "entity": "dt_target_speed",
+        "node_type": "target_speed",
+        "key_field": "pu_id",
+        "label_field": "effective_date",
+        "properties": [
+          "prod_id",
+          "expiration_date",
+          "target_speed"
+        ]
+      }
     ],
-    "entity_priority": [
-      "rm",
-      "mandate",
-      "client"
+    "edges": [
+      {
+        "name": "dt_operations_to_dt_operation_metrics__by__start_id",
+        "from_entity": "dt_operations",
+        "to_entity": "dt_operation_metrics",
+        "description": "Operation has_metrics (1:1 by start_id).",
+        "join_on": [
+          [
+            "start_id",
+            "start_id"
+          ]
+        ],
+        "edge_type": "rel"
+      },
+      {
+        "name": "dt_operation_metrics_to_dt_unit_config__by__pu_id",
+        "from_entity": "dt_operation_metrics",
+        "to_entity": "dt_unit_config",
+        "description": "Operation_metrics occurs_on machine (pu_id).",
+        "join_on": [
+          [
+            "pu_id",
+            "pu_id"
+          ]
+        ],
+        "edge_type": "rel"
+      },
+      {
+        "name": "dt_operations_to_dt_unit_config__by__pu_id",
+        "from_entity": "dt_operations",
+        "to_entity": "dt_unit_config",
+        "description": "Operation occurs_on machine (pu_id).",
+        "join_on": [
+          [
+            "pu_id",
+            "pu_id"
+          ]
+        ],
+        "edge_type": "rel"
+      },
+      {
+        "name": "dt_timed_event_denorm_to_dt_unit_config__by__pu_id",
+        "from_entity": "dt_timed_event_denorm",
+        "to_entity": "dt_unit_config",
+        "description": "Downtime_event occurs_on machine (pu_id).",
+        "join_on": [
+          [
+            "pu_id",
+            "pu_id"
+          ]
+        ],
+        "edge_type": "rel"
+      },
+      {
+        "name": "dt_waste_event_denorm_to_dt_unit_config__by__pu_id",
+        "from_entity": "dt_waste_event_denorm",
+        "to_entity": "dt_unit_config",
+        "description": "Waste_event occurs_on machine (pu_id).",
+        "join_on": [
+          [
+            "pu_id",
+            "pu_id"
+          ]
+        ],
+        "edge_type": "rel"
+      },
+      {
+        "name": "dt_target_speed_to_dt_unit_config__by__pu_id",
+        "from_entity": "dt_target_speed",
+        "to_entity": "dt_unit_config",
+        "description": "Target_speed defined_for machine (pu_id).",
+        "join_on": [
+          [
+            "pu_id",
+            "pu_id"
+          ]
+        ],
+        "edge_type": "rel"
+      },
+      {
+        "name": "dt_target_speed_to_dt_operation_metrics__by__pu_id_prod_id",
+        "from_entity": "dt_target_speed",
+        "to_entity": "dt_operation_metrics",
+        "description": "Target_speed candidate_for operation_metrics (pu_id, prod_id). Temporal validity must be applied in queries.",
+        "join_on": [
+          [
+            "pu_id",
+            "pu_id"
+          ],
+          [
+            "prod_id",
+            "prod_id"
+          ]
+        ],
+        "edge_type": "rel"
+      }
     ],
-    "dimension_hint": "RMID",
-    "entity_aliases": {
-      "rm_prefixes": [
-        "RM",
-        "Advisor",
-        "Relationship Manager"
-      ],
-      "mandate_prefixes": [
-        "Mandate",
-        "Client",
-        "Account"
-      ]
-    },
-    "driver_metric_synonyms": {},
-    "driver_question_core_terms": [],
-    "driver_question_change_terms": [],
-    "driver_question_special_phrases": [],
-    "driver_question_prescriptive_phrases": []
-  },
-  "config": {
-    "post_compute_derived_metrics": false,
-    "allow_sql_derived_expr": false,
-    "allow_multi_fact_aggregations": true
+    "graphs": [
+      {
+        "id": "machine_operations_graph",
+        "name": "Machine \u2194 Operations \u2194 Metrics",
+        "description": "Safe core operational graph: machines, operations and operation_metrics via pu_id/start_id joins.",
+        "directed": true,
+        "weighted": false,
+        "nodes": [
+          {
+            "entity": "dt_unit_config"
+          },
+          {
+            "entity": "dt_operations"
+          },
+          {
+            "entity": "dt_operation_metrics"
+          }
+        ],
+        "edges": [
+          {
+            "from_entity": "dt_operations",
+            "name": "dt_operations_to_dt_operation_metrics__by__start_id"
+          },
+          {
+            "from_entity": "dt_operation_metrics",
+            "name": "dt_operation_metrics_to_dt_unit_config__by__pu_id"
+          },
+          {
+            "from_entity": "dt_operations",
+            "name": "dt_operations_to_dt_unit_config__by__pu_id"
+          }
+        ]
+      },
+      {
+        "id": "downtime_graph",
+        "name": "Downtime events \u2194 Machines",
+        "description": "Safe downtime graph: timed_event_denorm joined to machines via pu_id only (recurrence via tefault_value).",
+        "directed": true,
+        "weighted": false,
+        "nodes": [
+          {
+            "entity": "dt_timed_event_denorm"
+          },
+          {
+            "entity": "dt_unit_config"
+          }
+        ],
+        "edges": [
+          {
+            "from_entity": "dt_timed_event_denorm",
+            "name": "dt_timed_event_denorm_to_dt_unit_config__by__pu_id"
+          }
+        ]
+      },
+      {
+        "id": "waste_graph",
+        "name": "Waste events \u2194 Machines",
+        "description": "Safe waste graph: waste_event_denorm joined to machines via pu_id only.",
+        "directed": true,
+        "weighted": false,
+        "nodes": [
+          {
+            "entity": "dt_waste_event_denorm"
+          },
+          {
+            "entity": "dt_unit_config"
+          }
+        ],
+        "edges": [
+          {
+            "from_entity": "dt_waste_event_denorm",
+            "name": "dt_waste_event_denorm_to_dt_unit_config__by__pu_id"
+          }
+        ]
+      },
+      {
+        "id": "target_speed_graph",
+        "name": "Target speed \u2194 Machine \u2194 Operation metrics",
+        "description": "Target speed graph: includes candidate equi-join edges; validity must be constrained by effective/expiration dates in queries.",
+        "directed": true,
+        "weighted": false,
+        "nodes": [
+          {
+            "entity": "dt_target_speed"
+          },
+          {
+            "entity": "dt_unit_config"
+          },
+          {
+            "entity": "dt_operation_metrics"
+          }
+        ],
+        "edges": [
+          {
+            "from_entity": "dt_target_speed",
+            "name": "dt_target_speed_to_dt_unit_config__by__pu_id"
+          },
+          {
+            "from_entity": "dt_target_speed",
+            "name": "dt_target_speed_to_dt_operation_metrics__by__pu_id_prod_id"
+          }
+        ]
+      }
+    ]
   }
 }
