@@ -4,8 +4,8 @@
       "name": "dt_unit_config",
       "description": "Machine/unit configuration (dimension). Grain: pu_id. Holds plant, machine label, OEM type, production variable and category mappings, and rate unit conversion settings.",
       "database": "RAI",
-      "schema": "RAI1",
-      "table": "DT_UNIT_CONFIG",
+      "schema": "RAI",
+      "table": "T_UNIT_CONFIG",
       "fields": [
         {
           "name": "pu_id",
@@ -126,8 +126,8 @@
       "name": "dt_operations",
       "description": "Operation windows. Grain: start_id. Contains plan detail, machine, product and operation start/end timestamps.",
       "database": "RAI",
-      "schema": "RAI1",
-      "table": "DT_OPERATIONS",
+      "schema": "RAI",
+      "table": "T_OPERATIONS",
       "fields": [
         {
           "name": "start_id",
@@ -222,11 +222,189 @@
       "applicable_derived_metrics": []
     },
     {
+      "name": "dt_execution_numeric",
+      "description": "Execution numeric results. Grain likely (test_id, var_id, result_on). Does not contain pu_id/prod_id; joins to operations/metrics are not defensible from provided columns alone.",
+      "database": "RAI",
+      "schema": "RAI",
+      "table": "T_EXECUTION_NUMERIC",
+      "fields": [
+        {
+          "name": "test_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "TEST_ID",
+          "description": "Execution test identifier.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "array_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ARRAY_ID",
+          "description": "Array identifier.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "canceled",
+          "dtype": "BOOLEAN",
+          "role": "dimension",
+          "expr": "CANCELED",
+          "description": "Canceled flag.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "comment_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "COMMENT_ID",
+          "description": "Comment identifier.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "entry_by1",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "ENTRY_BY1",
+          "description": "Entry-by (numeric) field.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "entry_on",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "ENTRY_ON",
+          "description": "Entry timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "event_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "EVENT_ID",
+          "description": "Event identifier (meaning not confirmed from schema alone).",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "locked",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "LOCKED",
+          "description": "Locked flag/value.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "result_raw",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "RESULT_RAW",
+          "description": "Raw result as text.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "result_float",
+          "dtype": "FLOAT",
+          "role": "metric",
+          "expr": "RESULT_FLOAT",
+          "description": "Result as float.",
+          "derived": false,
+          "default_agg": "avg",
+          "depends_on": []
+        },
+        {
+          "name": "result_on",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "RESULT_ON",
+          "description": "Result timestamp.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "result_ts",
+          "dtype": "TIMESTAMP_NTZ(9)",
+          "role": "dimension",
+          "expr": "RESULT_TS",
+          "description": "Result timestamp (duplicate/alternate).",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "second_user_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "SECOND_USER_ID",
+          "description": "Second user id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "signature_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "SIGNATURE_ID",
+          "description": "Signature id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "var_id",
+          "dtype": "NUMBER(38,0)",
+          "role": "dimension",
+          "expr": "VAR_ID",
+          "description": "Variable id.",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        },
+        {
+          "name": "entry_by",
+          "dtype": "VARCHAR(16777216)",
+          "role": "dimension",
+          "expr": "ENTRY_BY",
+          "description": "Entry-by (string).",
+          "derived": false,
+          "default_agg": "",
+          "depends_on": []
+        }
+      ],
+      "join_keys": [
+        "test_id",
+        "var_id",
+        "result_on"
+      ],
+      "default_metric": "result_float",
+      "entity_type": "execution_result",
+      "applicable_reasoners": [],
+      "applicable_derived_metrics": []
+    },
+    {
       "name": "dt_timed_event_denorm",
       "description": "Timed downtime events (denormalized). Grain: tedet_id. Contains machine, fault type (value/name), time window, effective duration, and reason hierarchy fields.",
       "database": "RAI",
-      "schema": "RAI1",
-      "table": "DT_TIMED_EVENT_DENORM",
+      "schema": "RAI",
+      "table": "T_TIMED_EVENT_DENORM",
       "fields": [
         {
           "name": "tedet_id",
@@ -578,8 +756,8 @@
       "name": "dt_waste_event_denorm",
       "description": "Waste event (denormalized) facts. Grain: wed_id. Contains machine, waste fault type, timestamps, amount, and reason fields.",
       "database": "RAI",
-      "schema": "RAI1",
-      "table": "DT_WASTE_EVENT_DENORM",
+      "schema": "RAI",
+      "table": "T_WASTE_EVENT_DENORM",
       "fields": [
         {
           "name": "wed_id",
@@ -870,8 +1048,8 @@
       "name": "dt_target_speed",
       "description": "Target speed reference by machine+product with effective dating. Equi-join uses (pu_id, prod_id). Correct validity requires effective_date/expiration_date filtering vs an operation timestamp.",
       "database": "RAI",
-      "schema": "RAI1",
-      "table": "DT_TARGET_SPEED",
+      "schema": "RAI",
+      "table": "T_TARGET_SPEED",
       "fields": [
         {
           "name": "pu_id",
@@ -937,8 +1115,8 @@
       "name": "dt_operation_metrics",
       "description": "Operation-level metrics (fact) keyed by start_id. Combines operation window, unit config attributes, throughput, downtime, waste, and quality signals. Suitable primary fact for OEE analytics.",
       "database": "RAI",
-      "schema": "RAI1",
-      "table": "DT_OPERATION_METRICS",
+      "schema": "RAI",
+      "table": "T_OPERATION_METRICS",
       "fields": [
         {
           "name": "start_id",
@@ -1331,16 +1509,11 @@
       "to_entity": "dt_target_speed",
       "description": "Reverse traversal of target speed candidates from operation_metrics by (pu_id, prod_id). Correctness still requires effective_date/expiration_date filtering vs operation_start in the query.",
       "join_on": [
-        [
-          "pu_id",
-          "pu_id"
-        ],
-        [
-          "prod_id",
-          "prod_id"
-        ]
+        ["pu_id", "pu_id"],
+        ["prod_id", "prod_id"]
       ]
     },
+
     {
       "name": "dt_operation_metrics_to_dt_unit_config__by__pu_id",
       "from_entity": "dt_operation_metrics",
@@ -1422,22 +1595,6 @@
       "from_entity": "dt_target_speed",
       "to_entity": "dt_operations",
       "description": "Target speed to operations by (pu_id, prod_id). Correctness requires effective/expiration date filtering vs operation_start.",
-      "join_on": [
-        [
-          "pu_id",
-          "pu_id"
-        ],
-        [
-          "prod_id",
-          "prod_id"
-        ]
-      ]
-    },
-    {
-      "name": "dt_operation_metrics_to_dt_target_speed",
-      "from_entity": "dt_operation_metrics",
-      "to_entity": "dt_target_speed",
-      "description": "User defined relationship",
       "join_on": [
         [
           "pu_id",
