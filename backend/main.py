@@ -403,7 +403,112 @@ def _registry_path() -> Path:
     env_path = os.environ.get("RAI_REGISTRY_PATH")
     if env_path:
         return Path(env_path)
-    return Path(__file__).resolve().parent.parent / "registry" / "semantic_registry.json"
+    reg_dir = Path(__file__).resolve().parent.parent / "registry"
+    rel_path = reg_dir / "registry.rel"
+    if rel_path.exists():
+        return rel_path
+    return reg_dir / "semantic_registry.json"
+
+
+def _is_rel_registry(path: Path) -> bool:
+    return path.suffix.lower() == ".rel"
+
+
+def _registry_runtime_path(primary: Path) -> Optional[Path]:
+    env_path = os.environ.get("RAI_REGISTRY_RUNTIME_PATH", "").strip()
+    if env_path:
+        p = Path(env_path)
+        return p if p.exists() else None
+    if primary.suffix.lower() == ".rel" and primary.name == "registry.rel":
+        candidate = primary.with_name("registry_runtime.rel")
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def _load_registry_payload_from_file(path: Path) -> Dict[str, Any]:
+    """
+    Load a registry payload from disk.
+
+    Supports:
+    - `.json` semantic registry (native format for the visual editor)
+    - `.rel` registry (Rel-first source-of-truth); converted to semantic registry JSON
+    """
+    if not path.exists():
+        return {}
+    if _is_rel_registry(path):
+        from registry.rel_to_semantic_registry import (
+            build_semantic_registry_payload,
+            extract_rel_meta,
+            parse_registry_rel,
+        )
+
+        text = path.read_text(encoding="utf-8")
+        entities, relations, streams, entity_stream, field_expr, reasoners = parse_registry_rel(text)
+
+        # Support split registry mode:
+        # - registry.rel => schema DSL
+        # - registry_runtime.rel => pure Rel defs/reasoners for execute_raw
+        runtime_path = _registry_runtime_path(path)
+        if runtime_path is not None:
+            runtime_text = runtime_path.read_text(encoding="utf-8")
+            (
+                _runtime_entities,
+                _runtime_relations,
+                runtime_streams,
+                runtime_entity_stream,
+                runtime_field_expr,
+                runtime_reasoners,
+            ) = parse_registry_rel(runtime_text)
+            streams = {**streams, **runtime_streams}
+            entity_stream = {**entity_stream, **runtime_entity_stream}
+            field_expr = {**field_expr, **runtime_field_expr}
+            if runtime_reasoners:
+                seen_reasoners: set[str] = set()
+                merged_reasoners: List[Dict[str, Any]] = []
+                for r in list(reasoners or []) + list(runtime_reasoners or []):
+                    if not isinstance(r, dict):
+                        continue
+                    rid = str(r.get("id") or "")
+                    key = rid if rid else json.dumps(r, sort_keys=True)
+                    if key in seen_reasoners:
+                        continue
+                    seen_reasoners.add(key)
+                    merged_reasoners.append(r)
+                reasoners = merged_reasoners
+
+        payload = build_semantic_registry_payload(
+            entities,
+            relations,
+            streams,
+            entity_stream,
+            field_expr,
+            reasoners,
+            emit_inverse_relationships=False,
+            emit_kg=True,
+        )
+        payload["rel_meta"] = extract_rel_meta(text)
+        if runtime_path is not None:
+            payload["rel_meta"]["runtime_rel_path"] = str(runtime_path)
+        return payload
+
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _write_registry_payload_to_file(path: Path, payload: Dict[str, Any]) -> None:
+    """
+    Persist a semantic registry payload to disk.
+
+    If `path` ends with `.rel`, we render a `registry.rel` file.
+    Otherwise we write JSON.
+    """
+    if _is_rel_registry(path):
+        from registry.semantic_registry_to_rel import render_registry_rel
+
+        path.write_text(render_registry_rel(payload), encoding="utf-8")
+        return
+
+    path.write_text(json.dumps(payload, indent=2, ensure_ascii=True), encoding="utf-8")
 
 
 def _registry_history_dir() -> Path:
@@ -1587,7 +1692,7 @@ def _registry_payload_for_helpers() -> Dict[str, Any]:
     path = _registry_path()
     if path.exists():
         try:
-            return json.loads(path.read_text(encoding="utf-8"))
+            return _load_registry_payload_from_file(path)
         except Exception:
             pass
     return _registry_payload_from_current()
@@ -3254,7 +3359,7 @@ def registry_load() -> Dict[str, Any]:
     path = _registry_path()
     if path.exists():
         try:
-            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload = _load_registry_payload_from_file(path)
         except Exception as exc:
             raise HTTPException(status_code=500, detail=f"Failed to read registry file: {exc}")
         return {"exists": True, "path": str(path), "registry": payload, "source": "file"}
@@ -3270,8 +3375,7 @@ def registry_save(req: RegistrySaveRequest) -> Dict[str, Any]:
     path = _registry_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     try:
-        json_text = json.dumps(payload, indent=2, ensure_ascii=True)
-        path.write_text(json_text, encoding="utf-8")
+        _write_registry_payload_to_file(path, payload)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Failed to write registry file: {exc}")
     _write_registry_version(payload)
@@ -3306,7 +3410,7 @@ def registry_rollback(req: RegistryRollbackRequest) -> Dict[str, Any]:
     path = _registry_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     try:
-        path.write_text(json.dumps(payload, indent=2, ensure_ascii=True), encoding="utf-8")
+        _write_registry_payload_to_file(path, payload)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Failed to restore registry: {exc}")
     _clear_registry_caches()
@@ -3319,7 +3423,7 @@ def registry_ontology_export(req: RegistryOntologyExportRequest) -> Dict[str, An
     if not payload:
         path = _registry_path()
         if path.exists():
-            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload = _load_registry_payload_from_file(path)
         else:
             payload = _registry_payload_from_current()
     triples = _registry_to_triples(payload)
