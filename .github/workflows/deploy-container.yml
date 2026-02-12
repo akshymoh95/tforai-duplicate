@@ -26,7 +26,7 @@ jobs:
       - name: Set image name
         id: meta
         run: |
-          IMAGE_BASE="ghcr.io/${{ github.repository_owner }}/tforai"
+          IMAGE_BASE="ghcr.io/${{ github.repository_owner }}/tforai-duplicate"
           IMAGE_SHA="${IMAGE_BASE}:${{ github.sha }}"
           IMAGE_LATEST="${IMAGE_BASE}:latest"
           echo "image=$IMAGE_SHA" >> $GITHUB_OUTPUT
