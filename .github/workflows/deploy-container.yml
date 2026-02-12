@@ -60,6 +60,7 @@ jobs:
       - name: Deploy container to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: "tforai"
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2AC0B3060FE04746B8B9E2D2D9E8B656 }}
+          app-name: 'tforai1'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_94F60BD8EB62474D852BE82D60CF0650 }}
           images: ${{ needs.build.outputs.image }}
