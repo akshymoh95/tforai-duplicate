@@ -101,6 +101,63 @@ def _cache_llm_result(prompt: str, result: str) -> None:
     _LLM_RESULT_CACHE[h] = {"result": result, "timestamp": time.time()}
 
 
+def _cortex_complete_with_retry(
+    session,
+    prompt: str,
+    *,
+    model: Optional[str] = None,
+    timeout_s: Optional[int] = None,
+    response_key: str = "RESPONSE",
+    max_retries: int = 3,
+) -> str:
+    """
+    Call Snowflake Cortex LLM with retry logic for connection failures.
+    
+    Args:
+        session: Snowflake session
+        prompt: The prompt to send to the LLM
+        model: LLM model to use
+        timeout_s: Timeout in seconds
+        response_key: Response column name
+        max_retries: Number of retry attempts (default 3)
+    """
+    last_exception = None
+    
+    for attempt in range(max_retries):
+        try:
+            return _cortex_complete_with_timeout(
+                session,
+                prompt,
+                model=model,
+                timeout_s=timeout_s,
+                response_key=response_key,
+            )
+        except (TimeoutError, ConnectionError, RuntimeError) as e:
+            error_msg = str(e).lower()
+            # Retry on connection/timeout errors
+            if any(x in error_msg for x in ["timeout", "connection", "expired", "closed", "disconnected", "invalid"]):
+                last_exception = e
+                if attempt < max_retries - 1:
+                    wait_time = (2 ** attempt)  # Exponential backoff: 1s, 2s, 4s
+                    print(f"[RETRY] Cortex call attempt {attempt + 1}/{max_retries} failed: {e}", file=sys.stderr)
+                    print(f"[RETRY] Waiting {wait_time}s before retry...", file=sys.stderr)
+                    sys.stderr.flush()
+                    time.sleep(wait_time)
+                else:
+                    print(f"[ERROR] Cortex call failed after {max_retries} attempts", file=sys.stderr)
+                    sys.stderr.flush()
+            else:
+                # Don't retry on other exceptions
+                raise
+        except Exception as e:
+            # Don't retry on non-connection errors
+            raise
+    
+    # All retries exhausted
+    if last_exception:
+        raise last_exception
+
+
 def _cortex_complete_with_timeout(
     session,
     prompt: str,
@@ -145,6 +202,56 @@ def _cortex_complete_with_timeout(
         except Exception:
             return str(result[0][0]).strip()
     return ""
+
+
+def _reload_rai_config() -> None:
+    """
+    Reload RAI configuration from file. Called when connection errors occur.
+    This helps recover from session expiration or role/permission issues.
+    """
+    try:
+        from rai_ai_insights_ontology import ensure_rai_config
+        print("[RETRY] Reloading RAI configuration...", file=sys.stderr)
+        sys.stderr.flush()
+        
+        # Re-ensure raiconfig is loaded
+        config_path = ensure_rai_config()
+        print(f"[RETRY] RAI config reloaded from: {config_path}", file=sys.stderr)
+        sys.stderr.flush()
+        
+        # Clear any cached RAI clients/builders to force fresh connection
+        import importlib
+        try:
+            import relationalai
+            importlib.reload(relationalai)
+            print("[RETRY] Reloaded relationalai module", file=sys.stderr)
+        except Exception as e:
+            print(f"[WARNING] Could not reload relationalai module: {e}", file=sys.stderr)
+        
+        sys.stderr.flush()
+    except Exception as e:
+        print(f"[WARNING] Error reloading RAI config: {e}", file=sys.stderr)
+        sys.stderr.flush()
+
+
+def _is_rai_role_or_connection_error(error: Exception) -> bool:
+    """Check if error is due to RAI role/permission or connection issues"""
+    error_msg = str(error).lower()
+    role_keywords = [
+        "role",
+        "permission",
+        "access",
+        "unauthorized",
+        "forbidden",
+        "expired",
+        "connection",
+        "closed",
+        "disconnected",
+        "network",
+        "timeout",
+        "temporarily",
+    ]
+    return any(keyword in error_msg for keyword in role_keywords)
 
 
 def _coerce_json_response(resp_text: str) -> Dict[str, Any]:
@@ -402,7 +509,7 @@ Output ONLY the JSON object above - no other text:
         else:
             print(f"[DEBUG] Calling Cortex LLM for narrative (prompt len={len(prompt)})", file=sys.stderr)
             sys.stderr.flush()
-            response_text = _cortex_complete_with_timeout(session, prompt)
+            response_text = _cortex_complete_with_retry(session, prompt)
             _cache_llm_result(prompt, response_text)
 
         if response_text:
@@ -560,7 +667,7 @@ def _generate_plotly_chart(
         for attempt in range(max_attempts):
             try:
                 prompt = _build_prompt(question, narrative_summary or "", schema, override_notes)
-                llm_raw = _cortex_complete_with_timeout(session, prompt)
+                llm_raw = _cortex_complete_with_retry(session, prompt)
 
                 print(f"[DEBUG] Generated Plotly code ({len(llm_raw or '')} chars)", file=sys.stderr)
                 print("[DEBUG] ===== CODE START =====", file=sys.stderr)
@@ -1083,11 +1190,11 @@ def run_orchestrate(
         print("[DEBUG] Built RAI knowledge graph builder")
         
         # ============================================================
-        # STEP 2: DEFINE CORTEX LLM COMPLETION FUNCTION
+        # STEP 2: DEFINE CORTEX LLM COMPLETION FUNCTION WITH RETRY
         # ============================================================
-        print("[DEBUG] Step 2: Defining Cortex LLM completion function...")
+        print("[DEBUG] Step 2: Defining Cortex LLM completion function with retry logic...")
         
-        def cortex_complete(prompt: str) -> str:
+        def cortex_complete_base(prompt: str) -> str:
             """Call Snowflake Cortex LLM to process prompt with timeout"""
             try:
                 import signal
@@ -1168,6 +1275,44 @@ def run_orchestrate(
                 traceback.print_exc()
                 sys.stderr.flush()
                 return ""
+        
+        # Wrap cortex_complete_base with retry logic
+        def cortex_complete(prompt: str, max_retries: int = 3) -> str:
+            """Call Cortex with automatic retry on connection failures"""
+            last_exception = None
+            
+            for attempt in range(max_retries):
+                try:
+                    result = cortex_complete_base(prompt)
+                    # Return even if empty; that's valid
+                    if result is not None:
+                        return result
+                except (TimeoutError, ConnectionError, RuntimeError) as e:
+                    error_msg = str(e).lower()
+                    # Retry on connection/timeout errors
+                    if any(x in error_msg for x in ["timeout", "connection", "expired", "closed", "disconnected", "invalid", "network"]):
+                        last_exception = e
+                        if attempt < max_retries - 1:
+                            wait_time = (2 ** attempt)  # Exponential backoff: 1s, 2s, 4s
+                            print(f"[RETRY] Cortex call attempt {attempt + 1}/{max_retries} failed: {e}", file=sys.stderr)
+                            print(f"[RETRY] Waiting {wait_time}s before retry...", file=sys.stderr)
+                            sys.stderr.flush()
+                            time.sleep(wait_time)
+                        else:
+                            print(f"[ERROR] Cortex call failed after {max_retries} attempts", file=sys.stderr)
+                            sys.stderr.flush()
+                            raise
+                    else:
+                        # Don't retry on other exceptions
+                        raise
+                except Exception as e:
+                    # Don't retry on non-connection errors
+                    raise
+            
+            # All retries exhausted
+            if last_exception:
+                raise last_exception
+            return ""
         
         # ============================================================
         # STEP 3: CONVERT NL QUESTION → RAI SPEC VIA LLM
@@ -1461,23 +1606,66 @@ def run_orchestrate(
 
         def _run_spec_with_timeout(local_spec: Dict[str, Any]) -> Optional[pd.DataFrame]:
             rai_timeout = int(os.environ.get("RAI_QUERY_TIMEOUT_SECONDS", "300"))
-            result_holder = [None]
-            exception_holder = [None]
+            max_retries = 3
+            retry_count = 0
+            last_exception = None
+            local_builder = builder  # Reference to builder, may be recreated on retry
+            
+            while retry_count < max_retries:
+                result_holder = [None]
+                exception_holder = [None]
 
-            def rai_thread():
-                try:
-                    result_holder[0] = run_dynamic_query(builder, local_spec)
-                except Exception as e:
-                    exception_holder[0] = e
+                def rai_thread():
+                    try:
+                        result_holder[0] = run_dynamic_query(local_builder, local_spec)
+                    except Exception as e:
+                        exception_holder[0] = e
 
-            t = threading.Thread(target=rai_thread, daemon=True)
-            t.start()
-            t.join(timeout=rai_timeout)
+                t = threading.Thread(target=rai_thread, daemon=True)
+                t.start()
+                t.join(timeout=rai_timeout)
 
-            if t.is_alive():
-                raise TimeoutError(f"RAI query timeout after {rai_timeout}s")
-            if exception_holder[0]:
-                raise exception_holder[0]
+                if t.is_alive():
+                    error = TimeoutError(f"RAI query timeout after {rai_timeout}s")
+                    last_exception = error
+                    retry_count += 1
+                    print(f"[WARNING] RAI query timeout (attempt {retry_count}/{max_retries})", file=sys.stderr)
+                    sys.stderr.flush()
+                    if retry_count < max_retries:
+                        time.sleep(2 ** (retry_count - 1))
+                    continue
+                    
+                if exception_holder[0]:
+                    error = exception_holder[0]
+                    is_role_error = _is_rai_role_or_connection_error(error)
+                    
+                    if is_role_error and retry_count < max_retries - 1:
+                        last_exception = error
+                        retry_count += 1
+                        print(f"[RETRY] RAI role/connection error (attempt {retry_count}/{max_retries}): {str(error)[:100]}", file=sys.stderr)
+                        sys.stderr.flush()
+                        
+                        # Reload config and rebuild
+                        _reload_rai_config()
+                        try:
+                            local_builder = build_ai_insights_builder()
+                            print("[RETRY] RAI builder rebuilt with fresh config", file=sys.stderr)
+                            sys.stderr.flush()
+                        except Exception as rebuild_err:
+                            print(f"[WARNING] Could not rebuild RAI builder: {rebuild_err}", file=sys.stderr)
+                            sys.stderr.flush()
+                        
+                        time.sleep(2 ** (retry_count - 1))
+                    else:
+                        raise error
+                else:
+                    # Success
+                    return result_holder[0]
+            
+            # All retries exhausted
+            if last_exception:
+                raise last_exception
+            raise TimeoutError(f"RAI query timeout after {rai_timeout}s")
             return result_holder[0]
 
         def _execute_and_merge_fallback_specs(spec_list: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, Dict[str, List[Dict[str, Any]]]]:
@@ -1574,13 +1762,30 @@ def run_orchestrate(
 
                     except Exception as e:
                         last_error = e
+                        error_msg = str(e)
+                        is_role_error = _is_rai_role_or_connection_error(e)
+                        
                         retry_count += 1
-                        print(f"[WARNING] Query execution failed (attempt {retry_count}/{max_retries}): {str(e)[:200]}")
-                        sys.stdout.flush()
+                        print(f"[WARNING] Query execution failed (attempt {retry_count}/{max_retries}): {str(e)[:200]}", file=sys.stderr)
+                        sys.stderr.flush()
+                        
+                        # On role/permission/connection errors, reload RAI config and retry
+                        if is_role_error and retry_count < max_retries:
+                            print(f"[RETRY] Detected RAI role/connection error, reloading config...", file=sys.stderr)
+                            sys.stderr.flush()
+                            _reload_rai_config()
+                            # Rebuild the builder with fresh config
+                            try:
+                                builder = build_ai_insights_builder()
+                                print("[RETRY] RAI builder rebuilt with fresh config", file=sys.stderr)
+                                sys.stderr.flush()
+                            except Exception as rebuild_err:
+                                print(f"[WARNING] Could not rebuild RAI builder: {rebuild_err}", file=sys.stderr)
+                                sys.stderr.flush()
 
                         # Wait before retry
                         if retry_count < max_retries:
-                            time.sleep(1)
+                            time.sleep(2 ** (retry_count - 1))  # Exponential backoff: 1s, 2s, 4s
 
                 if results_df is not None:
                     break

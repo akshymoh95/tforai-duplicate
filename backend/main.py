@@ -91,6 +91,61 @@ except RuntimeError as e:
     print(f"[ERROR] Environment validation failed: {e}", file=sys.stderr)
     raise
 
+# ============================================================================
+# RETRY LOGIC FOR CONNECTION RESILIENCE
+# ============================================================================
+from functools import wraps
+
+def retry_on_connection_error(max_retries: int = 3, backoff_factor: float = 1.0):
+    """
+    Decorator to retry a function on Snowflake connection errors.
+    Resets the session on failure to allow reconnection.
+    
+    Args:
+        max_retries: Number of retry attempts (default 3)
+        backoff_factor: Exponential backoff multiplier (default 1.0 = 1s, 2s, 4s...)
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            global _session
+            last_exception = None
+            
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except (TimeoutError, ConnectionError, RuntimeError) as e:
+                    error_msg = str(e).lower()
+                    # Retry on connection/timeout errors
+                    if any(x in error_msg for x in ["timeout", "connection", "expired", "closed", "disconnected"]):
+                        last_exception = e
+                        if attempt < max_retries - 1:
+                            wait_time = (backoff_factor ** attempt)
+                            print(f"[RETRY] Attempt {attempt + 1}/{max_retries} failed: {e}", file=sys.stderr)
+                            print(f"[RETRY] Resetting session and retrying in {wait_time}s...", file=sys.stderr)
+                            sys.stderr.flush()
+                            
+                            # Reset session to force reconnection
+                            _session = None
+                            time.sleep(wait_time)
+                        else:
+                            print(f"[ERROR] All {max_retries} retry attempts exhausted", file=sys.stderr)
+                            sys.stderr.flush()
+                    else:
+                        # Don't retry on other exceptions
+                        raise
+                except Exception as e:
+                    # Don't retry on non-connection errors
+                    raise
+            
+            # All retries exhausted
+            if last_exception:
+                raise last_exception
+        
+        return wrapper
+    return decorator
+
+
 DEFAULT_LLM = os.environ.get("CORTEX_LLM_MODEL", "openai-gpt-5-chat")
 DRAFT_REGISTRY_LLM = os.environ.get("RAI_DRAFT_REGISTRY_LLM", "openai-gpt-4.1")
 DRAFT_REGISTRY_DEBUG = os.environ.get("RAI_DRAFT_REGISTRY_DEBUG", "").lower() in ("1", "true", "yes")
