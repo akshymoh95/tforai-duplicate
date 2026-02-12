@@ -8,17 +8,18 @@ import time
 import threading
 import uuid
 import queue
+import logging
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Generator
 from datetime import datetime
+from logging.handlers import QueueHandler
 
 # Add parent directory to path for RAI modules FIRST, before other imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent))
 
 import requests
-import logging
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,13 +27,7 @@ from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from ai_insights_orchestrator import (
-    run_orchestrate,
-    set_stage_callback,
-    _ORCHESTRATION_STATE,
-    set_request_id,
-    AuthExpiredError,
-)
+from ai_insights_orchestrator import run_orchestrate, set_stage_callback, _ORCHESTRATION_STATE, set_request_id
 from snowflake.snowpark import Session
 from dotenv import load_dotenv
 from relationalai.semantics.rel.rel_utils import sanitize_identifier
@@ -63,89 +58,6 @@ from prompt_defaults import DEFAULT_PROMPT_TEMPLATES
 
 ENV_PATH = Path(os.environ.get("AI_INSIGHTS_ENV", Path(__file__).with_name(".env")))
 load_dotenv(ENV_PATH, override=False)
-
-# Reduce noisy access logs for high-frequency polling endpoints
-class _AccessLogFilter(logging.Filter):
-    def filter(self, record: logging.LogRecord) -> bool:
-        try:
-            args = record.args or ()
-            if len(args) >= 3:
-                path = args[2]
-                if isinstance(path, str) and (
-                    path.startswith("/api/stages") or path.startswith("/api/result")
-                ):
-                    return False
-        except Exception:
-            pass
-        return True
-
-logging.getLogger("uvicorn.access").addFilter(_AccessLogFilter())
-
-# Best-effort JSON sanitizer for async results + response payloads
-def _json_sanitize(value):
-    try:
-        import numpy as _np  # type: ignore
-    except Exception:
-        _np = None
-    try:
-        import pandas as _pd  # type: ignore
-    except Exception:
-        _pd = None
-
-    from datetime import date, datetime
-    from decimal import Decimal
-
-    if _np is not None:
-        if isinstance(value, _np.ndarray):
-            return [_json_sanitize(v) for v in value.tolist()]
-        if isinstance(value, (_np.integer, _np.floating, _np.bool_)):
-            return value.item()
-        if isinstance(value, (_np.datetime64, _np.timedelta64)):
-            return str(value)
-    if _pd is not None:
-        if isinstance(value, _pd.Timestamp):
-            return value.isoformat()
-        if isinstance(value, _pd.Timedelta):
-            return str(value)
-        if isinstance(value, _pd.Period):
-            try:
-                return value.to_timestamp().isoformat()
-            except Exception:
-                return str(value)
-        if isinstance(value, _pd.DataFrame):
-            return _json_sanitize(value.to_dict(orient="records"))
-        if isinstance(value, _pd.Series):
-            return _json_sanitize(value.tolist())
-        if isinstance(value, _pd.Index):
-            return _json_sanitize(value.tolist())
-    if isinstance(value, (datetime, date)):
-        return value.isoformat()
-    if isinstance(value, Decimal):
-        return float(value)
-    if isinstance(value, dict):
-        return {str(k): _json_sanitize(v) for k, v in value.items()}
-    if isinstance(value, (list, tuple, set)):
-        return [_json_sanitize(v) for v in value]
-    return value
-
-# Ensure PAT file is written if provided via env (Azure-friendly path)
-def _ensure_pat_file() -> None:
-    pat = os.environ.get("RAI_SNOWFLAKE_PAT", "").strip()
-    if not pat:
-        return
-    pat_path = "/home/site/secrets/snowflake_pat.txt"
-    try:
-        Path(pat_path).parent.mkdir(parents=True, exist_ok=True)
-        Path(pat_path).write_text(pat, encoding="utf-8")
-        # Best-effort permission hardening on *nix
-        try:
-            os.chmod(pat_path, 0o600)
-        except Exception:
-            pass
-    except Exception as exc:
-        print(f"[WARN] Failed to write PAT file at {pat_path}: {exc}", file=sys.stderr)
-
-_ensure_pat_file()
 
 # Validate required environment variables
 _REQUIRED_ENV_VARS = [
@@ -189,16 +101,168 @@ app = FastAPI(title="AI Insights API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://tforai.azurewebsites.net",
-        "https://analyst.tulapi.ai",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],
-    allow_credentials=False,
+    allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ============================================================================
+# LOGGING SETUP FOR LOG STREAMING
+# ============================================================================
+_log_queue: queue.Queue = queue.Queue(maxsize=1000)
+_log_history: List[Dict[str, Any]] = []
+_log_history_lock = threading.Lock()
+_max_log_history = 500
+
+_original_stdout = sys.stdout
+_original_stderr = sys.stderr
+
+_LEVEL_PREFIX_RE = re.compile(r'^\[(DEBUG|INFO|WARNING|ERROR|CRITICAL)\]\s*')
+
+
+class _ExcludeLoggerFilter(logging.Filter):
+    """Filter out logs from specific logger names."""
+
+    def __init__(self, names: set[str]):
+        super().__init__()
+        self._names = names
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return record.name not in self._names
+
+
+class StreamToLogger:
+    """File-like object that redirects writes to a logger."""
+
+    def __init__(self, logger: logging.Logger, level: int, stream) -> None:
+        self.logger = logger
+        self.level = level
+        self.stream = stream
+        self._buffer = ""
+
+    def write(self, message: str) -> int:
+        if not message:
+            return 0
+
+        # Preserve terminal output.
+        try:
+            if self.stream:
+                self.stream.write(message)
+        except Exception:
+            pass
+
+        self._buffer += message
+        while "\n" in self._buffer:
+            line, self._buffer = self._buffer.split("\n", 1)
+            line = line.rstrip("\r")
+            if not line:
+                continue
+            level = self.level
+            match = _LEVEL_PREFIX_RE.match(line)
+            if match:
+                level = logging._nameToLevel.get(match.group(1), self.level)
+                line = line[match.end():].lstrip()
+                if not line:
+                    continue
+            self.logger.log(level, line)
+        return len(message)
+
+    def flush(self) -> None:
+        if self._buffer:
+            self.logger.log(self.level, self._buffer)
+            self._buffer = ""
+        try:
+            if self.stream:
+                self.stream.flush()
+        except Exception:
+            pass
+
+    def isatty(self) -> bool:
+        return False
+
+    def writelines(self, lines) -> None:
+        for line in lines:
+            self.write(line)
+
+
+class QueueListenerHandler(logging.Handler):
+    """Custom handler to send logs to queue for streaming."""
+    
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            log_entry = {
+                "timestamp": datetime.fromtimestamp(record.created).isoformat(),
+                "level": record.levelname,
+                "logger": record.name,
+                "message": record.getMessage(),
+                "module": record.module,
+            }
+            
+            # Add to queue (non-blocking, drop oldest if full)
+            try:
+                _log_queue.put_nowait(log_entry)
+            except queue.Full:
+                try:
+                    _log_queue.get_nowait()
+                    _log_queue.put_nowait(log_entry)
+                except queue.Empty:
+                    pass
+            
+            # Add to history for recent logs endpoint
+            with _log_history_lock:
+                _log_history.append(log_entry)
+                if len(_log_history) > _max_log_history:
+                    _log_history.pop(0)
+        except Exception:
+            pass
+
+
+def _setup_logging() -> None:
+    """Configure logging with queue handler for streaming."""
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)
+    
+    # Remove existing handlers to avoid duplicates
+    for handler in root_logger.handlers[:]:
+        root_logger.removeHandler(handler)
+    
+    # Queue handler for streaming
+    queue_handler = QueueListenerHandler()
+    queue_handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    queue_handler.setFormatter(formatter)
+    root_logger.addHandler(queue_handler)
+    
+    # Also add console handler for local debugging
+    console_handler = logging.StreamHandler(_original_stdout)
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(formatter)
+    console_handler.addFilter(_ExcludeLoggerFilter({"stdout", "stderr"}))
+    root_logger.addHandler(console_handler)
+
+    # Ensure common server loggers propagate to root
+    for name in ("uvicorn", "uvicorn.error", "uvicorn.access"):
+        logger = logging.getLogger(name)
+        logger.handlers = []
+        logger.propagate = True
+        logger.setLevel(logging.DEBUG)
+
+    # Capture warnings from the warnings module
+    logging.captureWarnings(True)
+
+    # Redirect stdout/stderr to logging so prints are streamed
+    sys.stdout = StreamToLogger(logging.getLogger("stdout"), logging.INFO, _original_stdout)
+    sys.stderr = StreamToLogger(logging.getLogger("stderr"), logging.ERROR, _original_stderr)
+
+
+# Initialize logging
+_setup_logging()
+_logger = logging.getLogger(__name__)
+_logger.info("API Server initialized")
+
 
 _session: Optional[Session] = None
 _current_stage: Dict[str, str] = {}
@@ -532,8 +596,7 @@ def _quote_ident(name: str) -> str:
     trimmed = name.strip()
     if trimmed.startswith('"') and trimmed.endswith('"'):
         return trimmed
-    escaped = trimmed.replace('"', '""')
-    return f"\"{escaped}\""
+    return f"\"{trimmed.replace('\"', '\"\"')}\""
 
 
 def _quote_table(table: str) -> str:
@@ -1504,7 +1567,6 @@ def _registry_payload_from_current() -> Dict[str, Any]:
     config_payload = {
         "post_compute_derived_metrics": bool(getattr(cfg, "post_compute_derived_metrics", False)),
         "allow_sql_derived_expr": bool(getattr(cfg, "allow_sql_derived_expr", False)),
-        "allow_multi_fact_aggregations": bool(getattr(cfg, "allow_multi_fact_aggregations", False)),
     }
 
     kg_payload = load_kg_spec() or {"nodes": [], "edges": [], "graphs": []}
@@ -1833,20 +1895,6 @@ def create_session() -> Session:
     print(f"[DEBUG] Snowflake session created successfully", file=sys.stderr)
     sys.stderr.flush()
     return sess
-
-
-def _refresh_session_for_retry(sess: Session) -> Session:
-    """Close an expired session and create a fresh one."""
-    global _session
-    try:
-        if sess is not None:
-            sess.close()
-    except Exception:
-        pass
-    new_sess = create_session()
-    if _session is sess:
-        _session = new_sess
-    return new_sess
 
 
 def acquire_session() -> Session:
@@ -2483,6 +2531,8 @@ def ask(req: AskRequest, async_mode: bool = Query(False, alias="async")) -> AskR
         raise HTTPException(status_code=400, detail="Question is required")
 
     request_id = req.request_id or str(uuid.uuid4())
+    _logger.info(f"Processing question [{request_id}]: {question}")
+    
     if async_mode:
         with _request_lock:
             _request_store[request_id] = {
@@ -2499,14 +2549,7 @@ def ask(req: AskRequest, async_mode: bool = Query(False, alias="async")) -> AskR
             set_request_id(request_id)
             try:
                 session = acquire_session()
-                try:
-                    payload = run_orchestrate(session, question)
-                except AuthExpiredError:
-                    session = _refresh_session_for_retry(session)
-                    payload = run_orchestrate(session, question)
-                # Sanitize payload for JSON serialization (async poller uses raw payload)
-                if isinstance(payload, dict):
-                    payload = _json_sanitize(payload)
+                payload = run_orchestrate(session, question)
                 with _request_lock:
                     _request_store[request_id]["status"] = "done"
                     _request_store[request_id]["result"] = payload
@@ -2545,17 +2588,13 @@ def ask(req: AskRequest, async_mode: bool = Query(False, alias="async")) -> AskR
     session = acquire_session()
     try:
         # Start with planning stage (provisioning/initializing will be detected from orchestrator output)
-        _ORCHESTRATION_STATE["current_stage"] = "planning"
-        _current_stage["current"] = "planning"
+        _ORCHESTRATION_STATE['current_stage'] = 'planning'
+        _current_stage['current'] = 'planning'
         set_request_id(request_id)
-        try:
-            payload = run_orchestrate(session, question)
-        except AuthExpiredError:
-            session = _refresh_session_for_retry(session)
-            payload = run_orchestrate(session, question)
-        _current_stage["current"] = _ORCHESTRATION_STATE.get("current_stage", "done")
+        payload = run_orchestrate(session, question)
+        _current_stage['current'] = _ORCHESTRATION_STATE.get('current_stage', 'done')
     except Exception as exc:
-        _current_stage["current"] = "error"
+        _current_stage['current'] = 'error'
         detail = getattr(exc, "raw_content", None) or getattr(exc, "content", None)
         if not detail:
             table_objects = getattr(exc, "table_objects", None)
@@ -2645,8 +2684,6 @@ def ask(req: AskRequest, async_mode: bool = Query(False, alias="async")) -> AskR
                 except Exception:
                     fixed_frames[k] = []
         cleaned_payload["frames"] = fixed_frames
-
-    cleaned_payload = _json_sanitize(cleaned_payload)
     
     # Try to construct AskResponse with comprehensive error handling
     try:
@@ -2920,7 +2957,7 @@ def get_result(request_id: str) -> Dict[str, Any]:
         return {"status": "unknown", "error": "request_id not found (server may have restarted)"}
     status = entry.get("status")
     if status == "done":
-        return {"status": "done", "result": _json_sanitize(entry.get("result"))}
+        return {"status": "done", "result": entry.get("result")}
     if status == "error":
         return {"status": "error", "error": entry.get("error")}
     return {"status": "running"}
@@ -3294,6 +3331,93 @@ def registry_ontology_export(req: RegistryOntologyExportRequest) -> Dict[str, An
         export_path = str(export_dir / f"ontology_triples_{timestamp}.json")
         Path(export_path).write_text(json.dumps(triples, indent=2, ensure_ascii=True), encoding="utf-8")
     return {"ok": True, "triples": triples, "path": export_path}
+
+
+# ============================================================================
+# LOG STREAMING ENDPOINTS
+# ============================================================================
+
+def _log_stream_generator() -> Generator[str, None, None]:
+    """Generator that streams logs from the queue."""
+    try:
+        while True:
+            try:
+                log_entry = _log_queue.get(timeout=1)
+                yield json.dumps(log_entry) + "\n"
+            except queue.Empty:
+                # Send a heartbeat to keep connection alive
+                yield json.dumps({"type": "heartbeat"}) + "\n"
+    except GeneratorExit:
+        pass
+    except Exception as e:
+        yield json.dumps({"type": "error", "message": str(e)}) + "\n"
+
+
+@app.get("/api/logs/stream")
+def stream_logs() -> StreamingResponse:
+    """
+    Stream real-time logs from the API server.
+    
+    Returns: SSE-like streaming response with JSON log entries.
+    Each line is a JSON object with: timestamp, level, logger, message, module.
+    Use ?filter=<level> to filter by log level (DEBUG, INFO, WARNING, ERROR, CRITICAL).
+    """
+    return StreamingResponse(
+        _log_stream_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        }
+    )
+
+
+@app.get("/api/logs/recent")
+def get_recent_logs(limit: int = Query(100, ge=1, le=1000)) -> Dict[str, Any]:
+    """
+    Get recent logs from history.
+    
+    Parameters:
+    - limit: Number of recent logs to return (max 1000)
+    
+    Returns: List of log entries with timestamp, level, logger, message, module.
+    """
+    with _log_history_lock:
+        recent = _log_history[-limit:] if limit > 0 else _log_history.copy()
+    
+    return {
+        "ok": True,
+        "count": len(recent),
+        "logs": recent
+    }
+
+
+@app.get("/api/logs/clear")
+def clear_logs() -> Dict[str, Any]:
+    """Clear the log history."""
+    with _log_history_lock:
+        _log_history.clear()
+    
+    return {"ok": True, "message": "Log history cleared"}
+
+
+@app.get("/api/logs/stats")
+def get_log_stats() -> Dict[str, Any]:
+    """Get statistics about collected logs."""
+    with _log_history_lock:
+        levels = {}
+        for log_entry in _log_history:
+            level = log_entry.get("level", "UNKNOWN")
+            levels[level] = levels.get(level, 0) + 1
+    
+    return {
+        "ok": True,
+        "total_logs": len(_log_history),
+        "queue_size": _log_queue.qsize(),
+        "by_level": levels,
+        "max_history": _max_log_history,
+    }
 
 
 # ============================================================================

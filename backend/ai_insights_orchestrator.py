@@ -135,8 +135,6 @@ def _cortex_complete_with_timeout(
     if t.is_alive():
         raise TimeoutError(f"Cortex LLM call timed out after {cortex_timeout}s")
     if exception_holder[0]:
-        if _is_auth_expired_error(exception_holder[0]):
-            raise AuthExpiredError(str(exception_holder[0]))
         raise exception_holder[0]
 
     result = result_holder[0]
@@ -147,20 +145,6 @@ def _cortex_complete_with_timeout(
         except Exception:
             return str(result[0][0]).strip()
     return ""
-
-
-class AuthExpiredError(RuntimeError):
-    pass
-
-
-def _is_auth_expired_error(exc: Exception) -> bool:
-    msg = str(exc or "").lower()
-    return (
-        "authentication token has expired" in msg
-        or "token has expired" in msg
-        or "must authenticate again" in msg
-        or "390114" in msg
-    )
 
 
 def _coerce_json_response(resp_text: str) -> Dict[str, Any]:
@@ -395,8 +379,6 @@ Sections in narrative: Overall Summary, Key Findings, Drivers & Diagnostics, Rec
 If insufficient data, say exactly what rows/fields are missing.
 
 IMPORTANT:
-- Currency is SAR. Format monetary values with "SAR" and do not assume USD.
-- "RM" means Relationship Manager. Expand the acronym in narrative and KPI titles where helpful.
 - Treat the dataset as already filtered by the query/reasoners. Do NOT generalize to the full population.
 - Columns like signal_*, *_condition, *_score are derived outputs; describe them as flags/labels.
 - Do NOT invent correlations, regressions, or projections.
@@ -447,8 +429,6 @@ Output ONLY the JSON object above - no other text:
         }
 
     except Exception as e:
-        if isinstance(e, AuthExpiredError):
-            raise
         print(f"[ERROR] Failed to generate narrative: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc(file=sys.stderr)
@@ -648,8 +628,6 @@ def _generate_plotly_chart(
         return None
 
     except Exception as e:
-        if isinstance(e, AuthExpiredError):
-            raise
         print(f"[WARNING] Failed to generate chart: {e}", file=sys.stderr)
         sys.stderr.flush()
         return None
@@ -1040,8 +1018,6 @@ def run_orchestrate(
         current_wh = session.get_current_warehouse()
         print(f"[DEBUG] Current warehouse: {current_wh}")
     except Exception as e:
-        if _is_auth_expired_error(e):
-            raise AuthExpiredError(str(e))
         print(f"[WARNING] Could not get current warehouse: {e}")
         # Set warehouse explicitly from environment
         wh_env = os.environ.get("SNOWFLAKE_WAREHOUSE")
@@ -1050,8 +1026,6 @@ def run_orchestrate(
                 session.sql(f"USE WAREHOUSE {wh_env}").collect()
                 print(f"[DEBUG] Switched to warehouse: {wh_env}")
             except Exception as wh_err:
-                if _is_auth_expired_error(wh_err):
-                    raise AuthExpiredError(str(wh_err))
                 print(f"[WARNING] Could not switch warehouse: {wh_err}")
     
     print(f"[DEBUG] run_orchestrate: START - question='{question}'")
@@ -1180,8 +1154,6 @@ def run_orchestrate(
                 
             except Exception as e:
                 error_msg = str(e)
-                if _is_auth_expired_error(e):
-                    raise AuthExpiredError(error_msg)
                 print(f"[ERROR] Cortex LLM call failed: {error_msg}", file=sys.stderr)
                 
                 # Log specific error types
@@ -1224,8 +1196,6 @@ def run_orchestrate(
                     print(f"[DEBUG] Generated spec on attempt {retry_count + 1}")
                     break
             except Exception as e:
-                if isinstance(e, AuthExpiredError):
-                    raise
                 last_error = e
                 retry_count += 1
                 print(f"[WARNING] Spec generation failed (attempt {retry_count}/{max_retries}): {str(e)[:200]}")
@@ -1382,6 +1352,113 @@ def run_orchestrate(
             if fallback_specs:
                 spec = fallback_specs[0]
 
+        reasoner_context: Dict[str, Any] = {}
+
+        def _aliases_in_predicate(node: Any) -> set:
+            aliases: set = set()
+            if isinstance(node, list):
+                for item in node:
+                    aliases |= _aliases_in_predicate(item)
+                return aliases
+            if not isinstance(node, dict):
+                return aliases
+            if "alias" in node and isinstance(node.get("alias"), str):
+                aliases.add(node["alias"])
+            for val in node.values():
+                aliases |= _aliases_in_predicate(val)
+            return aliases
+
+        def _filter_where_by_alias(where_list: Any, alias: str) -> List[Dict[str, Any]]:
+            if not alias:
+                return []
+            out: List[Dict[str, Any]] = []
+            for pred in (where_list or []):
+                if not isinstance(pred, dict):
+                    continue
+                aliases = _aliases_in_predicate(pred)
+                if not aliases or aliases == {alias}:
+                    out.append(pred)
+            return out
+
+        def _extract_aliases_for_entity(local_spec: Dict[str, Any], entity_name: str) -> List[str]:
+            aliases: List[str] = []
+            for b in (local_spec.get("bind") or []):
+                if isinstance(b, dict) and b.get("entity") == entity_name and b.get("alias"):
+                    aliases.append(b["alias"])
+            return aliases
+
+        def _extract_timed_event_aliases(local_spec: Dict[str, Any], op_aliases: List[str]) -> List[str]:
+            aliases: List[str] = []
+            for b in (local_spec.get("bind") or []):
+                if not isinstance(b, dict):
+                    continue
+                if b.get("entity") == "dt_timed_event_denorm" and b.get("alias"):
+                    aliases.append(b["alias"])
+                if b.get("path") and b.get("alias") and b.get("from") in op_aliases:
+                    steps = b.get("path") or []
+                    if "dt_operation_metrics_to_dt_timed_event_denorm__by__pu_id" in steps:
+                        aliases.append(b["alias"])
+            return aliases
+
+        def _spec_has_cross_alias_where(local_spec: Dict[str, Any], left_alias: str, right_alias: str) -> bool:
+            for pred in (local_spec.get("where") or []):
+                aliases = _aliases_in_predicate(pred)
+                if left_alias in aliases and right_alias in aliases:
+                    return True
+            return False
+
+        def _spec_has_unplanned_filter(local_spec: Dict[str, Any]) -> bool:
+            for pred in (local_spec.get("where") or []):
+                if not isinstance(pred, dict):
+                    continue
+                if pred.get("op") == "==" and isinstance(pred.get("left"), dict) and isinstance(pred.get("right"), dict):
+                    left = pred.get("left") or {}
+                    right = pred.get("right") or {}
+                    if left.get("prop") == "is_unplanned" and right.get("value") is True:
+                        return True
+            return False
+
+        def _detect_unplanned_downtime_fanout(local_spec: Dict[str, Any], rids: List[str], q: str) -> bool:
+            if "availability_loss_drivers" not in (rids or []):
+                return False
+            ql = (q or "").lower()
+            if "unplanned" not in ql and not _spec_has_unplanned_filter(local_spec):
+                return False
+            op_aliases = _extract_aliases_for_entity(local_spec, "dt_operation_metrics")
+            if not op_aliases:
+                return False
+            event_aliases = _extract_timed_event_aliases(local_spec, op_aliases)
+            if not event_aliases:
+                return False
+            # If there is a cross-alias predicate, assume an explicit join (e.g., time overlap) and allow.
+            if _spec_has_cross_alias_where(local_spec, op_aliases[0], event_aliases[0]):
+                return False
+            return True
+
+        def _build_safe_op_metrics_spec(source_spec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+            ent = specs_by_name.get("dt_operation_metrics")
+            if ent is None:
+                return None
+            safe = _build_spec_for_entity(ent, ["ideal_time_seconds"])
+            op_aliases = _extract_aliases_for_entity(source_spec, "dt_operation_metrics")
+            if op_aliases:
+                op_where = _filter_where_by_alias(source_spec.get("where") or [], op_aliases[0])
+                if op_where:
+                    safe["where"] = op_where
+            return safe
+
+        if _detect_unplanned_downtime_fanout(spec, reasoner_ids, question):
+            original_spec = json.loads(json.dumps(spec, default=str))
+            safe_spec = _build_safe_op_metrics_spec(original_spec)
+            if safe_spec:
+                spec = safe_spec
+                reasoner_context["availability_loss_drivers"] = {
+                    "mode": "unplanned_downtime",
+                    "source_spec": original_spec,
+                }
+                print("[DEBUG] Rewriting spec to avoid fanout join; using multi-query reasoner path.")
+                sys.stdout.flush()
+
         def _run_spec_with_timeout(local_spec: Dict[str, Any]) -> Optional[pd.DataFrame]:
             rai_timeout = int(os.environ.get("RAI_QUERY_TIMEOUT_SECONDS", "300"))
             result_holder = [None]
@@ -1496,8 +1573,6 @@ def run_orchestrate(
                             break
 
                     except Exception as e:
-                        if isinstance(e, AuthExpiredError):
-                            raise
                         last_error = e
                         retry_count += 1
                         print(f"[WARNING] Query execution failed (attempt {retry_count}/{max_retries}): {str(e)[:200]}")
@@ -1542,9 +1617,17 @@ def run_orchestrate(
 
             print(f"[DEBUG] Query returned {len(results_df) if results_df is not None else 0} rows")
             sys.stdout.flush()
+            try:
+                if isinstance(results_df, pd.DataFrame):
+                    print(f"[DEBUG] Base results_df shape: rows={len(results_df)} cols={len(results_df.columns)}")
+                else:
+                    print(f"[DEBUG] Base results_df type: {type(results_df).__name__}")
+            except Exception as e:
+                print(f"[DEBUG] Base results_df shape check failed: {e}")
 
         reasoner_results = {}
         reasoning_context = ""
+        base_results_df = results_df
         if apply_all_relevant_reasoners is not None:
             try:
                 reasoner_payload = apply_all_relevant_reasoners(
@@ -1552,11 +1635,27 @@ def run_orchestrate(
                     spec=spec,
                     df=results_df if results_df is not None else pd.DataFrame(),
                     reasoner_ids=reasoner_ids,
+                    context=reasoner_context,
                 ) or {}
                 if isinstance(reasoner_payload, dict):
-                    results_df = reasoner_payload.get("dataframe") or results_df
+                    df_candidate = reasoner_payload.get("dataframe")
+                    if isinstance(df_candidate, pd.DataFrame):
+                        # Only replace base results when candidate has rows,
+                        # or when base is empty/None.
+                        if df_candidate.empty:
+                            if base_results_df is None or base_results_df.empty:
+                                results_df = df_candidate
+                        else:
+                            results_df = df_candidate
                     reasoner_results = reasoner_payload.get("reasoner_results") or {}
                     reasoning_context = reasoner_payload.get("reasoning_context") or ""
+                try:
+                    if isinstance(results_df, pd.DataFrame):
+                        print(f"[DEBUG] Post-reasoner results_df shape: rows={len(results_df)} cols={len(results_df.columns)}")
+                    else:
+                        print(f"[DEBUG] Post-reasoner results_df type: {type(results_df).__name__}")
+                except Exception as e:
+                    print(f"[DEBUG] Post-reasoner results_df shape check failed: {e}")
             except Exception as e:
                 print(f"[WARNING] Reasoner orchestration failed (non-critical): {e}", file=sys.stderr)
                 sys.stderr.flush()
@@ -1566,6 +1665,13 @@ def run_orchestrate(
         # ============================================================
         _update_stage("linking")
         print("[DEBUG] Step 5: Formatting results...")
+        try:
+            if isinstance(results_df, pd.DataFrame):
+                print(f"[DEBUG] Step 5 results_df shape: rows={len(results_df)} cols={len(results_df.columns)}")
+            else:
+                print(f"[DEBUG] Step 5 results_df type: {type(results_df).__name__}")
+        except Exception as e:
+            print(f"[DEBUG] Step 5 results_df shape check failed: {e}")
         
         # Handle empty or None results
         if results_df is None or results_df.empty:
@@ -1660,9 +1766,12 @@ def run_orchestrate(
             if rows:
                 try:
                     chart_df = pd.DataFrame(rows)
+                    print(f"[DEBUG] Chart rows={len(rows)} chart_df rows={len(chart_df)} cols={len(chart_df.columns)}", file=sys.stderr)
                 except Exception as e:
                     print(f"[WARNING] Failed to convert rows to DataFrame: {e}", file=sys.stderr)
                     sys.stderr.flush()
+            else:
+                print("[DEBUG] Chart skipped: rows empty", file=sys.stderr)
             
             chart_dict = _generate_plotly_chart(
                 session=session,
@@ -1680,8 +1789,6 @@ def run_orchestrate(
                 sys.stderr.flush()
                 
         except Exception as e:
-            if isinstance(e, AuthExpiredError):
-                raise
             print(f"[WARNING] Chart generation failed (non-critical): {e}", file=sys.stderr)
             sys.stderr.flush()
         
@@ -1700,8 +1807,6 @@ def run_orchestrate(
         return payload
         
     except Exception as e:
-        if isinstance(e, AuthExpiredError):
-            raise
         print(f"[ERROR] Orchestration failed: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()

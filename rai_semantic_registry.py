@@ -108,7 +108,6 @@ class RegistryConfig:
     """Optional registry config flags."""
     post_compute_derived_metrics: bool = False
     allow_sql_derived_expr: bool = False
-    allow_multi_fact_aggregations: bool = False
 
 
 def _field(
@@ -315,7 +314,6 @@ def _config_from_dict(data: dict) -> RegistryConfig:
     return RegistryConfig(
         post_compute_derived_metrics=bool(data.get("post_compute_derived_metrics", False)),
         allow_sql_derived_expr=bool(data.get("allow_sql_derived_expr", False)),
-        allow_multi_fact_aggregations=bool(data.get("allow_multi_fact_aggregations", False)),
     )
 
 
@@ -1161,9 +1159,12 @@ def load_reasoners() -> List[ReasonerSpec]:
             "signal_low_performance",
         ],
     }
-    if payload and isinstance(payload, dict):
-        reasoners = []
-        for item in payload.get("reasoners") or []:
+    # If the registry payload explicitly includes a "reasoners" key, treat it as an
+    # authoritative override. This allows registries for other domains to disable
+    # the built-in fallback reasoners by setting `"reasoners": []`.
+    if payload and isinstance(payload, dict) and "reasoners" in payload:
+        reasoners: List[ReasonerSpec] = []
+        for item in (payload.get("reasoners") or []):
             if isinstance(item, dict):
                 spec = _reasoner_from_dict(item)
                 if spec.id:
@@ -1181,8 +1182,7 @@ def load_reasoners() -> List[ReasonerSpec]:
                                 type=spec.type,
                             )
                         )
-        if reasoners:
-            return reasoners
+        return reasoners
     return [
         ReasonerSpec(
             id="mandate_risk",
@@ -1489,8 +1489,10 @@ def validate_registry() -> List[str]:
     
     # Check 4: default_metric exists
     for entity in entities:
-        if entity.default_metric not in field_map[entity.name]:
-            errors.append(f"ERROR: Entity '{entity.name}' default_metric '{entity.default_metric}' not found in fields")
+        if entity.default_metric and entity.default_metric not in field_map[entity.name]:
+            errors.append(
+                f"ERROR: Entity '{entity.name}' default_metric '{entity.default_metric}' not found in fields"
+            )
     
     # Check 5 & 6: Derived field dependencies
     for entity in entities:
